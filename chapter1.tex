@@ -1,0 +1,135 @@
+\section{Getting Started}
+
+\subsection{"What am I supposed to do with these files?"}
+
+The .tex files are what you edit.
+What you want to get out of them is a PDF file.
+This requires a \LaTeX\ compiler.
+If you just want to get started and avoid The Complicated Stuff I'd recommend a free online compiler such as Overleaf (\url{https://www.overleaf.com/} \parencite{overleaf}).
+Simply take the provided zip file and upload it with \textbf{New Project$\big\bracevert$Upload Project}.
+Under the project menu, make sure to configure the TeX Live version to the latest.
+
+\subsubsection{The Complicated Stuff}
+
+For editing and compiling \LaTeX\ projects locally on your computer, I'd recommend VS Code with the \href{https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop}{LaTeX Workshop} extension \parencite{workshop}.
+You'll also need a \TeX\ distribution (I'd recommend \href{https://www.tug.org/texlive/acquire-netinstall.html}{TeX Live} \parencite{texlive}).
+If you don't do a full install, you'll need to manually install packages as compilation errors crop up.
+
+For the minted package (used for code syntax highlighting), Python needs to be installed along with Python's \textbf{Pymgents} package \parencite{pygmentize}.
+
+Specify the following VS Code settings to enable the usage of the minted package, and to place generated files into an \texttt{out/} subfolder (try deleting this subfolder if you are experiencing weird compilation issues).
+\begin{minted}{json}
+"latex-workshop.latex.outDir": "%DIR%/out",
+"latex-workshop.latex.tools": [{
+    "name": "latexmk",
+    "command": "latexmk",
+    "args": ["--shell-escape", "-synctex=1", "-interaction=nonstopmode", "-pdf", "-outdir=%OUTDIR%", "%DOC%"]
+}],
+"latex-workshop.latex.recipes": [{
+    "name": "latexmk",
+    "tools": ["latexmk"]
+}]
+\end{minted}
+
+Restart VS Code, then with VS Code open the \texttt{xamk-template} folder.
+Open the \texttt{xamk-template.tex} file.
+A \TeX\ view should appear in the side bar.
+Select \textbf{\TeX$\big\bracevert$Build LaTeX Project$\big\bracevert$Recipe: latexmk}, wait for the compilation to finish, then view the PDF from \textbf{\TeX$\big\bracevert$View LaTeX PDF}.
+
+\subsection{Formatting}
+
+{\centering\sc \large A Simple Sample \LaTeX\ File \parencite{formatting}\par}
+\centerline{\sc Stupid Stuff I Wish Someone Had Told Me Four Years Ago}
+\centerline{\it (Read the .tex file along with this or it won't make much sense)}
+
+The first thing to realize about \LaTeX\ is that it is not ``WYSIWYG''.
+In other words, it isn't a word processor; what you type into your .tex file is not what you'll see in your PDF.
+For example, \LaTeX\ will      completely     ignore               extra    spaces    within                             a line of your .tex file.
+Pressing return
+in
+the
+middle
+of
+a
+line
+will not register in your PDF.
+However, a double carriage-return is read as a paragraph break.
+
+Like this.
+But any carriage-returns after the first two will be completely ignored; in other words, you
+
+
+can't
+
+add
+
+
+
+
+
+
+more
+
+
+
+
+space
+
+
+between
+
+
+
+
+lines, no matter how many times you press return in your .tex file.
+
+In order to add vertical space you have to use ``vspace''; for example, you could add 2 centimeters of space by typing \verb|\vspace{2cm}|, like this:
+\vspace{2cm}
+
+To get three lines of space you would type \verb|\vspace{3pc}| (``pc'' stands for ``pica'', a font-relative size), like this:
+\vspace{3pc}
+
+Notice that \LaTeX\ commands are always preceded by a backslash.
+Some commands, like \verb|\vspace|, take arguments (here, a length) in curly brackets.
+
+The second important thing to notice about \LaTeX\ is that you type in various ``environments''.
+So far we've just been typing regular text (except for a few inescapable usages of \verb|\verb| and the centered, smallcaps, large title).
+There are basically two ways that you can enter and/or exit an environment;
+\vspace{0pc}
+
+\centerline{this is the first way...}
+
+\begin{center}
+	this is the second way.
+\end{center}
+
+\noindent Actually there is one more way, used above; for example, {\sc this way}.
+The way that you get in and out of environment varies depending on which kind of environment you want; for example, you use \verb|\underline| ``outside'', but \verb|\it| ``inside''; notice \underline{this} versus {\it this}.
+
+The real power of \LaTeX\ (for us) is in the math environment.
+You push and pop out of the math environment by typing \verb|$|.
+For example, $2x^3 - 1 = 5$ is typed between dollar signs as \verb|$2x^3 - 1 = 5$|.
+Perhaps a more interesting example is $\lim_{N \to \infty} \sum_{k=1}^N f(t_k) \Delta t$.
+
+You can get a fancier, display-style math environment by enclosing your equation with double dollar signs.
+This will center your equation, and display sub- and super-scripts in a more readable fashion:
+
+$$\lim_{N \to \infty} \sum_{k=1}^N f(t_k) \Delta t$$
+
+If you don't want your equation to be centered, but you want the nice indicies and all that, you can use \verb|\displaystyle| and get your formula ``in-line''; using our example this is $\displaystyle \lim_{N \to \infty} \sum_{k=1}^N f(t_k) \Delta t$.
+However, this can screw up your line spacing a little bit.
+
+There are many more things to know about \LaTeX\ and we can't possibly talk about them all here.
+You can use \LaTeX\ to get tables, commutative diagrams, figures, aligned equations, cross-references, labels, matrices, and all manner of strange things into your documents.
+You can control margins, spacing, alignment, {\it et cetera} to higher degrees of accuracy than the human eye can perceive.
+You can waste entire days typesetting documents to be ``just so''.
+\LaTeX\ can do anything, given you can find the package for the task.
+
+The best way to learn \LaTeX\ is by example.
+Get yourself a bunch of .tex files, see what kind of output they produce, and figure out how to modify them to do what you want.
+The internet is full of instructions and examples for how to do various things in \LaTeX\ \parencite{tex-google}.
+You'll need to do a lot of copy-pasting while learning how to use \LaTeX.
+Good luck!
+
+% Notice how each sentence starts from a new line. This helps with version control.
+% Also notice the occasional ``<text>'', which creates the fancier quotation marks.

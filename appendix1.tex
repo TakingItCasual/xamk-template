@@ -1,0 +1,59 @@
+\section{Test Appendix 1}
+
+\subsection{Standard Title Page}
+
+\verb|\xamkstudentname{<student name>}{<student number>}{<group ID>}|\\
+Specify your full name, student number, and group ID.
+Can be used multiple times if the document should be attributed to multiple students.
+
+\verb|\xamkpapertitle{<paper title>}|\\
+Specify the title of the paper.
+
+\verb|\xamkpapersubtitle{<paper subtitle>}|\\
+Specify the subtitle of the paper (this command is optional).
+
+\verb|\xamkpapertype{<paper type>}|\\
+Specify the type of the paper (assignment, report, ect.)
+
+\verb|\xamkcoursename{<course name>}|\\
+Specify the name of the course the paper is written for.
+
+\verb|\xamkpaperdate{<date>}|\\
+Specify the year/date the paper was written in.
+
+\verb|\maketitle|\\
+Prints title page with preceding information (must be called after preceding commands).
+
+\subsection{Thesis Title Page}
+
+The following commands should be used before \verb|\maketitle[thesis]| is used.
+the title, subtitle, and date commands are the same.
+
+\verb|\xamkstudentname{<student name>}|\\
+Replaces \verb|\xamkstudentname|.
+Specify your full name (only takes one name).
+
+\verb|\xamkthesistype{<degree type>}|\\
+Specify your degree type.
+Optional, defaults to "Bachelor's Degree".
+
+\verb|\xamkdegreeprogramme{Information Technology}|\\
+
+\verb|\maketitle[thesis]|\\
+Prints thesis title page with preceding information (must be called after preceding commands).
+
+\begin{comment}
+
+\clearpage
+\subsection{subsection 1}
+
+\section{Test appendix 2}
+
+\section{Test appendix 3}
+\clearpage
+\subsection{subsection 1}
+\clearpage
+\subsection{subsection 2}
+\clearpage
+
+\end{comment}

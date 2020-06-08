@@ -1,0 +1,63 @@
+% Use "lessxamk" to disable most of the official XAMK formatting.
+% Use "online" to stop minted from using out/ as an output directory (use on Overleaf).
+% Use "minted" to enable the creation of code blocks with syntax highlighting.
+% Use "listings" to provide an environment to display monospaced commands/paths/etc.
+% Use "pgfplots" to load the pgfplots package (used for graphs) and set some default styling.
+% Use "includebib" to enable usage of biblatex/biber (a .bib file is then expected).
+\documentclass[online, minted, listings, pgfplots, includebib]{xamk} % Use the xamk.cls document class
+\addbibresource{my-bib.bib} % Your bibliography BibTeX file goes here
+\addbibresource{test.bib}
+
+% If "attach.zip" exists in the same directory, it will be attached to the output PDF.
+% Anything meant to be written to the PDF should be within the document environment.
+\begin{document}
+	% Comments are written after a percent symbol. They are not compiled (i.e. rendered to the PDF).
+
+	% Choose one of the following two title page formats. Remove percent symbols to start editing.
+
+	% Format for title page of assignment/report/etc.
+	%\xamkstudent{John Smith}{1234567}{ITMI17SP}
+	%\xamkstudent{Jane Smith}{1234568}{ITMI17SP} % More than 1 student can be listed
+	%\xamkstudent{Jake Smith}{1234569}{ITMI17SP} % The only limit is space
+	%\xamkpapertitle{Assignment 3}
+	%\xamkpapersubtitle{Doing The Thing} % Optional
+	%\xamkpapertype{Assignment}
+	%\xamkcoursename{Computer Hardware}
+    %\xamkpaperdate{2019}
+	%\maketitle % Creates title page with the preceding options (see xamk.cls)
+
+	% Format for title page of thesis.
+	\xamkstudentname{John Smith}
+	\xamkpapertitle{This And That And The Other Thing}
+	\xamkpapersubtitle{Doing The Thing} % Optional
+	\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
+	\xamkdegreeprogramme{Information Technology}
+	\xamkpaperdate{2019}
+	\maketitle[thesis] % Creates thesis title page with preceding options (see xamk.cls)
+
+    % Format for the thesis abstract page (some info copied from thesis title page).
+	\xamkpagecount{99} % Number of pages (not including appendices)
+	\xamkappendixpagecount{9} % Number of appendix pages
+	\xamkthesiscommissioner{Random Company Ltd.}
+	\xamkthesissupervisor{Bob Smith}
+	\xamkthesiskeywords{documentation, model, thesis, report writing}
+	\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of tex file containing abstract
+    \makethesisabstract % Creates thesis abstract page with preceding options (see xamk.cls)
+
+	\tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
+
+	% tex files can be imported with \input{} or \include{}
+	% \input{} just imports the file, while \include{} also ensures page breaks before and after
+	\input{chapter1} % Imports chapter1.tex from the same directory as xamk-template.tex
+	\input{chapter2}
+
+	% Use the lof command option to show the list of figures (relevant references removed from bib)
+	% Use the lot command option to show the list of tables (relevant references removed from bib)
+	% Use the notbib command option to hide the bibliography (e.g. if all references are in lof)
+    \makebibliography[lof, lot] % Automatically generates the bibliography using biblatex
+
+	% Appendix sections should be within the appendices environment
+	\begin{appendices}
+        \include{appendix1}
+    \end{appendices}
+\end{document}
