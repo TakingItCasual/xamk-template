@@ -3,7 +3,7 @@
 % Use "minted" to enable the creation of code blocks with syntax highlighting.
 % Use "listings" to provide an environment to display monospaced commands/paths/etc.
 % Use "pgfplots" to load the pgfplots package (used for graphs) and set some default styling.
-% Use "includebib" to enable usage of biblatex/biber (a .bib file is then expected).
+% Use "includebib" to enable usage of biblatex/biber (.bib file(s) must be imported).
 \documentclass[online, minted, listings, pgfplots, includebib]{xamk} % Use the xamk.cls document class
 \addbibresource{my-bib.bib} % Your bibliography BibTeX file goes here
 \addbibresource{test.bib}
@@ -24,25 +24,25 @@
 	%\xamkpapertype{Assignment}
 	%\xamkcoursename{Computer Hardware}
     %\xamkpaperdate{2019}
-	%\maketitle % Creates title page with the preceding options (see xamk.cls)
+	\maketitle % Creates title page with the preceding options (see xamk.cls)
 
 	% Format for title page of thesis.
-	\xamkstudentname{John Smith}
-	\xamkpapertitle{This And That And The Other Thing}
-	\xamkpapersubtitle{Doing The Thing} % Optional
-	\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
-	\xamkdegreeprogramme{Information Technology}
-	\xamkpaperdate{2019}
-	\maketitle[thesis] % Creates thesis title page with preceding options (see xamk.cls)
+	%\xamkstudentname{John Smith}
+	%\xamkpapertitle{This And That And The Other Thing}
+	%\xamkpapersubtitle{Doing The Thing} % Optional
+	%\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
+	%\xamkdegreeprogramme{Information Technology}
+	%\xamkpaperdate{2019}
+	%\maketitle[thesis] % Creates thesis title page with preceding options (see xamk.cls)
 
     % Format for the thesis abstract page (some info copied from thesis title page).
-	\xamkpagecount{99} % Number of pages (not including appendices)
-	\xamkappendixpagecount{9} % Number of appendix pages
-	\xamkthesiscommissioner{Random Company Ltd.}
-	\xamkthesissupervisor{Bob Smith}
-	\xamkthesiskeywords{documentation, model, thesis, report writing}
-	\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of tex file containing abstract
-    \makethesisabstract % Creates thesis abstract page with preceding options (see xamk.cls)
+	%\xamkpagecount{99} % Number of pages (not including appendices)
+	%\xamkappendixpagecount{9} % Number of appendix pages
+	%\xamkthesiscommissioner{Random Company Ltd.}
+	%\xamkthesissupervisor{Bob Smith}
+	%\xamkthesiskeywords{documentation, model, thesis, report writing}
+	%\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of tex file containing abstract
+    %\makethesisabstract % Creates thesis abstract page with preceding options (see xamk.cls)
 
 	\tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
 

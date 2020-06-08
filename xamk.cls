@@ -545,7 +545,7 @@
 }
 
 % Include the title page in page numbering. See https://tex.stackexchange.com/a/172005
-\renewenvironment{titlepage}{\thispagestyle{empty}}{}
+\renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
 
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
 
@@ -644,7 +644,7 @@
 \newcommand*\makethesisabstract{
     \thesisabstractgeometry
     \begin{singlespace}
-    \thispagestyle{empty}
+    \thispagestyle{empty} % Don't print page number
 	\begin{tikzpicture}[remember picture, overlay, x=0.33pt, y=0.33pt]
         \xamkdrawlogo
 	\end{tikzpicture}
@@ -674,6 +674,7 @@
         \end{tabularx}
     \tcbline
         \noindent\begin{tabularx}{\textwidth}
+        % Just enough space for a 3 digit number of appendix pages
         {@{} >{\hsize=1.44\hsize}X >{\hsize=0.56\hsize}X @{}}
         \textbf{Thesis title}
         \vspace*{0.5pc}

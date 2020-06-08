@@ -26,21 +26,57 @@ Prints title page with preceding information (must be called after preceding com
 
 \subsection{Thesis Title Page}
 
-The following commands should be used before \verb|\maketitle[thesis]| is used.
 the title, subtitle, and date commands are the same.
 
 \verb|\xamkstudentname{<student name>}|\\
-Replaces \verb|\xamkstudentname|.
+Used in place of \verb|\xamkstudentname|.
 Specify your full name (only takes one name).
 
 \verb|\xamkthesistype{<degree type>}|\\
+Used in place of \verb|\xamkpapertype|.
 Specify your degree type.
 Optional, defaults to "Bachelor's Degree".
 
-\verb|\xamkdegreeprogramme{Information Technology}|\\
+\verb|\xamkdegreeprogramme{<degree programme>}|\\
+Used in place of \verb|\xamkcoursename|.
+Specify your degree program.
 
 \verb|\maketitle[thesis]|\\
 Prints thesis title page with preceding information (must be called after preceding commands).
+
+\subsection{Thesis Abstract Page}
+
+\verb|\xamkpagecount{<number>}|\\
+Specify the number of pages, not including appendix pages.
+
+\verb|\xamkappendixpagecount{<number>}|\\
+Specify the number of appendix pages.
+
+\verb|\xamkthesiscommissioner{<commissioner>}|\\
+Specify the commissioner (e.g. a company) of the thesis.
+
+\verb|\xamkthesissupervisor{<supervisor>}|\\
+Specify the full name of the teacher supervising the thesis.
+
+\verb|\xamkthesiskeywords{<keywords>}|\\
+Specify a list of keywords for the thesis.
+
+\verb|\xamkthesisabstractfile{<abstract file>}|\\
+Specify the \verb|.tex| file containing the text of the abstract.
+
+\verb|\makethesisabstract|\\
+Prints thesis abstract with preceding information.
+
+\subsection{Bibliography}
+
+\verb|\makebibliography|\\
+Prints the bibliography, and list of figures/tabels if configured to.
+Use the \verb|lof| (and/or \verb|lot|) option(s) to print the list of figures/tables and move figure/table bibliography entries there.
+Use the \verb|notbib| option to cancel printing the bibliography (e.g. if only the lof is needed).
+
+\verb|\citecaption{<cite key>}{<caption>}|\\
+Used in figure and table environments.
+Inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate settings set for \verb|\makebibliography|.
 
 \begin{comment}
 
