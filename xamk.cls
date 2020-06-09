@@ -6,10 +6,6 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{xamk}[2020/06/09 TakingItCasual's XAMK assignment/thesis template]
 
-\def\@@ptsize{12pt}
-%\DeclareOption{10pt}{\def\@@ptsize{10pt}}
-%\DeclareOption{11pt}{\def\@@ptsize{11pt}}
-%\DeclareOption{12pt}{\def\@@ptsize{12pt}}
 \DeclareOption{online}{\def\@onlineflag{}} % Needed for minted output folder setting
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -18,12 +14,26 @@
 \DeclareOption{includebib}{\def\@includebibflag{}} % Set up biblatex with biber
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptions\relax
+\def\@@ptsize{12pt}
 \LoadClass[a4paper, \@@ptsize]{article}
 
 \RequirePackage{etoolbox} % Needed for logic in this class file
 \RequirePackage{pgfkeys} % Needed for named command options
 \RequirePackage{xcolor} % Needed for background color behind code blocks
-\RequirePackage{inconsolata} % Changes the \ttfamily font to something better
+\RequirePackage[mono]{inconsolata} % Better \ttfamily font (load before text encoding)
+    % Inconsolata doesn't have italics, refer requests for italics font to normal font
+    \@namedef{T1/zi4/m/it}{<->ssub*zi4/m/n}
+    \@namedef{T1/zi4/b/it}{<->ssub*zi4/b/n}
+    \@namedef{T1/zi4/bx/it}{<->ssub*zi4/b/n}
+    \@namedef{T1/zi4/m/sl}{<->ssub*zi4/m/n}
+    \@namedef{T1/zi4/b/sl}{<->ssub*zi4/b/n}
+    \@namedef{T1/zi4/bx/sl}{<->ssub*zi4/b/n}
+    \@namedef{TS1/zi4/m/it}{<->ssub*zi4/m/n}
+    \@namedef{TS1/zi4/b/it}{<->ssub*zi4/b/n}
+    \@namedef{TS1/zi4/bx/it}{<->ssub*zi4/b/n}
+    \@namedef{TS1/zi4/m/sl}{<->ssub*zi4/m/n}
+    \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
+    \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
 \RequirePackage[immediate]{silence} % Needed to silence some annoying warnings
 
 % Package options to use if the official layout is used
@@ -42,11 +52,11 @@
 \ifdef{\@reqmintedflag}{
     % TODO: Find (or check if latexmk has implemented) a way to automate this
     \ifdef{\@onlineflag}{}{\PassOptionsToPackage{outputdir=out}{minted}}
-    \RequirePackage[cache=false]{minted} % Needed for code blocks with syntax highlighting
     % The [cache=false] option is needed to prevent errors in TeXstudio
+    \RequirePackage[cache=false]{minted} % Needed for code blocks with syntax highlighting
 
     \definecolor{mintedbgcolor}{rgb}{0.95, 0.95, 0.95}
-    % Set default options for code blocks, such as bg color and line numbering.
+    % Set default options for code blocks, such as bg color and line numbering
     \setminted{
         frame=lines,
         framesep=2mm,
@@ -73,7 +83,7 @@
 % pgfplots is quite a large package (slows compilation), so its usage has been made optional
 \ifdef{\@reqpgfplotsflag}{
     \RequirePackage{pgfplots} % Needed for fancy graphs
-    	\pgfplotsset{compat=newest} % See https://tex.stackexchange.com/a/139695
+    	\pgfplotsset{compat=newest} % See tex.stackexchange.com/a/139695
 
     % Set default options for pgfplots graphs (most are related to the grid).
     \pgfplotsset{
@@ -98,7 +108,7 @@
     \patchcmd{\env@matrix}% Right-align matrices
         {\array{*\c@MaxMatrixCols c}}%
         {\array{*\c@MaxMatrixCols r}}{}{}
-\RequirePackage{mathtools} % See https://tex.stackexchange.com/a/43009
+\RequirePackage{mathtools} % See tex.stackexchange.com/a/43009
     \DeclarePairedDelimiter\abs{\lvert}{\rvert}
         \let\@oldabs\abs
         \def\abs{\@ifstar{\@oldabs}{\@oldabs*}}
@@ -125,7 +135,7 @@
 \RequirePackage{everyshi} % Needed for incrementing counters every page
 \RequirePackage[titletoc]{appendix} % Adds Appendix before section numbering in ToC
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
-\RequirePackage{parskip} % Needed for vertical spacing (must be imported after tocloft)
+\RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
 \RequirePackage[notbib, nottoc]{tocbibind} % Add LoF and LoT to ToC
 %\RequirePackage{lipsum} % Needed for filler text
 
@@ -135,11 +145,11 @@
     \AtBeginDocument{\embedfile{./attach.zip}}
 }{}
 
-% filecontents can't be put under anything (https://tex.stackexchange.com/a/44467/156666)
-\WarningFilter[temp-file]{latex}{Writing or overwriting file}
+% filecontents can't be put under anything (tex.stackexchange.com/a/44467)
 \begingroup\newif\ifbibincluded
 \ifdef{\@includebibflag}{\bibincludedtrue}{}
 \ifbibincluded
+\WarningFilter[temp-file]{latex}{Writing or overwriting file}
 \begin{filecontents}[overwrite]{xamkbibdm.dbx}
 \DeclareDatamodelFields[type=field, datatype=literal]{doctype}
 \DeclareDatamodelFields[type=field, datatype=datepart]{
@@ -155,12 +165,12 @@
 \DeclareDatamodelFields[type=field, datatype=date, skipout]{lastmoddate}
 \DeclareDatamodelEntryfields{doctype, lastmoddate}
 \end{filecontents}
-\fi\endgroup
 \DeactivateWarningFilters[temp-file]
+\fi\endgroup
 
 % biblatex complains if no .bib resources are given, so its usage has been made optional
 \ifdef{\@includebibflag}{
-    \RequirePackage{xpatch} % Needed for some more advanced bibliography format changes
+    \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
     \RequirePackage[
         datamodel=xamkbibdm, % Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,
@@ -284,27 +294,27 @@
 }{}
 
 % Official XAMK page margins.
-\newcommand*\xamkpagegeometry{%
+\newcommand*\@xamkpagegeometry{%
     \newgeometry{left=4.3cm, right=2.0cm, top=2.25cm, bottom=1.25cm,%
         headheight=14.5pt}}
 % Custom page margins for the title page.
-\newcommand*\titlepagegeometry{%
+\newcommand*\@titlepagegeometry{%
     \newgeometry{left=3.0cm, right=3.0cm, top=3.0cm, bottom=3.0cm}}
 % Custom page margins for thesis abstract
-\newcommand*\thesisabstractgeometry{%
+\newcommand*\@thesisabstractgeometry{%
     \newgeometry{left=1.5cm, right=1.5cm, top=1.5cm, bottom=1.5cm}}
 % Custom page margins for the table of contents
-\newcommand*\tableofcontentsgeometry{%
+\newcommand*\@tableofcontentsgeometry{%
     \newgeometry{left=1.75cm, right=1.75cm, top=1.75cm, bottom=1.75cm}}
 % Custom page margins for appendices (large headheight to allow for header)
-\newcommand*\xamkappendixgeometry{%
+\newcommand*\@xamkappendixgeometry{%
     \newgeometry{left=4.3cm, right=2.0cm, top=2.25cm, bottom=1.25cm,%
         headheight=42.0pt, headsep=0pt}}
 
 % Official section/ToC formatting
 \newcommand*\@xamktoclayout{
     % Makes section headings all caps, and make font size same as paragraphs
-    \WarningFilter[temp-sectsty]{latex}{Command} % See https://tex.stackexchange.com/a/311003
+    \WarningFilter[temp-sectsty]{latex}{Command} % See tex.stackexchange.com/a/311003
     \RequirePackage{sectsty}
     \DeactivateWarningFilters[temp-sectsty]
         \let\SS@makeulinesect\relax
@@ -336,7 +346,7 @@
     % Redefine \tableofcontents to add custom geometry and line spacing
     \let\@@oldtableofcontents\tableofcontents
     \renewcommand\tableofcontents{
-        \tableofcontentsgeometry
+        \@tableofcontentsgeometry
 
         \renewcommand{\baselinestretch}{1.5}\normalsize
         \@@oldtableofcontents
@@ -373,7 +383,7 @@
     % TODO: Add appendix total page count
     \AtBeginEnvironment{appendices}{
         \pretocmd{\section}{\clearpage}{}{} % Force appendix sections to start from new pages
-        \xamkappendixgeometry
+        \@xamkappendixgeometry
         \singlespacing
 
         % Create a counter to indicate section page number
@@ -396,9 +406,9 @@
 
 % Apply the official XAMK layout. Can be disabled with the lessxamk class option.
 \ifundef{\@lessxamkflag}{
-    \xamkpagegeometry
+    \@xamkpagegeometry
     \RequirePackage{helvet} % Provides the helvet font
-        \renewcommand{\familydefault}{\sfdefault} % Set Helvet as default font
+        \renewcommand*{\familydefault}{\sfdefault} % Set Helvet as default font
         \RequirePackage[helvet]{sfmath} % Set Helvet as default font for math
     \@xamktoclayout % Apply official section/ToC formatting
     \@xamkloftlayout % Apply official list of figures/tables formatting
@@ -544,7 +554,7 @@
 	\end{tikzpicture}
 }
 
-% Include the title page in page numbering. See https://tex.stackexchange.com/a/172005
+% Include the title page in page numbering. See tex.stackexchange.com/a/172005
 \renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
 
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
@@ -589,7 +599,7 @@
     \pgfkeys{/maketitle, #1}
     \newbool{thesistitle}\setbool{thesistitle}{\pgfkeysvalueof{/maketitle/thesis}}
 
-    \titlepagegeometry
+    \@titlepagegeometry
     \begin{singlespace}
 	\begin{titlepage}
 		\begin{center}
@@ -642,7 +652,7 @@
 \newenvironment{tcbrow}{\setlength{\parskip}{0.5\baselineskip}}{\setlength{\parskip}{0pc}}
 % Command for rendering the thesis abstract
 \newcommand*\makethesisabstract{
-    \thesisabstractgeometry
+    \@thesisabstractgeometry
     \begin{singlespace}
     \thispagestyle{empty} % Don't print page number
 	\begin{tikzpicture}[remember picture, overlay, x=0.33pt, y=0.33pt]

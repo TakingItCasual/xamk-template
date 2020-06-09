@@ -1,9 +1,9 @@
-\section{New and Modified Commands}
+\section{List of Commands}
 
 Standard title page commands:
 \begin{minted}{latex}
 \xamkstudentname{<student name>}{<student number>}{<group ID>}
-% Specify your full name, student number, and group ID. Can be used multiple times if the document should be attributed to multiple students.
+% Specify your full name, student number, and group ID. Can be used multiple times to attribute the document to multiple students.
 \xamkpapertitle{<paper title>}
 % Specify the title of the paper.
 \xamkpapersubtitle{<paper subtitle>}
@@ -45,12 +45,12 @@ Thesis abstract page commands:
 \xamkthesisabstractfile{<abstract file>}
 % Specify the .tex file containing the text of the abstract.
 \makethesisabstract
-% Prints thesis abstract with preceding information.
+% Prints thesis abstract (must be called after preceding commands).
 \end{minted}
 
 Bibliography commands:
 \begin{minted}{latex}
-\makebibliography
+\makebibliography[<options>]
 % Prints the bibliography, and (if configured) list of figures/tables. Use the lof (and/or lot) option(s) to print the list of figures/tables and move figure/table bibliography entries there. Use the notbib option to cancel printing the bibliography (e.g. if only the lof is needed).
 \citecaption{<cite key>}{<caption>}
 % Defined for the figure and table environments. Inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate settings set for \makebibliography.
