@@ -1,8 +1,8 @@
 \section{Some Examples}
 
-\subsection{Table}
+\subsection{Tables}
 
-Notice the missing | and \verb|\hline| in the chapter2.tex file and their effect.
+Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their effects.
 
 % If you don't need a caption/label you can remove the table environment.
 \begin{table}[H]
@@ -10,18 +10,18 @@ Notice the missing | and \verb|\hline| in the chapter2.tex file and their effect
     % extra | before first l and missing | after the last l
     \begin{tabular}[b]{ || l | l  }
     	\hline % "\\" adds a linebreak, "\hline" adds a horizontal line
-    	placeholder 1 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
-    	placeholder 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
-    	placeholder 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
+    	Measurement 1 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
+    	Measurement 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
+    	Measurement 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
     \end{tabular}
     \caption{An example table} % \citecaption can also be used in tables
     \label{tab:tabletest}
 \end{table}
 
-\subsection{Equation group}
+\subsection{Mathematics}
 
-For physics units, \verb|\si{}| can be used to easily distinguish units from variables (variables are italic).
-% The "&"s control alignment. Try moving them around to adjust alignment.
+% For physics units, \si{} can be used to distinguish units from variables (variables are italic).
+% The "&"s control alignment (aside from the matrix env). Try moving them around to adjust alignment.
 \begin{align*}
     % _{} is used for subscript, ^{} is used for superscript
 	V_{cuboid} &= w h l = 20.49\si{mm} \times 20.47\si{mm} \times 18.63\si{mm} \approx 7814\si{mm^{3}} \\ 
@@ -31,7 +31,10 @@ For physics units, \verb|\si{}| can be used to easily distinguish units from var
 	\num{1000000} &= \num{1000000000000} \times \num{0.000001} \\
 	x &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \\
 	\int_{x^2 + y^2 \leq R^2} & f(x,y)\,dx\,dy
-	    = \int_{\theta=0}^{2\pi} \int_{r=0}^R f(r\cos\theta,r\sin\theta) r\,dr\,d\theta.
+	    = \int_{\theta=0}^{2\pi} \int_{r=0}^R f(r\cos\theta,r\sin\theta) r\,dr\,d\theta. \\
+    \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}&
+        \begin{bmatrix} 7 & 8 \\ 9 & 10 \\ 11 & 12 \end{bmatrix} =
+        \begin{bmatrix} 58 & 64 \\ 139 & 154 \end{bmatrix}
 	% If \\ was included after the last row it'd create an extra empty line of space below
 \end{align*}
 % Empty lines should be avoided around an align* environment, to preserve page space.
@@ -59,7 +62,7 @@ It's a cube with a hole through the top. Try changing the value of \texttt{cubex
     \label{fig:cube}
 \end{figure}
 
-\subsection{Graph}
+\subsection{Graphs}
 
 % If you don't need the caption/label you can remove the figure environment.
 \begin{figure}[H]
@@ -129,7 +132,7 @@ private void StoreItemClicked(object sender, SelectionChangedEventArgs e) {
 \end{minted}
 \end{comment}
 
-\subsection{Image}
+\subsection{Images}
 
 A figure containing an image and a caption:
 % Figures (and tables) will reorder your layout if they're forced onto the next page.

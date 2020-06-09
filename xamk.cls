@@ -4,7 +4,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/08 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/09 TakingItCasual's XAMK assignment/thesis template]
 
 \def\@@ptsize{12pt}
 %\DeclareOption{10pt}{\def\@@ptsize{10pt}}
