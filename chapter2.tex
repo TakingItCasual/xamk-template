@@ -7,6 +7,9 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 % If you don't need a caption/label you can remove the table environment.
 \begin{table}[H]
     %\centering
+    % Table captions should go above their tables, according to the official styling
+    \caption{An example table} % \citecaption can also be used in tables
+    \label{tab:tabletest}
     % extra | before first l and missing | after the last l
     \begin{tabular}[b]{ || l | l  }
     	\hline % "\\" adds a linebreak, "\hline" adds a horizontal line
@@ -14,8 +17,6 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
     	Measurement 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
     	Measurement 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
     \end{tabular}
-    \caption{An example table} % \citecaption can also be used in tables
-    \label{tab:tabletest}
 \end{table}
 
 \subsection{Mathematics}

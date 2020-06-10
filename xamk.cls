@@ -4,7 +4,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/09 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/10 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{online}{\def\@onlineflag{}} % Needed for minted output folder setting
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
@@ -38,7 +38,7 @@
 
 % Package options to use if the official layout is used
 \ifundef{\@lessxamkflag}{
-    \PassOptionsToPackage{font=small, labelsep=period}{caption}
+    \PassOptionsToPackage{font={small, singlespacing}, labelsep=period}{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
     \ifdef{\@includebibflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
@@ -61,22 +61,22 @@
         frame=lines,
         framesep=2mm,
         baselinestretch=1.2,
-        bgcolor=mintedbgcolor,
+        bgcolor=mintedbgcolor,% TODO: Fix issue with line breaks at end of page
         fontsize=\small,
-        linenos,
-        breaklines}
+        linenos,% Enable line numbering
+        breaklines}% By default, long lines just run off the side of the page
     
     \AtBeginEnvironment{minted}{% Remove often incorrect error boxes
         \renewcommand{\fcolorbox}[4][]{#4}}
 }{}
 
 \ifdef{\@reqlistingsflag}{
-    \RequirePackage{listings} % Useful for basic commandline snippets
+    \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
 
     \lstset{
         basicstyle=\ttfamily,
-        breaklines=true,
-        postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}
+        breaklines=true,% Same reason as for minted
+        postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}% Similar to minted's
     }
 }{}
 
@@ -105,7 +105,7 @@
 \RequirePackage{tikz} % Needed for drawing shapes
     \usetikzlibrary{backgrounds}
 \RequirePackage[fleqn]{amsmath} % Needed for math equations/formulas
-    \patchcmd{\env@matrix}% Right-align matrices
+    \patchcmd{\env@matrix}% Default to right-aligning matrices
         {\array{*\c@MaxMatrixCols c}}%
         {\array{*\c@MaxMatrixCols r}}{}{}
 \RequirePackage{mathtools} % See tex.stackexchange.com/a/43009
@@ -172,14 +172,14 @@
 \ifdef{\@includebibflag}{
     \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
     \RequirePackage[
-        datamodel=xamkbibdm, % Load entry/field definitions from xamkbibdm.dbx file
+        datamodel=xamkbibdm,% Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,
         bibstyle=authoryear,
-        dashed=false, % Don't use dashes for duplicate author-years(?)
-        uniquename=init, % Needed so the following option doesn't give a warning
-        giveninits=true, % Abbreviate names (except for last name)
-        urldate=long, % Output urldate field in natural text format
-        dateabbrev=false, % Use full month names instead of abbreviations
+        dashed=false,% Don't use dashes for duplicate author-years(?)
+        uniquename=init,% Needed so the following option doesn't give a warning
+        giveninits=true,% Abbreviate names (except for last name)
+        urldate=long,% Output urldate field in natural text format
+        dateabbrev=false,% Use full month names instead of abbreviations
         defernumbers=true
         ]{biblatex} % Handles the bibliography
 
@@ -253,8 +253,8 @@
     % Set options for \makebibliography command to show list of figures/tables
     \pgfkeys{
         /makebibliography/.is family, /makebibliography,
-        lof/.default = true, % lof's value if "lof" option given to command (without value)
-        lof/.initial = false, % lof's value if "lof" option not given to command
+        lof/.default = true,% lof's value if "lof" option given to command (without value)
+        lof/.initial = false,% lof's value if "lof" option not given to command
         lot/.default = true,
         lot/.initial = false,
         notbib/.default = true,

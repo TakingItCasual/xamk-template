@@ -1,5 +1,21 @@
 \section{List of Commands}
 
+\texttt{xamk} document class options:
+\begin{minted}{latex}
+lessxamk
+% By default, lots of formatting is done with spacings, margins, the bibliography and citations, fonts, justification, etc. Using this option brings the formatting closer to LaTeX's defaults.
+online
+% To be removed (hopefully). An output directory of "out/" has been configured locally, and the minted package needs its output directory explicitly configured. Use this option when compiling on Overleaf, or just when a separate output directory isn't configured.
+minted
+% Enables the minted package, used for code blocks with syntax highlighting. Requires Python and Python's Pygments package to be installed. Sets some default stylings.
+listings
+% Enables the listings package, used for command-line snippets. Sets some default stylings. (Simpler to use than minted.)
+pgfplots
+% Enables the pgfplots package, used for graphs. Sets some default grid stylings. Large/slow, importing premade graph images may be preferred.
+includebib
+% Enables the biblatex package, used for bibliographies. Sets the format according to XAMK's guidelines. \addbibresource{<file>} must then be used to import the needed bibliography .bib file(s).
+\end{minted}
+%
 Standard title page commands:
 \begin{minted}{latex}
 \xamkstudentname{<student name>}{<student number>}{<group ID>}
