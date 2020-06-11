@@ -52,7 +52,7 @@
     \RequirePackage{currfile-abspath}
         \getabspath{\jobname.log}
         \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
-            {}{\PassOptionsToPackage{outputdir=out}{minted}}
+            {}{\PassOptionsToPackage{outputdir=\theabsdir}{minted}}
     % The [cache=false] option is needed to prevent errors in TeXstudio
     \RequirePackage[cache=false]{minted} % Needed for code blocks with syntax highlighting
 
