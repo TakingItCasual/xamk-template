@@ -1,5 +1,5 @@
 % See appendix 1 for a list of options for the xamk document class
-\documentclass[online, minted, listings, pgfplots, includebib]{xamk} % Use the xamk.cls document class
+\documentclass[minted, listings, pgfplots, includebib]{xamk} % Use the xamk.cls document class
 \addbibresource{my-bib.bib} % Your bibliography BibTeX file goes here
 \addbibresource{test.bib}
 
@@ -46,12 +46,10 @@
 	\input{chapter1} % Imports chapter1.tex from the same directory as xamk-template.tex
 	\input{chapter2}
 
-	% Use the lof command option to show the list of figures (relevant references removed from bib)
-	% Use the lot command option to show the list of tables (relevant references removed from bib)
-	% Use the notbib command option to hide the bibliography (e.g. if all references are in lof)
+	% See appendix 1 for a description of this command's options
     \makebibliography[lof, lot] % Automatically generates the bibliography using biblatex
 
-	% Appendix sections should be within the appendices environment
+	% Appendix sections are expected to be within the appendices environment
 	\begin{appendices}
         \include{appendix1}
     \end{appendices}

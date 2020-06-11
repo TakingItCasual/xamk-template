@@ -4,9 +4,8 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/10 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/11 TakingItCasual's XAMK assignment/thesis template]
 
-\DeclareOption{online}{\def\@onlineflag{}} % Needed for minted output folder setting
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
 \DeclareOption{listings}{\def\@reqlistingsflag{}} % Require the listing package
@@ -42,7 +41,7 @@
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
     \ifdef{\@includebibflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
-}{ % Package options to use if the official layout is not used
+}{% Package options to use if the official layout is not used
     \PassOptionsToPackage{title}{appendix}
     \ifdef{\@includebibflag}{%
         \PassOptionsToPackage{citestyle=numeric}{biblatex}}{}
@@ -50,8 +49,10 @@
 
 % minted depends on Python's Pygments package, so its usage has been made optional
 \ifdef{\@reqmintedflag}{
-    % TODO: Find (or check if latexmk has implemented) a way to automate this
-    \ifdef{\@onlineflag}{}{\PassOptionsToPackage{outputdir=out}{minted}}
+    \RequirePackage{currfile-abspath}
+        \getabspath{\jobname.log}
+        \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
+            {}{\PassOptionsToPackage{outputdir=out}{minted}}
     % The [cache=false] option is needed to prevent errors in TeXstudio
     \RequirePackage[cache=false]{minted} % Needed for code blocks with syntax highlighting
 
@@ -134,6 +135,8 @@
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage{everyshi} % Needed for incrementing counters every page
 \RequirePackage[titletoc]{appendix} % Adds Appendix before section numbering in ToC
+    \pretocmd{\appendix}{\ClassError{xamk}%
+        {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
 \RequirePackage[notbib, nottoc]{tocbibind} % Add LoF and LoT to ToC
@@ -414,14 +417,14 @@
     \@xamkloftlayout % Apply official list of figures/tables formatting
     \@xamkapplayout % Apply official appendix formatting
     \onehalfspacing % Set line spacing to 1.5
-    %\AtBeginEnvironment{thebibliography}{\singlespacing} % Line spacing is already 1?
+    \AtBeginEnvironment{thebibliography}{\singlespacing} % Line spacing is already 1?
     \RequirePackage{fancyhdr} % Allows customization of the header and footer
         \pagestyle{fancy}
         \fancyhf{} % Clear whatever defaults the header and footer may have
         \renewcommand\headrulewidth{0pc} % Remove the header bar
         \chead{\thepage} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification
-}{ % Commands to run if the official layout isn't used
+}{% Commands to run if the official layout isn't used
     % Make captions include the section they're in.
     \numberwithin{equation}{section}
     \numberwithin{figure}{section}
