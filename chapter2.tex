@@ -61,7 +61,7 @@ It's a cube with a hole through the top. Try changing the value of \texttt{cubex
         \pgfmathsetmacro\circlez{\cubez/2}
         \draw[fill=black] (-\circlex,0,-\circlez) ellipse (0.1 and 0.05);
     \end{tikzpicture}
-    \citecaption{cube}{A cube drawn with TikZ} % 1st argument is the citation key, 2nd is the caption
+    \citecaption{cube}{A cube drawn with TikZ}
     \label{fig:cube}
 \end{figure}
 
@@ -112,19 +112,19 @@ echo "is this thing working?" > test.txt
 
 Some inlined paths: \lstinline{C:\Windows}, \lstinline{~/.bashrc} % \verb|| works as well
 
-Some Python code with syntax highlighting:
-% The starting line number is set with "firstnumber".
-% {python} sets the language, use "pygmentize -L lexers" to get full list of supported languages.
-\begin{minted}[firstnumber=11]{python}
+% Settings within square brackets "[]" are optional.
+% The starting line number is set with minted's "firstnumber".
+% {python} sets the language, see https://pygments.org/docs/lexers/ for the language list.
+\begin{code}[firstnumber=11]{python}[title={Some Python code with syntax highlighting},label=code:python-eg]
 def zip_gen(tuple_list):
     for index in range(min(len(tuple_list[0]), len(tuple_list[1]))):
         yield {tuple_list[0][index]: tuple_list[1][index]}
-\end{minted}
+\end{code}
 
 \begin{comment} % This section is hidden due to the comment environment
 Some C-sharp code with syntax highlighting:
 % {csharp} sets syntax highlighting to C#.
-\begin{minted}[firstnumber=11]{csharp}
+\begin{code}{csharp}
 private void StoreItemClicked(object sender, SelectionChangedEventArgs e) {
     if(Store.SelectedIndex != -1) {
         booksInCart.Add(booksInStore[Store.SelectedIndex]);
@@ -132,7 +132,7 @@ private void StoreItemClicked(object sender, SelectionChangedEventArgs e) {
     }
     Refresh_ListBoxes();
 }
-\end{minted}
+\end{code}
 \end{comment}
 
 \subsection{Images}
@@ -145,6 +145,6 @@ A figure containing an image and a caption:
 \begin{figure}[H]
 	%\centering % Uncomment to center the image and its caption
 	\includegraphics[width=0.8\linewidth]{eye.png}
-	\citecaption{human-eye}{The human eye} % 1st argument is the citation key, 2nd is the caption
+	\citecaption{human-eye}{The human eye}
 	\label{fig:human-eye}
 \end{figure}

@@ -4,7 +4,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/11 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/15 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -20,7 +20,7 @@
 \RequirePackage{pgfkeys} % Needed for named command options
 \RequirePackage{xcolor} % Needed for background color behind code blocks
 \RequirePackage[mono]{inconsolata} % Better \ttfamily font (load before text encoding)
-    % Inconsolata doesn't have italics, refer requests for italics font to normal font
+    % Inconsolata doesn't have italics, refer italics/slanted font requests to normal font
     \@namedef{T1/zi4/m/it}{<->ssub*zi4/m/n}
     \@namedef{T1/zi4/b/it}{<->ssub*zi4/b/n}
     \@namedef{T1/zi4/bx/it}{<->ssub*zi4/b/n}
@@ -33,6 +33,7 @@
     \@namedef{TS1/zi4/m/sl}{<->ssub*zi4/m/n}
     \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
     \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
+\RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
 \RequirePackage[immediate]{silence} % Needed to silence some annoying warnings
 
 % Package options to use if the official layout is used
@@ -49,26 +50,20 @@
 
 % minted depends on Python's Pygments package, so its usage has been made optional
 \ifdef{\@reqmintedflag}{
-    \RequirePackage{currfile-abspath}
+    \RequirePackage{currfile-abspath} % Apparently only works reliably with TeX Live?
         \getabspath{\jobname.log}
         \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
             {}{\PassOptionsToPackage{outputdir=\theabsdir}{minted}}
     % The [cache=false] option is needed to prevent errors in TeXstudio
     \RequirePackage[cache=false]{minted} % Needed for code blocks with syntax highlighting
-
-    \definecolor{mintedbgcolor}{rgb}{0.95, 0.95, 0.95}
-    % Set default options for code blocks, such as bg color and line numbering
-    \setminted{
-        frame=lines,
-        framesep=2mm,
-        baselinestretch=1.2,
-        bgcolor=mintedbgcolor,% TODO: Fix issue with line breaks at end of page
-        fontsize=\small,
-        linenos,% Enable line numbering
-        breaklines}% By default, long lines just run off the side of the page
+    % The "code" TCBListing environment is declared after tcolorbox is loaded
+    \PassOptionsToPackage{minted, breakable}{tcolorbox}
     
-    \AtBeginEnvironment{minted}{% Remove often incorrect error boxes
-        \renewcommand{\fcolorbox}[4][]{#4}}
+    % Disable syntax error highlighting, as it's unneeded and has false positives
+    \AtBeginEnvironment{minted}{\@disablefcolorbox}
+    \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
+    \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
+    \xpatchcmd{\mintinline}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
 }{}
 
 \ifdef{\@reqlistingsflag}{
@@ -76,7 +71,7 @@
 
     \lstset{
         basicstyle=\ttfamily,
-        breaklines=true,% Same reason as for minted
+        breaklines=true,% Breaks lines rather than running off the page
         postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}% Similar to minted's
     }
 }{}
@@ -142,6 +137,27 @@
 \RequirePackage[notbib, nottoc]{tocbibind} % Add LoF and LoT to ToC
 %\RequirePackage{lipsum} % Needed for filler text
 
+% Creates the minted "code" environment using tcolorbox
+\ifdef{\@reqmintedflag}{
+    \DeclareTCBListing{code}{O{}m!O{}}{%
+        colback=blue!5!white,% Set background to light blue
+        sharp corners,% I prefer this to the rounded corners
+        left=0pc,right=0pc,% Left padding removed so line numbers show properly
+        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
+        breakable,enhanced jigsaw,% Properly break across pages
+        listing engine=minted,% Use minted for syntax hightlighting
+        listing only,% Disable the secondary code display
+        minted language=#2,
+        minted options={
+            baselinestretch=1.2,
+            fontsize=\small,
+            linenos,% Enable line numbering
+            breaklines,% Breaks lines rather than running off the page
+            autogobble,% Removes common leading whitespace
+            #1},
+        #3}
+}{}
+
 % If attach.zip exists in same directory, attach to PDF
 \IfFileExists{./attach.zip}{
     \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
@@ -173,7 +189,6 @@
 
 % biblatex complains if no .bib resources are given, so its usage has been made optional
 \ifdef{\@includebibflag}{
-    \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
     \RequirePackage[
         datamodel=xamkbibdm,% Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,

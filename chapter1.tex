@@ -18,7 +18,7 @@ If you don't do a full install, you'll need to manually install packages as comp
 For the minted package (used for code syntax highlighting), Python needs to be installed along with Python's \textbf{Pymgents} package \parencite{pygmentize}.
 
 Specify the following VS Code settings to enable the usage of the minted package, and to place generated files into an \texttt{out/} subfolder (try deleting this subfolder if you are experiencing weird compilation issues).
-\begin{minted}{json}
+\begin{code}{json}[label=code:vscode-config]
 "latex-workshop.latex.outDir": "%DIR%/out",
 "latex-workshop.latex.tools": [{
     "name": "latexmk",
@@ -29,7 +29,7 @@ Specify the following VS Code settings to enable the usage of the minted package
     "name": "latexmk",
     "tools": ["latexmk"]
 }]
-\end{minted}
+\end{code}
 
 Restart VS Code, then with VS Code open the \texttt{xamk-template} folder.
 Open the \texttt{xamk-template.tex} file.

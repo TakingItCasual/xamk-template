@@ -1,21 +1,19 @@
-\section{List of Commands}
+\section{List of Options, Commands, and Environments}
 
-\texttt{xamk} document class options:
-\begin{minted}{latex}
+\begin{code}{latex}[title={\texttt{xamk} document class options},label=code:class-options]
 lessxamk
 % By default, lots of formatting is done with spacings, margins, the bibliography and citations, fonts, justification, etc. Using this option brings the formatting closer to LaTeX's defaults.
 minted
-% Enables the minted package, used for code blocks with syntax highlighting. Requires Python and Python's Pygments package to be installed. Sets some default stylings.
+% Enables the minted package, used for code blocks with syntax highlighting. Requires Python and Python's Pygments package to be installed. Provides the "code" environment.
 listings
 % Enables the listings package, used for command-line snippets. Sets some default stylings. (Simpler to use than minted.)
 pgfplots
-% Enables the pgfplots package, used for graphs. Sets some default grid stylings. Large/slow, importing premade graph images may be preferred.
+% Enables the pgfplots package, used for graphs. Sets some default grid stylings.
 includebib
-% Enables the biblatex package, used for bibliographies. Sets the format according to XAMK's guidelines. \addbibresource{<file>} must then be used to import the needed bibliography .bib file(s).
-\end{minted}
+% Enables the biblatex package, used for the bibliography. Sets the format according to XAMK's guidelines. \addbibresource{<file>} must then be used to import the needed bibliography .bib file(s).
+\end{code}
 %
-Standard title page commands:
-\begin{minted}{latex}
+\begin{code}{latex}[title={Standard title page commands},label=code:std-cmds]
 \xamkstudentname{<student name>}{<student number>}{<group ID>}
 % Specify your full name, student number, and group ID. Can be used multiple times to attribute the document to multiple students.
 \xamkpapertitle{<paper title>}
@@ -23,17 +21,16 @@ Standard title page commands:
 \xamkpapersubtitle{<paper subtitle>}
 % Specify the subtitle of the paper (this command is optional).
 \xamkpapertype{<paper type>}
-% Specify the type of the paper (assignment, report, ect.)
+% Specify the type of the paper (assignment, report, etc.)
 \xamkcoursename{<course name>}
 % Specify the name of the course the paper is written for.
 \xamkpaperdate{<date>}
 % Specify the year/date the paper was written in.
 \maketitle
 % Prints title page (must be called after preceding commands).
-\end{minted}
+\end{code}
 %
-Thesis title page commands (title, subtitle, and date commands are the same):
-\begin{minted}{latex}
+\begin{code}{latex}[title={Thesis title page commands (reuses title/subtitle/date commands)},label=code:thesis-cmds]
 \xamkstudentname{<student name>}
 % Used in place of \xamkstudentname. Specify your full name (one name only).
 \xamkdegreetype{<degree type>}
@@ -42,10 +39,9 @@ Thesis title page commands (title, subtitle, and date commands are the same):
 % Used in place of \xamkcoursename. Specify your degree program.
 \maketitle[thesis]
 % Prints title page in thesis format (must be called after preceding commands).
-\end{minted}
+\end{code}
 %
-Thesis abstract page commands:
-\begin{minted}{latex}
+\begin{code}{latex}[title={Thesis abstract page commands},label=code:thesis-abstract]
 \xamkpagecount{<number>}
 % Specify the number of pages, not including appendix pages.
 \xamkappendixpagecount{<number>}
@@ -60,15 +56,19 @@ Thesis abstract page commands:
 % Specify the .tex file containing the text of the abstract.
 \makethesisabstract
 % Prints thesis abstract (must be called after preceding commands).
-\end{minted}
-
-Bibliography commands:
-\begin{minted}{latex}
+\end{code}
+%
+\begin{code}{latex}[title={Bibliography commands},label=code:bib-cmds]
 \makebibliography[<options>]
 % Prints the bibliography, and (if configured) list of figures/tables. Use the lof (and/or lot) option(s) to print the list of figures/tables and move figure/table bibliography entries there. Use the notbib option to cancel printing the bibliography (e.g. if only the lof is needed).
 \citecaption{<cite key>}{<caption>}
 % Defined for the figure and table environments. Inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate settings set for \makebibliography.
-\end{minted}
+\end{code}
+%
+\begin{code}{latex}[title={Environments},label=code:envs]
+{code}[<minted options>]{<language>}[<tcblisting options>]
+% Provided with the minted class option. Minted options (e.g. starting line number or font size) are specified before the language, while TCBListing options (e.g. title or label) are specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+\end{code}
 
 \begin{comment}
 
