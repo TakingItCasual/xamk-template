@@ -133,8 +133,7 @@
         sharp corners,% XAMK is all about those sharp edges, judging from its logo
         left=0pc,right=0pc,% Left padding removed so line numbers show properly
         top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
-        breakable,enhanced jigsaw,% Properly break across pages
-        listing only}% Disable the secondary code display
+        breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage{everyshi} % Needed for incrementing counters every page
 \RequirePackage[titletoc]{appendix} % Adds Appendix before section numbering in ToC
@@ -148,6 +147,7 @@
 % Creates the minted "code" environment using tcolorbox
 \ifdef{\@reqmintedflag}{
     \DeclareTCBListing{code}{O{} m! O{}}{% 1st optional, 2nd mandatory, 3rd optional
+        listing only,% Disable the secondary code display
         listing engine=minted,% Use minted for syntax hightlighting
         minted language=#2,
         minted options={
@@ -162,6 +162,7 @@
 % Creates the listings "cmd" environment using tcolorbox
 \ifdef{\@reqlistingsflag}{
     \DeclareTCBListing{cmd}{O{}}{
+        listing only,% Not available without minted/listings (don't put into tcbset)
         listing engine=listings,
         listing options={% Inherits from listings' lstset command
             basicstyle=\small\ttfamily,% Use small font, and properly apply inconsolata
