@@ -1,4 +1,4 @@
-\section{List of Options, Commands, and Environments}
+\section{New and Modified Commands/Options/Etc.}
 
 \begin{code}{latex}[title={\texttt{xamk} document class options},label=code:class-options]
 lessxamk
@@ -9,11 +9,11 @@ listings
 % Enables the listings package, used for command-line snippets. Sets some default stylings. (Simpler to use than minted.)
 pgfplots
 % Enables the pgfplots package, used for graphs. Sets some default grid stylings.
-includebib
+bib
 % Enables the biblatex package, used for the bibliography. Sets the format according to XAMK's guidelines. \addbibresource{<file>} must then be used to import the needed bibliography .bib file(s).
 \end{code}
 %
-\begin{code}{latex}[title={Standard title page commands},label=code:std-cmds]
+\begin{code}[firstnumber=last]{latex}[title={Standard title page commands},label=code:std-cmds]
 \xamkstudentname{<student name>}{<student number>}{<group ID>}
 % Specify your full name, student number, and group ID. Can be used multiple times to attribute the document to multiple students.
 \xamkpapertitle{<paper title>}
@@ -30,7 +30,7 @@ includebib
 % Prints title page (must be called after preceding commands).
 \end{code}
 %
-\begin{code}{latex}[title={Thesis title page commands (reuses title/subtitle/date commands)},label=code:thesis-cmds]
+\begin{code}[firstnumber=last]{latex}[title={Thesis title page commands (reuses title/subtitle/date commands)},label=code:thesis-cmds]
 \xamkstudentname{<student name>}
 % Used in place of \xamkstudentname. Specify your full name (one name only).
 \xamkdegreetype{<degree type>}
@@ -41,7 +41,7 @@ includebib
 % Prints title page in thesis format (must be called after preceding commands).
 \end{code}
 %
-\begin{code}{latex}[title={Thesis abstract page commands},label=code:thesis-abstract]
+\begin{code}[firstnumber=last]{latex}[title={Thesis abstract page commands},label=code:thesis-abstract]
 \xamkpagecount{<number>}
 % Specify the number of pages, not including appendix pages.
 \xamkappendixpagecount{<number>}
@@ -58,16 +58,25 @@ includebib
 % Prints thesis abstract (must be called after preceding commands).
 \end{code}
 %
-\begin{code}{latex}[title={Bibliography commands},label=code:bib-cmds]
+\begin{code}[firstnumber=last]{latex}[title={Bibliography commands},label=code:bib-cmds]
 \makebibliography[<options>]
 % Prints the bibliography, and (if configured) list of figures/tables. Use the lof (and/or lot) option(s) to print the list of figures/tables and move figure/table bibliography entries there. Use the notbib option to cancel printing the bibliography (e.g. if only the lof is needed).
 \citecaption{<cite key>}{<caption>}
 % Defined for the figure and table environments. Inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate settings set for \makebibliography.
 \end{code}
 %
-\begin{code}{latex}[title={Environments},label=code:envs]
+\begin{code}[firstnumber=last]{latex}[title={Bibliography database fields},label=code:bib-fields]
+doctype
+% Goes with the url field. Specifies the document type (e.g. "PDF document"). If not specified, defaults to "WWW document".
+lastmoddate
+% Goes with the url field. Specifies the date when the document was last modified.
+\end{code}
+%
+\begin{code}[firstnumber=last]{latex}[title={Environments},label=code:envs]
 {code}[<minted options>]{<language>}[<tcblisting options>]
-% Provided with the minted class option. Minted options (e.g. starting line number or font size) are specified before the language, while TCBListing options (e.g. title or label) are specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+% Provided with the minted class option. Minted settings (e.g. starting line number or font size) can be specified before the language, while TCBListing settings (e.g. title or label) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+{cmd}[<tcblisting options>]
+% Provided with the listings class option. TCBListing settings (title, label, line prefix, etc.) can optionally be specified.
 \end{code}
 
 \begin{comment}

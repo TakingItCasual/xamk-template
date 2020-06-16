@@ -1,16 +1,17 @@
 % Unofficial LaTeX class file for XAMK assignments/theses/reports/etc.
 % This file is not meant to be modified, see xamk-template.tex instead
+% If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
 
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/15 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/16 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
 \DeclareOption{listings}{\def\@reqlistingsflag{}} % Require the listing package
 \DeclareOption{pgfplots}{\def\@reqpgfplotsflag{}} % Require the pgfplots package
-\DeclareOption{includebib}{\def\@includebibflag{}} % Set up biblatex with biber
+\DeclareOption{bib}{\def\@reqbiblatexflag{}} % Set up biblatex with biber
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptions\relax
 \def\@@ptsize{12pt}
@@ -40,11 +41,11 @@
 \ifundef{\@lessxamkflag}{
     \PassOptionsToPackage{font={small, singlespacing}, labelsep=period}{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
-    \ifdef{\@includebibflag}{%
+    \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
 }{% Package options to use if the official layout is not used
     \PassOptionsToPackage{title}{appendix}
-    \ifdef{\@includebibflag}{%
+    \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=numeric}{biblatex}}{}
 }
 
@@ -54,10 +55,10 @@
         \getabspath{\jobname.log}
         \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
             {}{\PassOptionsToPackage{outputdir=\theabsdir}{minted}}
-    % The [cache=false] option is needed to prevent errors in TeXstudio
-    \RequirePackage[cache=false]{minted} % Needed for code blocks with syntax highlighting
+    \RequirePackage[cache=false% Needed to prevent errors in TeXstudio
+        ]{minted} % Needed for code blocks with syntax highlighting
     % The "code" TCBListing environment is declared after tcolorbox is loaded
-    \PassOptionsToPackage{minted, breakable}{tcolorbox}
+    \PassOptionsToPackage{minted}{tcolorbox}
     
     % Disable syntax error highlighting, as it's unneeded and has false positives
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
@@ -68,12 +69,12 @@
 
 \ifdef{\@reqlistingsflag}{
     \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
+    \PassOptionsToPackage{listings}{tcolorbox}
 
     \lstset{
-        basicstyle=\ttfamily,
+        basicstyle=\ttfamily,% Used to properly apply inconsolata
         breaklines=true,% Breaks lines rather than running off the page
-        postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}% Similar to minted's
-    }
+        postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
 }{}
 
 % pgfplots is quite a large package (slows compilation), so its usage has been made optional
@@ -126,7 +127,14 @@
     ]{hyperref} % Enclose urls in \url{} to avoid errors
 \RequirePackage{setspace} % Needed for setting line spacing
 \RequirePackage{tabularx} % Needed for horizontal table stretching
-\RequirePackage[many]{tcolorbox} % Needed to vertically stretch table to page's bottom
+\RequirePackage[many, breakable]{tcolorbox} % Needed for abstract page and cmd/code boxes
+    \tcbset{
+        colback=blue!5!white,% Set background to light blue
+        sharp corners,% XAMK is all about those sharp edges, judging from its logo
+        left=0pc,right=0pc,% Left padding removed so line numbers show properly
+        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
+        breakable,enhanced jigsaw,% Properly break across pages
+        listing only}% Disable the secondary code display
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage{everyshi} % Needed for incrementing counters every page
 \RequirePackage[titletoc]{appendix} % Adds Appendix before section numbering in ToC
@@ -139,23 +147,26 @@
 
 % Creates the minted "code" environment using tcolorbox
 \ifdef{\@reqmintedflag}{
-    \DeclareTCBListing{code}{O{}m!O{}}{%
-        colback=blue!5!white,% Set background to light blue
-        sharp corners,% I prefer this to the rounded corners
-        left=0pc,right=0pc,% Left padding removed so line numbers show properly
-        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
-        breakable,enhanced jigsaw,% Properly break across pages
+    \DeclareTCBListing{code}{O{} m! O{}}{% 1st optional, 2nd mandatory, 3rd optional
         listing engine=minted,% Use minted for syntax hightlighting
-        listing only,% Disable the secondary code display
         minted language=#2,
         minted options={
-            baselinestretch=1.2,
+            baselinestretch=1.2,% Sets line spacing to 1.2
             fontsize=\small,
             linenos,% Enable line numbering
             breaklines,% Breaks lines rather than running off the page
             autogobble,% Removes common leading whitespace
             #1},
         #3}
+}{}
+% Creates the listings "cmd" environment using tcolorbox
+\ifdef{\@reqlistingsflag}{
+    \DeclareTCBListing{cmd}{O{}}{
+        listing engine=listings,
+        listing options={% Inherits from listings' lstset command
+            basicstyle=\small\ttfamily,% Use small font, and properly apply inconsolata
+            lineskip=0.2pc},% Sets line spacing to 1.2 (same as code env's)
+        #1}
 }{}
 
 % If attach.zip exists in same directory, attach to PDF
@@ -164,11 +175,12 @@
     \AtBeginDocument{\embedfile{./attach.zip}}
 }{}
 
-% filecontents can't be put under anything (tex.stackexchange.com/a/44467)
+% filecontents can't be put under anything, see tex.stackexchange.com/a/44467
 \begingroup\newif\ifbibincluded
-\ifdef{\@includebibflag}{\bibincludedtrue}{}
+\ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
 \ifbibincluded
 \WarningFilter[temp-file]{latex}{Writing or overwriting file}
+% Add doctype and lastmoddate bibliography database fields
 \begin{filecontents}[overwrite]{xamkbibdm.dbx}
 \DeclareDatamodelFields[type=field, datatype=literal]{doctype}
 \DeclareDatamodelFields[type=field, datatype=datepart]{
@@ -188,7 +200,7 @@
 \fi\endgroup
 
 % biblatex complains if no .bib resources are given, so its usage has been made optional
-\ifdef{\@includebibflag}{
+\ifdef{\@reqbiblatexflag}{
     \RequirePackage[
         datamodel=xamkbibdm,% Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,
@@ -331,12 +343,13 @@
 
 % Official section/ToC formatting
 \newcommand*\@xamktoclayout{
-    % Makes section headings all caps, and make font size same as paragraphs
-    \WarningFilter[temp-sectsty]{latex}{Command} % See tex.stackexchange.com/a/311003
+    % See tex.stackexchange.com/a/311003
+    \WarningFilter[temp-sectsty]{latex}{Command}
     \RequirePackage{sectsty}
     \DeactivateWarningFilters[temp-sectsty]
         \let\SS@makeulinesect\relax
         \let\SS@makeulinepartchap\relax
+    % Makes section headings all caps, and make font size same as paragraphs
     \allsectionsfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont}
     \sectionfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont\scshape\MakeUppercase}
 
@@ -572,7 +585,7 @@
 	\end{tikzpicture}
 }
 
-% Include the title page in page numbering. See tex.stackexchange.com/a/172005
+% Include the title page in page numbering, see tex.stackexchange.com/a/172005
 \renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
 
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text

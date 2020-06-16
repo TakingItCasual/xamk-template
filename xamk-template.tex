@@ -1,7 +1,7 @@
 % See appendix 1 for a list of options for the xamk document class
-\documentclass[minted, listings, pgfplots, includebib]{xamk} % Use the xamk.cls document class
-\addbibresource{my-bib.bib} % Your bibliography BibTeX file goes here
-\addbibresource{test.bib}
+\documentclass[minted, listings, pgfplots, bib]{xamk} % Use the xamk.cls document class
+\addbibresource{main.bib} % Your bibliography BibTeX file goes here
+\addbibresource{extra.bib}
 
 % If "attach.zip" exists in the same directory, it will be attached to the output PDF.
 % Anything meant to be written to the PDF should be within the document environment.
@@ -13,12 +13,12 @@
 	% Format for title page of assignment/report/etc.
 	%\xamkstudent{John Smith}{1234567}{ITMI17SP}
 	%\xamkstudent{Jane Smith}{1234568}{ITMI17SP} % More than 1 student can be listed
-	%\xamkstudent{Jake Smith}{1234569}{ITMI17SP} % The only limit is space
+	%\xamkstudent{Jake Smith}{1234569}{ITMI17SP} % The only limit is page space
 	%\xamkpapertitle{Assignment 3}
 	%\xamkpapersubtitle{Doing The Thing} % Optional
 	%\xamkpapertype{Assignment}
 	%\xamkcoursename{Computer Hardware}
-    %\xamkpaperdate{2019}
+    %\xamkpaperdate{2020}
 	\maketitle % Creates title page with the preceding options (see xamk.cls)
 
 	% Format for title page of thesis.
@@ -27,7 +27,7 @@
 	%\xamkpapersubtitle{Doing The Thing} % Optional
 	%\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
 	%\xamkdegreeprogramme{Information Technology}
-	%\xamkpaperdate{2019}
+	%\xamkpaperdate{2020}
 	%\maketitle[thesis] % Creates thesis title page with preceding options (see xamk.cls)
 
     % Format for the thesis abstract page (some info copied from thesis title page).

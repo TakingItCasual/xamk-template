@@ -104,15 +104,15 @@ It's a cube with a hole through the top. Try changing the value of \texttt{cubex
 
 \subsection{Monospace text}
 
-Some Linux commands:
-\begin{lstlisting}
-wget http://tex.stackexchange.com
-echo "is this thing working?" > test.txt
-\end{lstlisting}
-
 Some inlined paths: \lstinline{C:\Windows}, \lstinline{~/.bashrc} % \verb|| works as well
 
 % Settings within square brackets "[]" are optional.
+% The $, #, and space characters must be escaped to work properly.
+\begin{cmd}[title={Some command-line commands},label=code:linux-cmd,every listing line={\$\#>\ }]
+wget http://tex.stackexchange.com
+echo "is this thing working?" > test.txt
+\end{cmd}
+
 % The starting line number is set with minted's "firstnumber".
 % {python} sets the language, see https://pygments.org/docs/lexers/ for the language list.
 \begin{code}[firstnumber=11]{python}[title={Some Python code with syntax highlighting},label=code:python-eg]
@@ -144,7 +144,8 @@ A figure containing an image and a caption:
 % If you don't need a caption/label for a figure you can use just the \includegraphics command.
 \begin{figure}[H]
 	%\centering % Uncomment to center the image and its caption
-	\includegraphics[width=0.8\linewidth]{eye.png}
-	\citecaption{human-eye}{The human eye}
-	\label{fig:human-eye}
+	% The image is scaled to 80% of the page's line width
+	\includegraphics[width=0.8\linewidth]{LaTeX-logo.png}
+	\citecaption{latex-logo}{The \LaTeX\ logo}
+	\label{fig:latex-logo}
 \end{figure}
