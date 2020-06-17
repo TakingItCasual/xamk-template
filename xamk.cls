@@ -132,7 +132,6 @@
         colback=blue!5!white,% Set background to light blue
         sharp corners,% XAMK is all about those sharp edges, judging from its logo
         left=0pc,right=0pc,% Left padding removed so line numbers show properly
-        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage{everyshi} % Needed for incrementing counters every page
@@ -147,6 +146,7 @@
 % Creates the minted "code" environment using tcolorbox
 \ifdef{\@reqmintedflag}{
     \DeclareTCBListing{code}{O{} m! O{}}{% 1st optional, 2nd mandatory, 3rd optional
+        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         listing only,% Disable the secondary code display
         listing engine=minted,% Use minted for syntax hightlighting
         minted language=#2,
@@ -162,6 +162,7 @@
 % Creates the listings "cmd" environment using tcolorbox
 \ifdef{\@reqlistingsflag}{
     \DeclareTCBListing{cmd}{O{}}{
+        top=-0.5pc,bottom=-0.5pc,% Padding works differently for this, for some reason
         listing only,% Not available without minted/listings (don't put into tcbset)
         listing engine=listings,
         listing options={% Inherits from listings' lstset command
@@ -232,7 +233,8 @@
 
     % Biblatex bibliography format modifications
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
-    \renewcommand*\finalnamedelim{\addspace\&\addspace} % Use "&" instead of "and"
+    \renewcommand*\finalnamedelim{% Replace "and" with "&", and enable Oxford Comma
+        \ifthenelse{\value{listcount}>2}{\addcomma}{}\addspace\&\addspace}
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct}
     \xpatchbibmacro{bbx:editor}{\addcomma\space}{\space}{}{} % Remove comma
