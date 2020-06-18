@@ -60,7 +60,7 @@
     % The "code" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{minted}{tcolorbox}
     
-    % Disable syntax error highlighting, as it's unneeded and has false positives
+    % Disable syntax error highlighting, since it has false positives
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
@@ -233,18 +233,16 @@
 
     % Biblatex bibliography format modifications
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
-    \renewcommand*\finalnamedelim{% Replace "and" with "&", and enable Oxford Comma
-        \ifthenelse{\value{listcount}>2}{\addcomma}{}\addspace\&\addspace}
+    \DeclareDelimFormat{finalnamedelim}{%
+        \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}% Preserves Oxford Comma option
+        \addspace\&\space}% Redefine (based on original def) to use "&" instead of "and"
+    \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct}
     \xpatchbibmacro{bbx:editor}{\addcomma\space}{\space}{}{} % Remove comma
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
-    % Remove parentheses around date, add period before
-    \xpatchbibmacro{date+extrayear}% For older versions of biblatex
-        {\printtext[parens]}%
-        {\setunit*{\addperiod\addspace}\printtext}{}{}
-    \xpatchbibmacro{date+extradate}% For newer versions of biblatex
+    \xpatchbibmacro{date+extradate}% Remove parentheses around date, add period before
         {\printtext[parens]}%
         {\setunit*{\addperiod\addspace}\printtext}{}{}
     \DeclareFieldFormat{lastmoddate}{\bibstring{lastmodstr}\addspace#1}
@@ -271,6 +269,7 @@
     }
 
     % TODO: Figure out how to handle punctuation at end of caption
+    % TODO: Automatically add label? Do other environments need to be considered?
     % Command to set caption with citation, and prepare bibentry for LoF/LoT
     \newcommand\@citecaption[2]{%
         \ifundef{\@lessxamkflag}%
@@ -382,9 +381,9 @@
     \renewcommand\tableofcontents{
         \@tableofcontentsgeometry
 
-        \renewcommand{\baselinestretch}{1.5}\normalsize
+        \begin{onehalfspace}
         \@@oldtableofcontents
-        \renewcommand{\baselinestretch}{1.0}\normalsize
+        \end{onehalfspace}
 
         \restoregeometry
     }
@@ -420,16 +419,16 @@
         \@xamkappendixgeometry
         \singlespacing
 
-        % Create a counter to indicate section page number
-        \newcounter{myappendixpage}[section]
-        \EveryShipout{\stepcounter{myappendixpage}}
+        % Create a counter to indicate appendix section page number
+        \newcounter{xamkappendixpage}[section]
+        \EveryShipout{\stepcounter{xamkappendixpage}}
 
+        \chead{\thepage \\ ~\\} % Compensate for increased headheight (place higher)
         % Add "Appendix <appendix number> (page <appendix page>)" to the header
-        \chead{\thepage \\ ~\\}
-        \rhead{Appendix \thesection\ (page \number\numexpr\value{myappendixpage}+1\relax)}
+        \rhead{Appendix \thesection\ (page \number\numexpr\value{xamkappendixpage}+1\relax)}
 
         % Remove section header numbers
-        \renewcommand{\@seccntformat}[1]{}
+        \renewcommand*{\@seccntformat}[1]{}
     }
     \AtEndEnvironment{appendices}{
         \restoregeometry
@@ -448,7 +447,7 @@
     \@xamkloftlayout % Apply official list of figures/tables formatting
     \@xamkapplayout % Apply official appendix formatting
     \onehalfspacing % Set line spacing to 1.5
-    \AtBeginEnvironment{thebibliography}{\singlespacing} % Line spacing is already 1?
+    \pretocmd{\printbibliography}{\singlespacing}{}{} % Set bib's line spacing to 1
     \RequirePackage{fancyhdr} % Allows customization of the header and footer
         \pagestyle{fancy}
         \fancyhf{} % Clear whatever defaults the header and footer may have
