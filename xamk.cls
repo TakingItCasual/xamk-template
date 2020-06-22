@@ -5,7 +5,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/16 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/22 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -69,6 +69,7 @@
 
 \ifdef{\@reqlistingsflag}{
     \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
+    % The "cmd" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{listings}{tcolorbox}
 
     \lstset{
@@ -141,6 +142,7 @@
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
 \RequirePackage[notbib, nottoc]{tocbibind} % Add LoF and LoT to ToC
+\RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
 
 % Creates the minted "code" environment using tcolorbox
@@ -169,12 +171,6 @@
             basicstyle=\small\ttfamily,% Use small font, and properly apply inconsolata
             lineskip=0.2pc},% Sets line spacing to 1.2 (same as code env's)
         #1}
-}{}
-
-% If attach.zip exists in same directory, attach to PDF
-\IfFileExists{./attach.zip}{
-    \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
-    \AtBeginDocument{\embedfile{./attach.zip}}
 }{}
 
 % filecontents can't be put under anything, see tex.stackexchange.com/a/44467
@@ -593,9 +589,9 @@
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
 
 % The list of students. Defaults to "<Student Name> | <Student Number> | <Group ID>".
-\def\@xamkdefaultstudent{\@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID} \par}
+\def\@xamkdefaultstudent{\@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID}\par}
 \newcommand*\xamkstudent[3]{\listadd\@xamkstudentlist{#1 | #2 | #3}}
-\newcommand*\@iteratexamkstudents[1]{{#1 \\}}
+\newcommand*\@iteratexamkstudents[1]{{#1\\}}
 % The paper title. Defaults to "<Paper Title>".
 \newcommand*\xamkpapertitle[1]{\def\@xamkpapertitle{#1}}
 \xamkpapertitle{\@placehold{Paper Title}}
@@ -637,25 +633,25 @@
 	\begin{titlepage}
 		\begin{center}
 		    \@titlepageimages
-		{\Large \bf
+		{\Large\bf
 		    \notbool{thesistitle}{
     			\ifdef{\@xamkstudentlist}%
     			    {\forlistloop\@iteratexamkstudents{\@xamkstudentlist}}%
     			    {\@xamkdefaultstudent}%
-			}{\@xamkstudentname \par}
+			}{\@xamkstudentname\par}
 			\vspace*{3pc}
-			{\huge \@xamkpapertitle \par}
-			\ifdef{\@xamkpapersubtitle}{{\LARGE \@xamkpapersubtitle \par}}{}
+			{\huge\@xamkpapertitle\par}
+			\ifdef{\@xamkpapersubtitle}{{\LARGE\@xamkpapersubtitle\par}}{}
 			\vspace*{2pc}
 			\notbool{thesistitle}{%
-    			\@xamkpapertype \par
-    			\@xamkcoursename \par
+    			\@xamkpapertype\par
+    			\@xamkcoursename\par
 			}{%
-    			\@xamkdegreetype \par
-    			\@xamkdegreeprogramme \par
+    			\@xamkdegreetype\par
+    			\@xamkdegreeprogramme\par
 			}
 			\vspace*{2pc}
-			\@xamkpaperdate \par
+			\@xamkpaperdate\par
 		}
 		\end{center}
 	\end{titlepage}
@@ -681,10 +677,15 @@
 % Abstract for the thesis. Expects a file name as input. Defaults to "<Thesis Abstract>".
 \newcommand*\xamkthesisabstractfile[1]{\def\@xamkthesisabstractfile{#1}}
 
-% Set custom parskip for thesis abstract
-\newenvironment{tcbrow}{\setlength{\parskip}{0.5\baselineskip}}{\setlength{\parskip}{0pc}}
 % Command for rendering the thesis abstract
 \newcommand*\makethesisabstract{
+    % Set custom parskip for abstract (and restore default parskip after)
+    % If lessxamk, use default, otherwise use 1pc (even default needs to be explicitly set)
+    \newlength{\preabstractparskip}\setlength{\preabstractparskip}{\parskip}
+    \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
+        {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
+    \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}%
+        {\setlength{\parskip}{\preabstractparskip}}
     \@thesisabstractgeometry
     \begin{singlespace}
     \thispagestyle{empty} % Don't print page number
@@ -695,8 +696,8 @@
     enhanced, space to upper,
     height fill, sharp corners,
     segmentation style=solid,
-    colback=white,
-    middle=0.5pc, boxsep=0.1pc]
+    colback=white,% Background color
+    middle=0pc,boxsep=0.5pc]% Inner margins
         \ifundef{\@lessxamkflag}{\raggedright}{}
         \noindent\begin{tabularx}{\textwidth}
         {@{} >{\hsize=1.15\hsize}X >{\hsize=1.15\hsize}X >{\hsize=0.7\hsize}X @{}}

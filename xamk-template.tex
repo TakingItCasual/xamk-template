@@ -1,14 +1,14 @@
+% Comments are written after a percent symbol. They are not compiled (i.e. written to the PDF).
 % See appendix 1 for a list of options for the xamk document class
 \documentclass[minted, listings, pgfplots, bib]{xamk} % Use the xamk.cls document class
-\addbibresource{main.bib} % Your bibliography BibTeX file goes here
+\addbibresource{main.bib} % Add your bibliography BibTeX file with this command
 \addbibresource{extra.bib}
 
-% If "attach.zip" exists in the same directory, it will be attached to the output PDF.
-% Anything meant to be written to the PDF should be within the document environment.
+% Anything meant to be written to the PDF must be within the document environment.
 \begin{document}
-	% Comments are written after a percent symbol. They are not compiled (i.e. rendered to the PDF).
+    %\embedfile{./attach.zip} % Attach attach.zip file to output PDF
 
-	% Choose one of the following two title page formats. Remove percent symbols to start editing.
+	% Choose one of the following two title page formats. See appendix 1 for more information.
 
 	% Format for title page of assignment/report/etc.
 	%\xamkstudent{John Smith}{1234567}{ITMI17SP}
@@ -19,7 +19,7 @@
 	%\xamkpapertype{Assignment}
 	%\xamkcoursename{Computer Hardware}
     %\xamkpaperdate{2020}
-	\maketitle % Creates title page with the preceding options (see xamk.cls)
+	\maketitle % Creates title page with the preceding options
 
 	% Format for title page of thesis.
 	%\xamkstudentname{John Smith}
@@ -28,16 +28,16 @@
 	%\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
 	%\xamkdegreeprogramme{Information Technology}
 	%\xamkpaperdate{2020}
-	%\maketitle[thesis] % Creates thesis title page with preceding options (see xamk.cls)
+	%\maketitle[thesis] % Creates thesis title page with preceding options
 
     % Format for the thesis abstract page (some info copied from thesis title page).
-	%\xamkpagecount{99} % Number of pages (not including appendices)
+	%\xamkpagecount{999} % Number of pages (not including appendices)
 	%\xamkappendixpagecount{9} % Number of appendix pages
 	%\xamkthesiscommissioner{Random Company Ltd.}
 	%\xamkthesissupervisor{Bob Smith}
 	%\xamkthesiskeywords{documentation, model, thesis, report writing}
-	%\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of tex file containing abstract
-    %\makethesisabstract % Creates thesis abstract page with preceding options (see xamk.cls)
+	%\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of .tex file containing abstract
+    %\makethesisabstract % Creates thesis abstract page with preceding options
 
 	\tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
 
