@@ -34,7 +34,7 @@ bib
 \xamkstudentname{<student name>}
 % Used in place of \xamkstudentname. Specify your full name (one name only).
 \xamkdegreetype{<degree type>}
-% Used in place of \xamkpapertype. Specify your degree type. Optional, defaults to "Bachelor's Degree".
+% Used in place of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
 \xamkdegreeprogramme{<degree programme>}
 % Used in place of \xamkcoursename. Specify your degree program.
 \maketitle[thesis]
@@ -47,7 +47,7 @@ bib
 \xamkappendixpagecount{<number>}
 % Specify the number of appendix pages.
 \xamkthesiscommissioner{<commissioner>}
-% Specify the commissioner (e.g. a company) of the thesis.
+% Specify the commissioning organization/company/etc. of the thesis. Optional, defaults to "N/A".
 \xamkthesissupervisor{<supervisor>}
 % Specify the full name of the teacher supervising the thesis.
 \xamkthesiskeywords{<keywords>}
@@ -74,7 +74,7 @@ lastmoddate
 %
 \begin{code}[firstnumber=last]{latex}[title={Environments},label=code:envs]
 {code}[<minted options>]{<language>}[<tcblisting options>]
-% Provided with the minted class option. Minted settings (e.g. starting line number or font size) can be specified before the language, while TCBListing settings (e.g. title or label) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+% Provided with the minted class option. Minted settings (starting line number, font size, etc.) can be specified before the language, while TCBListing settings (title, label, etc.) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
 {cmd}[<tcblisting options>]
 % Provided with the listings class option. TCBListing settings (title, label, line prefix, etc.) can optionally be specified.
 \end{code}

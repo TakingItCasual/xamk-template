@@ -7,50 +7,50 @@
 % Anything meant to be written to the PDF must be within the document environment.
 \begin{document}
     %\embedfile{./attach.zip} % Attach attach.zip file to output PDF
-
-	% Choose one of the following two title page formats. See appendix 1 for more information.
-
-	% Format for title page of assignment/report/etc.
-	%\xamkstudent{John Smith}{1234567}{ITMI17SP}
-	%\xamkstudent{Jane Smith}{1234568}{ITMI17SP} % More than 1 student can be listed
-	%\xamkstudent{Jake Smith}{1234569}{ITMI17SP} % The only limit is page space
-	%\xamkpapertitle{Assignment 3}
-	%\xamkpapersubtitle{Doing The Thing} % Optional
-	%\xamkpapertype{Assignment}
-	%\xamkcoursename{Computer Hardware}
+    
+    % Choose one of the following two title page formats. See appendix 1 for more information.
+    
+    % Format for title page of assignment/report/etc.
+    %\xamkstudent{John Smith}{1234567}{ITMI17SP}
+    %\xamkstudent{Jane Smith}{1234568}{ITMI17SP} % More than 1 student can be listed
+    %\xamkstudent{Jake Smith}{1234569}{ITMI17SP} % The only limit is page space
+    %\xamkpapertitle{Assignment 3}
+    %\xamkpapersubtitle{Doing The Thing} % Optional
+    %\xamkpapertype{Assignment}
+    %\xamkcoursename{Computer Hardware}
     %\xamkpaperdate{2020}
-	\maketitle % Creates title page with the preceding options
-
-	% Format for title page of thesis.
-	%\xamkstudentname{John Smith}
-	%\xamkpapertitle{This And That And The Other Thing}
-	%\xamkpapersubtitle{Doing The Thing} % Optional
-	%\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
-	%\xamkdegreeprogramme{Information Technology}
-	%\xamkpaperdate{2020}
-	%\maketitle[thesis] % Creates thesis title page with preceding options
-
+    \maketitle % Creates title page with the preceding options
+    
+    % Format for title page of thesis.
+    %\xamkstudentname{John Smith}
+    %\xamkpapertitle{This And That And The Other Thing}
+    %\xamkpapersubtitle{Doing The Thing} % Optional
+    %\xamkdegreetype{Master's Degree} % Optional, defaults to "Bachelor's Degree"
+    %\xamkdegreeprogramme{Bachelor of Engineering}
+    %\xamkpaperdate{2020}
+    %\maketitle[thesis] % Creates thesis title page with preceding options
+    
     % Format for the thesis abstract page (some info copied from thesis title page).
-	%\xamkpagecount{999} % Number of pages (not including appendices)
-	%\xamkappendixpagecount{9} % Number of appendix pages
-	%\xamkthesiscommissioner{Random Company Ltd.}
-	%\xamkthesissupervisor{Bob Smith}
-	%\xamkthesiskeywords{documentation, model, thesis, report writing}
-	%\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of .tex file containing abstract
+    %\xamkpagecount{99} % Number of pages (not including appendices)
+    %\xamkappendixpagecount{9} % Number of appendix pages
+    %\xamkthesiscommissioner{Random Company Ltd.}
+    %\xamkthesissupervisor{Bob Smith}
+    %\xamkthesiskeywords{documentation, model, thesis, report writing}
+    %\xamkthesisabstractfile{thesis-abstract.tex} % Takes name of .tex file containing abstract
     %\makethesisabstract % Creates thesis abstract page with preceding options
-
-	\tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
-
-	% tex files can be imported with \input{} or \include{}
-	% \input{} just imports the file, while \include{} also ensures page breaks before and after
-	\input{chapter1} % Imports chapter1.tex from the same directory as xamk-template.tex
-	\input{chapter2}
-
-	% See appendix 1 for a description of this command's options
+    
+    \tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
+    
+    % tex files can be imported with \input{} or \include{}
+    % \input{} just imports the file, while \include{} also ensures page breaks before and after
+    \input{chapter1} % Imports chapter1.tex from the same directory as xamk-template.tex
+    \input{chapter2}
+    
+    % See appendix 1 for a description of this command's options
     \makebibliography[lof, lot] % Automatically generates the bibliography using biblatex
-
-	% Appendix sections are expected to be within the appendices environment
-	\begin{appendices}
+    
+    % Appendix sections are expected to be within the appendices environment
+    \begin{appendices}
         \include{appendix1}
     \end{appendices}
 \end{document}

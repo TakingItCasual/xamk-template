@@ -1,11 +1,12 @@
 % Unofficial LaTeX class file for XAMK assignments/theses/reports/etc.
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
+% For comments with a number, append the number to "tex.stackexchange.com/a/"
 
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/22 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/23 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -21,7 +22,7 @@
 \RequirePackage{pgfkeys} % Needed for named command options
 \RequirePackage{xcolor} % Needed for background color behind code blocks
 \RequirePackage[mono]{inconsolata} % Better \ttfamily font (load before text encoding)
-    % Inconsolata doesn't have italics, refer italics/slanted font requests to normal font
+    % Inconsolata doesn't have italics, refer italics/slanted requests to normal font (224262)
     \@namedef{T1/zi4/m/it}{<->ssub*zi4/m/n}
     \@namedef{T1/zi4/b/it}{<->ssub*zi4/b/n}
     \@namedef{T1/zi4/bx/it}{<->ssub*zi4/b/n}
@@ -51,7 +52,7 @@
 
 % minted depends on Python's Pygments package, so its usage has been made optional
 \ifdef{\@reqmintedflag}{
-    \RequirePackage{currfile-abspath} % Apparently only works reliably with TeX Live?
+    \RequirePackage{currfile-abspath} % Apparently only works reliably with TeX Live? (548869)
         \getabspath{\jobname.log}
         \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
             {}{\PassOptionsToPackage{outputdir=\theabsdir}{minted}}
@@ -60,7 +61,7 @@
     % The "code" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{minted}{tcolorbox}
     
-    % Disable syntax error highlighting, since it has false positives
+    % Disable syntax error highlighting, since it gives false positives
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
@@ -81,7 +82,7 @@
 % pgfplots is quite a large package (slows compilation), so its usage has been made optional
 \ifdef{\@reqpgfplotsflag}{
     \RequirePackage{pgfplots} % Needed for fancy graphs
-    	\pgfplotsset{compat=newest} % See tex.stackexchange.com/a/139695
+    	\pgfplotsset{compat=newest} % (139695)
 
     % Set default options for pgfplots graphs (most are related to the grid).
     \pgfplotsset{
@@ -106,13 +107,13 @@
     \patchcmd{\env@matrix}% Default to right-aligning matrices
         {\array{*\c@MaxMatrixCols c}}%
         {\array{*\c@MaxMatrixCols r}}{}{}
-\RequirePackage{mathtools} % See tex.stackexchange.com/a/43009
+\RequirePackage{mathtools} % Needed for abs/norm commands (43009)
     \DeclarePairedDelimiter\abs{\lvert}{\rvert}
         \let\@oldabs\abs
-        \def\abs{\@ifstar{\@oldabs}{\@oldabs*}}
+        \def\abs{\@ifstar{\@oldabs}{\@oldabs*}} % Make starred version default
     \DeclarePairedDelimiter\norm{\lVert}{\rVert}
         \let\@oldnorm\norm
-        \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}}
+        \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
 % TODO: Default float placement of H for figures and tables?
 \RequirePackage{float} % Needed for "proper" figure placement
@@ -125,7 +126,7 @@
     urlcolor=blue,
     linkcolor=black,
     citecolor=black
-    ]{hyperref} % Enclose urls in \url{} to avoid errors
+    ]{hyperref} % Enclose urls in \url{} to create proper links
 \RequirePackage{setspace} % Needed for setting line spacing
 \RequirePackage{tabularx} % Needed for horizontal table stretching
 \RequirePackage[many, breakable]{tcolorbox} % Needed for abstract page and cmd/code boxes
@@ -140,6 +141,7 @@
     \pretocmd{\appendix}{\ClassError{xamk}%
         {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
+%\RequirePackage{tocbasic} % TODO: Needed for LoF, LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
 \RequirePackage[notbib, nottoc]{tocbibind} % Add LoF and LoT to ToC
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
@@ -173,12 +175,12 @@
         #1}
 }{}
 
-% filecontents can't be put under anything, see tex.stackexchange.com/a/44467
+% filecontents can't be put under anything (44467)
 \begingroup\newif\ifbibincluded
 \ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
 \ifbibincluded
 \WarningFilter[temp-file]{latex}{Writing or overwriting file}
-% Add doctype and lastmoddate bibliography database fields
+% Add doctype and lastmoddate bibliography database fields (244144)
 \begin{filecontents}[overwrite]{xamkbibdm.dbx}
 \DeclareDatamodelFields[type=field, datatype=literal]{doctype}
 \DeclareDatamodelFields[type=field, datatype=datepart]{
@@ -214,8 +216,8 @@
     % Combine numeric and authoryear bibstyles when lessxamk is used
     \ifdef{\@lessxamkflag}{\input{numeric.bbx}}{}
 
-    \setlength\bibitemsep{0.5\baselineskip} % Add space between bibliography entries
-    \setlength\bibhang{0pt} % Remove indent from bibliography
+    \setlength\bibitemsep{0.6pc} % Add space between bibliography entries
+    \setlength\bibhang{0pc} % Remove indent from bibliography
 
     % Create/modify bibliography string constants
     \NewBibliographyString{wwwdoc, lastmodstr, urlpre}
@@ -229,14 +231,14 @@
 
     % Biblatex bibliography format modifications
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
-    \DeclareDelimFormat{finalnamedelim}{%
+    \DeclareDelimFormat{finalnamedelim}{% (549872)
         \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}% Preserves Oxford Comma option
         \addspace\&\space}% Redefine (based on original def) to use "&" instead of "and"
     \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct}
     \xpatchbibmacro{bbx:editor}{\addcomma\space}{\space}{}{} % Remove comma
-    \DeclareLabeldate{% Remove urldate as fallback date in bibliography
+    \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove parentheses around date, add period before
         {\printtext[parens]}%
@@ -251,7 +253,7 @@
         \iffieldundef{doctype}%
             {\iffieldundef{url}{}{\bibstring{wwwdoc}\setunit*{\addperiod\addspace}}}%
             {\printfield{doctype}\setunit*{\addperiod\addspace}}%
-        \iffieldundef{lastmodyear}%
+        \iffieldundef{lastmodyear}% (244144)
             {}%
             {\printlastmoddate\setunit*{\addperiod\addspace}}%
     }{}{}
@@ -295,6 +297,7 @@
         \newbool{showlot}\setbool{showlot}{\pgfkeysvalueof{/makebibliography/lot}}
         \newbool{hidebib}\setbool{hidebib}{\pgfkeysvalueof{/makebibliography/notbib}}
 
+        \begin{singlespace}
         \notbool{hidebib}{
             \clearpage
             \ifdef{\@lessxamkflag}%
@@ -309,9 +312,8 @@
                         {\printbibliography[heading=bibintoc]}}}%
         }{}
 
-        \begin{singlespace}
-            \ifbool{showlof}{\clearpage\listoffigures}{}
-            \ifbool{showlot}{\clearpage\listoftables}{}
+        \ifbool{showlof}{\clearpage\listoffigures}{}
+        \ifbool{showlot}{\clearpage\listoftables}{}
         \end{singlespace}
 
         \clearpage%\null\clearpage
@@ -341,9 +343,8 @@
 
 % Official section/ToC formatting
 \newcommand*\@xamktoclayout{
-    % See tex.stackexchange.com/a/311003
-    \WarningFilter[temp-sectsty]{latex}{Command}
-    \RequirePackage{sectsty}
+    \WarningFilter[temp-sectsty]{latex}{Command} % (311003)
+    \RequirePackage{sectsty} % Needed for formatting table of contents
     \DeactivateWarningFilters[temp-sectsty]
         \let\SS@makeulinesect\relax
         \let\SS@makeulinepartchap\relax
@@ -385,8 +386,8 @@
     }
 }
 
-\setlength{\cftbeforefigskip}{0.5\baselineskip} % Add space between LoF entries
-\setlength{\cftbeforetabskip}{0.5\baselineskip} % Add space between LoT entries
+\setlength{\cftbeforefigskip}{0.6pc} % Add space between LoF entries
+\setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
 % TODO: Figure out how to fix the "Overfull \hbox" warnings
 % Official list of figures/tables formatting (fig/tab numbers >999 will clip caption)
 \newcommand*\@xamkloftlayout{
@@ -396,14 +397,14 @@
     \renewcommand{\cftfigaftersnum}{.} % Goes after figure number
     \settowidth{\@mylen}{\cftfigpresnum} % space required to print \cftfigpresnum
     \addtolength{\@mylen}{\cftfignumwidth} % plus space for the number
-    \cftsetindents{figure}{0pt}{0pt} % Remove caption indent, and flush entries with title
+    \cftsetindents{figure}{0pc}{0pc} % Remove caption indent, and flush entries with title
     \renewcommand{\cftfigaftersnumb}{\hspace{\@mylen}} % add space after the zero-spaced number
     % Set formatting for LoT
     \renewcommand{\cfttabpresnum}{Table }
     \renewcommand{\cfttabaftersnum}{.}
     \settowidth{\@mylen}{\cfttabpresnum}
     \addtolength{\@mylen}{\cfttabnumwidth}
-    \cftsetindents{table}{0pt}{0pt}
+    \cftsetindents{table}{0pc}{0pc}
     \renewcommand{\cfttabaftersnumb}{\hspace{\@mylen}}
 }
 
@@ -443,7 +444,6 @@
     \@xamkloftlayout % Apply official list of figures/tables formatting
     \@xamkapplayout % Apply official appendix formatting
     \onehalfspacing % Set line spacing to 1.5
-    \pretocmd{\printbibliography}{\singlespacing}{}{} % Set bib's line spacing to 1
     \RequirePackage{fancyhdr} % Allows customization of the header and footer
         \pagestyle{fancy}
         \fancyhf{} % Clear whatever defaults the header and footer may have
@@ -583,7 +583,7 @@
 	\end{tikzpicture}
 }
 
-% Include the title page in page numbering, see tex.stackexchange.com/a/172005
+% Include the title page in page numbering (172005)
 \renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
 
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
@@ -615,7 +615,7 @@
 \xamkdegreetype{Bachelor’s Degree}
 % The degree programme the thesis was written for. Defaults to "<Degree Programme>".
 \newcommand*\xamkdegreeprogramme[1]{\def\@xamkdegreeprogramme{#1}}
-\xamkdegreeprogramme{\@placehold{Degree Programme}}
+\xamkdegreeprogramme{\href{https://student.xamk.fi/studies-and-supporting-services/Documents/degree_titles.pdf}{\@placehold{Degree Programme}}}
 
 % Set option for \maketitle command to be a thesis title page
 \pgfkeys{
@@ -679,13 +679,11 @@
 
 % Command for rendering the thesis abstract
 \newcommand*\makethesisabstract{
-    % Set custom parskip for abstract (and restore default parskip after)
-    % If lessxamk, use default, otherwise use 1pc (even default needs to be explicitly set)
-    \newlength{\preabstractparskip}\setlength{\preabstractparskip}{\parskip}
+    % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
-    \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}%
-        {\setlength{\parskip}{\preabstractparskip}}
+    % I don't understand what happens afterwards, group not needed, but just to be sure
+    \newenvironment{tcbrow}{\begingroup\setlength{\parskip}{\abstractparskip}}{\endgroup}
     \@thesisabstractgeometry
     \begin{singlespace}
     \thispagestyle{empty} % Don't print page number
