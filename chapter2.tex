@@ -4,9 +4,10 @@
 
 Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their effects.
 
-% If you don't need a caption/label you can remove the table environment.
+% If the caption/label aren't needed, you only need the tabular environment.
 \begin{table}[H]
-    %\centering
+    %\centering % Uncomment to center the table
+	%\captionsetup{justification=centering} % Uncomment to center the caption
     % Table captions should go above their tables, according to XAMK guidelines
     \caption{An example table} % \citecaption can also be used in tables
     \label{tab:tabletest} % Table labels usually prepended with "tab:", must come after caption
@@ -47,9 +48,10 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 
 A cube with a hole through the top. Try changing the value of \texttt{cubex}.
 
-% If you don't need the caption/label you can remove the figure environment.
+% If the caption/label aren't needed, you only need the tikzpicture environment.
 \begin{figure}[H]
-    %\centering
+    %\centering % Uncomment to center the figure
+	%\captionsetup{justification=centering} % Uncomment to center the caption
     \begin{tikzpicture}
         \pgfmathsetmacro\cubex{1.5}
         \pgfmathsetmacro\cubey{1.5}
@@ -67,9 +69,10 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
 
 \subsection{Graphs}
 
-% If you don't need the caption/label you can remove the figure environment.
+% If the caption/label aren't needed, you only need the tikzpicture environment.
 \begin{figure}[H]
-    %\centering
+    %\centering % Uncomment to center the figure
+	%\captionsetup{justification=centering} % Uncomment to center the caption
     \begin{tikzpicture}
     % Google "pgfplots gallery" to see examples of graphs and how to make them.
     % If you need negative numbers, add the "axis lines=middle" option to axis.
@@ -140,10 +143,11 @@ A figure containing an image and a caption:
 % By default, figures (and tables) will reorder your layout if they're forced onto the next page.
 % Using the [H] option for all figures and tables will prevent this from happening.
 % You could also manually reduce a figure's width or scale to fit within its page.
-% If you don't need a caption/label for a figure you can use just the \includegraphics command.
+% If the figure caption and label aren't needed, you only need the \includegraphics command.
 \begin{figure}[H]
-	%\centering % Uncomment to center the image and its caption
-	% The image is scaled to 80% of the page's line width
+	%\centering % Uncomment to center the image
+	%\captionsetup{justification=centering} % Uncomment to center the caption
+	% The image is scaled to 80% of line width (width available for text in current environment)
 	\includegraphics[width=0.8\linewidth]{LaTeX-logo.png}
 	\citecaption{latex-logo}{The \LaTeX\ logo}
 	\label{fig:latex-logo} % Figure labels usually prepended with "fig:", must come after caption

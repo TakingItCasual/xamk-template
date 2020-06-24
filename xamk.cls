@@ -1,7 +1,7 @@
 % Unofficial LaTeX class file for XAMK assignments/theses/reports/etc.
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
-% For comments with a number, append the number to "tex.stackexchange.com/a/"
+% For comments with a number in parentheses, append the number to "tex.stackexchange.com/a/"
 
 % TODO: Create proper formatting for bibliography
 
@@ -229,7 +229,7 @@
         urlpre = {Available at}
     }
 
-    % Biblatex bibliography format modifications
+    % Biblatex bibliography/citation format modifications
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
     \DeclareDelimFormat{finalnamedelim}{% (549872)
         \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}% Preserves Oxford Comma option
@@ -240,12 +240,28 @@
     \xpatchbibmacro{bbx:editor}{\addcomma\space}{\space}{}{} % Remove comma
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
-    \xpatchbibmacro{date+extradate}% Remove parentheses around date, add period before
+    \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (428193)
         {\printtext[parens]}%
         {\setunit*{\addperiod\addspace}\printtext}{}{}
     \DeclareFieldFormat{lastmoddate}{\bibstring{lastmodstr}\addspace#1}
     \DeclareFieldFormat{url}{\bibstring{urlpre}\addcolon\addspace\url{#1}}
-    \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix
+    \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
+    \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in postnotes
+    \ifdef{\@lessxamkflag}{}{% Automatic page numbers for numeric citations is confusing
+        \xpatchbibmacro{postnote}% Default citation postnote to pages (TODO: multipostnote?)
+            {{}}% Only replace if postnote not set by user
+            {{\iffieldundef{pages}{}%
+                {\setunit{\printdelim{postnotedelim}}\printfield{pages}}}}{}{}
+        \xpatchbibmacro{textcite:postnote}% authoryear's textcite has its own postnote
+            {\ifbool{cbx:parens}
+                {\bibcloseparen}
+                {}}% This search-and-replace only works without the % symbols
+            {\iffieldundef{pages}%
+                {\ifbool{cbx:parens}{\bibcloseparen}{}}%
+                {\ifbool{cbx:parens}%
+                    {\setunit{\printdelim{postnotedelim}}}%
+                    {\setunit{\printdelim{extpostnotedelim}\bibopenparen}}%
+                    \printfield{pages}\bibcloseparen}}{}{}}
     \DeclareFieldFormat{urldate}{\mkbibbrackets{\bibstring{urlseen}\addspace#1}}
     \DeclareFieldFormat{title}{#1} % Remove italics
     \DeclareFieldFormat[article]{title}{#1} % Remove quotation marks
@@ -254,9 +270,7 @@
             {\iffieldundef{url}{}{\bibstring{wwwdoc}\setunit*{\addperiod\addspace}}}%
             {\printfield{doctype}\setunit*{\addperiod\addspace}}%
         \iffieldundef{lastmodyear}% (244144)
-            {}%
-            {\printlastmoddate\setunit*{\addperiod\addspace}}%
-    }{}{}
+            {}{\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
     % Citations in figures/tables put into one of these categories
     \DeclareBibliographyCategory{fullcitedfig}
@@ -466,12 +480,6 @@
     \ifdef{\@lessxamkflag}{\pagestyle{plain}}{\pagestyle{fancy}}
 }
 
-% Make it so using \centering in figures/tables also centers caption.
-\AtBeginEnvironment{figure}{%
-    \apptocmd{\centering}{\captionsetup{justification=centering}}{}{}}
-\AtBeginEnvironment{table}{%
-    \apptocmd{\centering}{\captionsetup{justification=centering}}{}{}}
-
 % Colors used in title page
 \definecolor{xamklightblue}{RGB}{200, 200, 255}
 \definecolor{xamkdarkblue}{RGB}{11, 124, 164}
@@ -610,7 +618,7 @@
 % Student's name. Defaults to "<First-name Last-name>".
 \newcommand*\xamkstudentname[1]{\def\@xamkstudentname{#1}}
 \xamkstudentname{\@placehold{First-name Last-name}}
-% The thesis type (Bachelor’s or Master’s). Defaults to "Bachelor’s Degree".
+% The thesis type (Bachelor’s, Master’s, etc.). Defaults to "Bachelor’s Degree".
 \newcommand*\xamkdegreetype[1]{\def\@xamkdegreetype{#1}}
 \xamkdegreetype{Bachelor’s Degree}
 % The degree programme the thesis was written for. Defaults to "<Degree Programme>".
