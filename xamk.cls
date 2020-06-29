@@ -167,6 +167,16 @@
         #1}
 }{}
 
+% Commands to print LoF/LoT, clear page before, and add to ToC (48511)
+\newcommand*\newtoclof{%
+    \cleardoublepage%
+    \phantomsection\addcontentsline{toc}{section}{\listfigurename}%
+    \listoffigures}
+\newcommand*\newtoclot{%
+    \cleardoublepage
+    \phantomsection\addcontentsline{toc}{section}{\listtablename}
+    \listoftables}{}
+
 % filecontents can't be put under anything (44467)
 \begingroup\newif\ifbibincluded
 \ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
@@ -272,6 +282,7 @@
         \iffieldundef{lastmodyear}{}% (244144)
             {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
+    \DeclarePrintbibliographyDefaults{heading=bibintoc} % Add bibliography to ToC
     % Citations in figures/tables put into one of these categories
     \DeclareBibliographyCategory{fullcitedfig}
     \DeclareBibliographyCategory{fullcitedtab}
@@ -301,41 +312,32 @@
         lof/.initial = false,% lof's value if "lof" option not given to command
         lot/.default = true,
         lot/.initial = false,
-        notbib/.default = true,
-        notbib/.initial = false,
     }
     % Command to render bibliography (and optionally LoF/LoT) to own page(s)
     \newcommand\makebibliography[1][]{
         \pgfkeys{/makebibliography, #1}
         \newbool{showlof}\setbool{showlof}{\pgfkeysvalueof{/makebibliography/lof}}
         \newbool{showlot}\setbool{showlot}{\pgfkeysvalueof{/makebibliography/lot}}
-        \newbool{hidebib}\setbool{hidebib}{\pgfkeysvalueof{/makebibliography/notbib}}
 
         \begin{singlespace}
-        \notbool{hidebib}{
-            \clearpage
-            \ifdef{\@lessxamkflag}%
-                {\printbibliography[heading=bibintoc]}%
-                % References left out of bibliography if present in LoF or LoT
-                {\ifbool{showlof}%
-                    {\ifbool{showlot}%
-                        {\printbibliography[heading=bibintoc, filter=notfullcited]}%
-                        {\printbibliography[heading=bibintoc, notcategory=fullcitedfig]}}%
-                    {\ifbool{showlot}%
-                        {\printbibliography[heading=bibintoc, notcategory=fullcitedtab]}%
-                        {\printbibliography[heading=bibintoc]}}}}{}
+        \clearpage
+        \ifdef{\@lessxamkflag}{\printbibliography}{%
+            % If all references in LoF/LoT, suppress warning (TODO: check if empty before)
+            \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}%
+            \ifbool{showlof}% References left out of bibliography if in LoF or LoT
+                {\ifbool{showlot}%
+                    {\printbibliography[filter=notfullcited]}%
+                    {\printbibliography[notcategory=fullcitedfig]}}%
+                {\ifbool{showlot}%
+                    {\printbibliography[notcategory=fullcitedtab]}%
+                    {\printbibliography}}%
+            \DeactivateWarningFilters[temp-empty-bib]}
 
-        \ifbool{showlof}{% (48511)
-            \cleardoublepage
-            \phantomsection\addcontentsline{toc}{section}{\listfigurename}
-            \listoffigures}{}
-        \ifbool{showlot}{%
-            \cleardoublepage
-            \phantomsection\addcontentsline{toc}{section}{\listtablename}
-            \listoftables}{}
+        \ifbool{showlof}{\newtoclof}{}
+        \ifbool{showlot}{\newtoclot}{}
         \end{singlespace}
 
-        \clearpage%\null\clearpage
+        \clearpage
     }
 
     % Make bibliography entries visible even if uncited
