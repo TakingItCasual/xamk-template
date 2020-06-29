@@ -45,6 +45,7 @@
     \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
 }{% Package options to use if the official layout is not used
+    \PassOptionsToPackage{title}{appendix} % Prepends "Appendix #" to appendix sections
     \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=numeric}{biblatex}}{}
 }
@@ -130,7 +131,7 @@
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage{everyshi} % Needed for incrementing counters every page
-\RequirePackage[title,titletoc]{appendix} % Prepends "Appendix #" to section in ToC/document
+\RequirePackage[titletoc]{appendix} % Prepends "Appendix #" to appendix sections in ToC
     \pretocmd{\appendix}{\ClassError{xamk}%
         {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
