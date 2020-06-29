@@ -7,16 +7,16 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 % If the caption/label aren't needed, you only need the tabular environment.
 \begin{table}[H]
     %\centering % Uncomment to center the table
-	%\captionsetup{justification=centering} % Uncomment to center the caption
+    %\captionsetup{justification=centering} % Uncomment to center the caption
     % Table captions should go above their tables, according to XAMK guidelines
     \caption{An example table} % \citecaption can also be used in tables
     \label{tab:tabletest} % Table labels usually prepended with "tab:", must come after caption
     % extra | before first l and missing | after the last l
     \begin{tabular}[b]{ || l | l  }
-    	\hline % "\\" adds a linebreak, "\hline" adds a horizontal line
-    	Measurement 1 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
-    	Measurement 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
-    	Measurement 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
+        \hline % "\\" adds a linebreak, "\hline" adds a horizontal line
+        Measurement 1 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
+        Measurement 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
+        Measurement 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
     \end{tabular}
 \end{table}
 
@@ -26,20 +26,20 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 % The "&"s control alignment. Try moving them around to adjust alignment.
 \begin{align*}
     % _{} is used for subscript, ^{} is used for superscript
-	V_{cuboid} &= w h l = 20.49\si{mm} \times 20.47\si{mm} \times 18.63\si{mm} \approx 7814\si{mm^{3}} \\ 
-	% Notice how this \num{} converts its input into scientific notation
-	G &= \num{6.673e-11}\si{N.m^{2}.kg^{-2}} \\ 
-	% \num{} can also add those small spaces in large/small numbers
-	\num{1000000} &= \num{1000000000000} \times \num{0.000001} \\
-	% Algebra
-	x &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \\
-	% \abs, \norm, and expanding parentheses
-	\norm{x}_p &= \left(\sum_i\abs{x_i}^p\right)^{\frac{1}{p}} \\
+    V_{cuboid} &= w h l = 20.49\si{mm} \times 20.47\si{mm} \times 18.63\si{mm} \approx 7814\si{mm^{3}} \\ 
+    % Notice how this \num{} converts its input into scientific notation
+    G &= \num{6.673e-11}\si{N.m^{2}.kg^{-2}} \\ 
+    % \num{} can also add those small spaces in large/small numbers
+    \num{1000000} &= \num{1000000000000} \times \num{0.000001} \\
+    % Algebra
+    x &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \\
+    % \abs, \norm, and expanding parentheses
+    \norm{x}_p &= \left(\sum_i\abs{x_i}^p\right)^{\frac{1}{p}} \\
     % Matrices ("&" doesn't control alignment from within the matrix environment)
     \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}&
         \begin{bmatrix} 7 & 8 \\ 9 & 10 \\ 11 & 12 \end{bmatrix} =
         \begin{bmatrix} 58 & 64 \\ 139 & 154 \end{bmatrix}
-	% If \\ was included after the last row it'd create an extra empty line of space below
+    % If \\ was included after the last row it'd create an extra empty line of space below
 \end{align*}
 % Empty lines should be avoided around an align* environment, to preserve page space.
 % Alternatively, a comment (even a "%" by itself) can be used.
@@ -51,7 +51,7 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
 % If the caption/label aren't needed, you only need the tikzpicture environment.
 \begin{figure}[H]
     %\centering % Uncomment to center the figure
-	%\captionsetup{justification=centering} % Uncomment to center the caption
+    %\captionsetup{justification=centering} % Uncomment to center the caption
     \begin{tikzpicture}
         \pgfmathsetmacro\cubex{1.5}
         \pgfmathsetmacro\cubey{1.5}
@@ -72,7 +72,7 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
 % If the caption/label aren't needed, you only need the tikzpicture environment.
 \begin{figure}[H]
     %\centering % Uncomment to center the figure
-	%\captionsetup{justification=centering} % Uncomment to center the caption
+    %\captionsetup{justification=centering} % Uncomment to center the caption
     \begin{tikzpicture}
     % Google "pgfplots gallery" to see examples of graphs and how to make them.
     % If you need negative numbers, add the "axis lines=middle" option to axis.
@@ -80,25 +80,25 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
     xmin=0, xmax=1.2, ymin=0, ymax=2, % sets x-axis and y-axis limits
     xlabel={foo $a_1$ (\si{m.s^{-2}})}, % set x axis label
     ylabel={bar \\ $a_2$ (\si{m.s^{-2}})}] % set y axis label
-    	\addplot+[only marks,error bars/.cd,
-    	y dir=both,y explicit,
-    	x dir=both,x explicit]
-    	coordinates { % points
-    		(0.1702, 0.376) +- (0.05, 0.25)
-    		(0.2867, 0.552) +- (0.05, 0.25)
-    		(0.3886, 0.724) +- (0.05, 0.25)
-    		(0.4410, 0.891) +- (0.05, 0.25)
-    		(0.5589, 1.05)  +- (0.05, 0.25)
-    		(0.6659, 1.20)  +- (0.05, 0.25)
-    		(0.7574, 1.35)  +- (0.05, 0.25)
-    		(0.8580, 1.49)  +- (0.05, 0.25)
-    		(0.9415, 1.63)  +- (0.05, 0.25)
-    		(1.070,  1.77)  +- (0.05, 0.25)
-    	};
-    	% By default line domains are set to -5:5. You'll want to manually set them.
-    	\addplot[domain=0:2, color=black, mark=none, dotted] {2.2*x}; % dotted line
-    	\addplot[domain=0:2, color=black, mark=none, solid] {(1/0.541)*x}; % solid line
-    	\addplot[domain=0:2, color=black, mark=none, dashed] {1.5*x}; % dashed line
+        \addplot+[only marks,error bars/.cd,
+        y dir=both,y explicit,
+        x dir=both,x explicit]
+        coordinates { % points
+            (0.1702, 0.376) +- (0.05, 0.25)
+            (0.2867, 0.552) +- (0.05, 0.25)
+            (0.3886, 0.724) +- (0.05, 0.25)
+            (0.4410, 0.891) +- (0.05, 0.25)
+            (0.5589, 1.05)  +- (0.05, 0.25)
+            (0.6659, 1.20)  +- (0.05, 0.25)
+            (0.7574, 1.35)  +- (0.05, 0.25)
+            (0.8580, 1.49)  +- (0.05, 0.25)
+            (0.9415, 1.63)  +- (0.05, 0.25)
+            (1.070,  1.77)  +- (0.05, 0.25)
+        };
+        % By default line domains are set to -5:5. You'll want to manually set them.
+        \addplot[domain=0:2, color=black, mark=none, dotted] {2.2*x}; % dotted line
+        \addplot[domain=0:2, color=black, mark=none, solid] {(1/0.541)*x}; % solid line
+        \addplot[domain=0:2, color=black, mark=none, dashed] {1.5*x}; % dashed line
     \end{axis}
     \end{tikzpicture}
     \caption{A graph using TikZ's axis environment}
@@ -145,10 +145,10 @@ A figure containing an image and a caption:
 % You could also manually reduce a figure's width or scale to fit within its page.
 % If the figure caption and label aren't needed, you only need the \includegraphics command.
 \begin{figure}[H]
-	%\centering % Uncomment to center the image
-	%\captionsetup{justification=centering} % Uncomment to center the caption
-	% The image is scaled to 80% of line width (width available for text in current environment)
-	\includegraphics[width=0.8\linewidth]{LaTeX-logo.png}
-	\citecaption{latex-logo}{The \LaTeX\ logo}
-	\label{fig:latex-logo} % Figure labels usually prepended with "fig:", must come after caption
+    %\centering % Uncomment to center the image
+    %\captionsetup{justification=centering} % Uncomment to center the caption
+    % The image is scaled to 80% of line width (width available for text in current environment)
+    \includegraphics[width=0.8\linewidth]{LaTeX-logo.png}
+    \citecaption{latex-logo}{The \LaTeX\ logo}
+    \label{fig:latex-logo} % Figure labels usually prepended with "fig:", must come after caption
 \end{figure}

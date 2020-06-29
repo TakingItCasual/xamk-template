@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/23 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/29 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -21,7 +21,7 @@
 \RequirePackage{etoolbox} % Needed for logic in this class file
 \RequirePackage{pgfkeys} % Needed for named command options
 \RequirePackage{xcolor} % Needed for background color behind code blocks
-\RequirePackage[mono]{inconsolata} % Better \ttfamily font (load before text encoding)
+\RequirePackage[mono]{inconsolata} % Better tt font (must be loaded before text encoding)
     % Inconsolata doesn't have italics, refer italics/slanted requests to normal font (224262)
     \@namedef{T1/zi4/m/it}{<->ssub*zi4/m/n}
     \@namedef{T1/zi4/b/it}{<->ssub*zi4/b/n}
@@ -36,7 +36,7 @@
     \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
     \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
-\RequirePackage[immediate]{silence} % Needed to silence some annoying warnings
+\RequirePackage[immediate]{silence} % Needed to silence some unavoidable warnings
 
 % Package options to use if the official layout is used
 \ifundef{\@lessxamkflag}{
@@ -45,7 +45,6 @@
     \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
 }{% Package options to use if the official layout is not used
-    \PassOptionsToPackage{title}{appendix}
     \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=numeric}{biblatex}}{}
 }
@@ -62,8 +61,8 @@
     \PassOptionsToPackage{minted}{tcolorbox}
     
     % Disable syntax error highlighting, since it gives false positives
-    \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
+    \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
     \xpatchcmd{\mintinline}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
 }{}
@@ -118,15 +117,9 @@
 % TODO: Default float placement of H for figures and tables?
 \RequirePackage{float} % Needed for "proper" figure placement
 \RequirePackage[
-    justification=raggedright, singlelinecheck=false
-    ]{caption} % Flush left the captions
-\RequirePackage[
-    hidelinks,
-    colorlinks=true,
-    urlcolor=blue,
-    linkcolor=black,
-    citecolor=black
-    ]{hyperref} % Enclose urls in \url{} to create proper links
+    justification=raggedright,% Disable caption justification
+    singlelinecheck=false% Disable automatic centering when caption fits on 1 line
+    ]{caption} % Needed for formatting captions
 \RequirePackage{setspace} % Needed for setting line spacing
 \RequirePackage{tabularx} % Needed for horizontal table stretching
 \RequirePackage[many, breakable]{tcolorbox} % Needed for abstract page and cmd/code boxes
@@ -137,13 +130,11 @@
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage{everyshi} % Needed for incrementing counters every page
-\RequirePackage[titletoc]{appendix} % Adds Appendix before section numbering in ToC
+\RequirePackage[title,titletoc]{appendix} % Prepends "Appendix #" to section in ToC/document
     \pretocmd{\appendix}{\ClassError{xamk}%
         {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
-%\RequirePackage{tocbasic} % TODO: Needed for LoF, LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
-\RequirePackage[notbib, nottoc]{tocbibind} % Add LoF and LoT to ToC
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
 
@@ -211,7 +202,7 @@
         urldate=long,% Output urldate field in natural text format
         dateabbrev=false,% Use full month names instead of abbreviations
         defernumbers=true
-        ]{biblatex} % Handles the bibliography
+        ]{biblatex} % Handles the bibliography and citations
 
     % Combine numeric and authoryear bibstyles when lessxamk is used
     \ifdef{\@lessxamkflag}{\input{numeric.bbx}}{}
@@ -229,11 +220,16 @@
         urlpre = {Available at}
     }
 
+    % general:    github.com/plk/biblatex/blob/master/tex/latex/biblatex/biblatex.def
+    % authoryear: github.com/plk/biblatex/blob/master/tex/latex/biblatex/cbx/authoryear.cbx
     % Biblatex bibliography/citation format modifications
+    \renewrobustcmd*{\mkbibemph}{} % Disable all bib italics (e.g. for titles) (296150)
+        \protected\long\def\blx@imc@mkbibemph#1{#1} % Also disable internal macro
+    \renewrobustcmd*{\mkbibacro}{} % Disable text monospacing (e.g. for ISBN/DOI/etc.)
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
-    \DeclareDelimFormat{finalnamedelim}{% (549872)
+    \DeclareDelimFormat{finalnamedelim}{%
         \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}% Preserves Oxford Comma option
-        \addspace\&\space}% Redefine (based on original def) to use "&" instead of "and"
+        \addspace\&\space}% Redefine (based on original) to use "&" instead of "and" (549872)
     \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct}
@@ -246,7 +242,7 @@
     \DeclareFieldFormat{lastmoddate}{\bibstring{lastmodstr}\addspace#1}
     \DeclareFieldFormat{url}{\bibstring{urlpre}\addcolon\addspace\url{#1}}
     \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
-    \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in postnotes
+    \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
     \ifdef{\@lessxamkflag}{}{% Automatic page numbers for numeric citations is confusing
         \xpatchbibmacro{postnote}% Default citation postnote to pages (TODO: multipostnote?)
             {{}}% Only replace if postnote not set by user
@@ -263,14 +259,17 @@
                     {\setunit{\printdelim{extpostnotedelim}\bibopenparen}}%
                     \printfield{pages}\bibcloseparen}}{}{}}
     \DeclareFieldFormat{urldate}{\mkbibbrackets{\bibstring{urlseen}\addspace#1}}
-    \DeclareFieldFormat{title}{#1} % Remove italics
-    \DeclareFieldFormat[article]{title}{#1} % Remove quotation marks
+    \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
+        ]{title}{#1} % Remove title quotes from bibliography (94090)
+    \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
+        ]{citetitle}{#1} % Remove title quotes from citations (94090)
+    % TODO: Also apply to doi/eprint?
     \xpretobibmacro{url+urldate}{% Print doctype and lastmoddate before url+urldate
-        \iffieldundef{doctype}%
-            {\iffieldundef{url}{}{\bibstring{wwwdoc}\setunit*{\addperiod\addspace}}}%
-            {\printfield{doctype}\setunit*{\addperiod\addspace}}%
-        \iffieldundef{lastmodyear}% (244144)
-            {}{\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
+        {\iffieldundef{url}{}% If doctype not specified, default to wwwdoc string
+            {\iffieldundef{doctype}{\bibstring{wwwdoc}}{\printfield{doctype}}%
+            \setunit*{\addperiod\addspace}}}%
+        \iffieldundef{lastmodyear}{}% (244144)
+            {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
     % Citations in figures/tables put into one of these categories
     \DeclareBibliographyCategory{fullcitedfig}
@@ -323,11 +322,16 @@
                         {\printbibliography[heading=bibintoc, notcategory=fullcitedfig]}}%
                     {\ifbool{showlot}%
                         {\printbibliography[heading=bibintoc, notcategory=fullcitedtab]}%
-                        {\printbibliography[heading=bibintoc]}}}%
-        }{}
+                        {\printbibliography[heading=bibintoc]}}}}{}
 
-        \ifbool{showlof}{\clearpage\listoffigures}{}
-        \ifbool{showlot}{\clearpage\listoftables}{}
+        \ifbool{showlof}{% (48511)
+            \cleardoublepage
+            \phantomsection\addcontentsline{toc}{section}{\listfigurename}
+            \listoffigures}{}
+        \ifbool{showlot}{%
+            \cleardoublepage
+            \phantomsection\addcontentsline{toc}{section}{\listtablename}
+            \listoftables}{}
         \end{singlespace}
 
         \clearpage%\null\clearpage
@@ -336,6 +340,14 @@
     % Make bibliography entries visible even if uncited
     \AfterEndPreamble{\nocite{*}}
 }{}
+
+\RequirePackage[
+    hidelinks,% Remove annoying borders
+    colorlinks=true,% Re-enable colors disabled by hidelinks
+    urlcolor=blue,
+    linkcolor=black,
+    citecolor=black
+    ]{hyperref} % Needed for urls/hyperlinks/etc. (must be loaded after biblatex)
 
 % Official XAMK page margins.
 \newcommand*\@xamkpagegeometry{%
@@ -366,12 +378,13 @@
     \allsectionsfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont}
     \sectionfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont\scshape\MakeUppercase}
 
-    % Add dotted lines and remove bold font weight for sections in ToC
-    \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+    \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
+    \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Add dotted line to sections in ToC
+    % Remove bold font weight from sections in ToC
     \renewcommand{\cftsecfont}{}
     \renewcommand{\cftsecpagefont}{}
 
-    % Make sections within ToC uppercase
+    % Make sections within ToC uppercase (156917)
     \let\@oldcontentsline\contentsline
     \def\contentsline##1##2{%
         \expandafter\ifx\csname l@##1\endcsname\l@section
@@ -403,23 +416,25 @@
 \setlength{\cftbeforefigskip}{0.6pc} % Add space between LoF entries
 \setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
 % TODO: Figure out how to fix the "Overfull \hbox" warnings
+% TODO: Make indent dynamic (w/ tocbasic?) tex.stackexchange.com/questions/460987
 % Official list of figures/tables formatting (fig/tab numbers >999 will clip caption)
 \newcommand*\@xamkloftlayout{
+    \renewcommand{\@tocrmarg}{2.5pc plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
     \newlength{\@mylen}
     % Set formatting for LoF
     \renewcommand{\cftfigpresnum}{Figure } % goes before figure number
     \renewcommand{\cftfigaftersnum}{.} % Goes after figure number
     \settowidth{\@mylen}{\cftfigpresnum} % space required to print \cftfigpresnum
     \addtolength{\@mylen}{\cftfignumwidth} % plus space for the number
-    \cftsetindents{figure}{0pc}{0pc} % Remove caption indent, and flush entries with title
     \renewcommand{\cftfigaftersnumb}{\hspace{\@mylen}} % add space after the zero-spaced number
+    \cftsetindents{figure}{0pc}{0pc} % Remove caption indent, and flush entries with title
     % Set formatting for LoT
     \renewcommand{\cfttabpresnum}{Table }
     \renewcommand{\cfttabaftersnum}{.}
     \settowidth{\@mylen}{\cfttabpresnum}
     \addtolength{\@mylen}{\cfttabnumwidth}
-    \cftsetindents{table}{0pc}{0pc}
     \renewcommand{\cfttabaftersnumb}{\hspace{\@mylen}}
+    \cftsetindents{table}{0pc}{0pc}
 }
 
 % Official appendix formatting
@@ -435,7 +450,7 @@
         \EveryShipout{\stepcounter{xamkappendixpage}}
 
         \chead{\thepage \\ ~\\} % Compensate for increased headheight (place higher)
-        % Add "Appendix <appendix number> (page <appendix page>)" to the header
+        % Add "Appendix # (page #)" to the header
         \rhead{Appendix \thesection\ (page \number\numexpr\value{xamkappendixpage}+1\relax)}
 
         % Remove section header numbers
