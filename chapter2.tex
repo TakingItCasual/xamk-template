@@ -9,8 +9,7 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
     %\centering % Uncomment to center the table
     %\captionsetup{justification=centering} % Uncomment to center the caption
     % Table captions should go above their tables, according to XAMK guidelines
-    \caption{An example table} % \citecaption can also be used in tables
-    \label{tab:tabletest} % Table labels usually prepended with "tab:", must come after caption
+    \labelcaption{table-eg}{An example table} % See appendix 1
     % extra | before first l and missing | after the last l
     \begin{tabular}[b]{ || l | l  }
         \hline % "\\" adds a linebreak, "\hline" adds a horizontal line
@@ -63,8 +62,7 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
         \pgfmathsetmacro\circlez{\cubez/2}
         \draw[fill=black] (-\circlex,0,-\circlez) ellipse (0.1 and 0.05);
     \end{tikzpicture}
-    \citecaption{cube}{A cube drawn with TikZ}
-    \label{fig:cube}
+    \citecaption{cube}{A cube drawn with TikZ} % See appendix 1
 \end{figure}
 
 \subsection{Graphs}
@@ -101,8 +99,7 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
         \addplot[domain=0:2, color=black, mark=none, dashed] {1.5*x}; % dashed line
     \end{axis}
     \end{tikzpicture}
-    \caption{A graph using TikZ's axis environment}
-    \label{fig:fancygraph}
+    \labelcaption{fancygraph}{A graph using TikZ's axis environment} % See appendix 1
 \end{figure}
 
 \subsection{Monospace text}
@@ -149,6 +146,5 @@ A figure containing an image and a caption:
     %\captionsetup{justification=centering} % Uncomment to center the caption
     % The image is scaled to 80% of line width (width available for text in current environment)
     \includegraphics[width=0.8\linewidth]{LaTeX-logo.png}
-    \citecaption{latex-logo}{The \LaTeX\ logo}
-    \label{fig:latex-logo} % Figure labels usually prepended with "fig:", must come after caption
+    \citecaption{latex-logo}{The \LaTeX\ logo} % See appendix 1
 \end{figure}

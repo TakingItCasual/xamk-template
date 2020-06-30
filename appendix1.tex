@@ -61,8 +61,13 @@ bib
 \begin{code}[firstnumber=last]{latex}[title={Bibliography commands},label=code:bib-cmds]
 \makebibliography[<options>]
 % Prints the bibliography, and (if configured) list of figures/tables. Use the lof (and/or lot) option(s) to print the list of figures/tables and move figure/table bibliography entries there.
-\citecaption{<cite key>}{<caption>}
-% Defined for the figure and table environments. Inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate settings set for \makebibliography.
+\end{code}
+%
+\begin{code}[firstnumber=last]{latex}[title={Caption commands},label=code:caption-cmds]
+\labelcaption{<label>}{<caption>}
+% Defined for the figure and table environments. Creates label (prefixed with "fig:" for figures and "tab:" for tables). Must be used instead of the \caption and \label commands in these environments.
+\citecaption{<cite key/label>}{<caption>}
+% Same as the \labelcaption command, but also inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate options set for \makebibliography.
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography database fields},label=code:bib-fields]
@@ -74,9 +79,9 @@ lastmoddate
 %
 \begin{code}[firstnumber=last]{latex}[title={Environments},label=code:envs]
 {code}[<minted options>]{<language>}[<tcblisting options>]
-% Provided with the minted class option. Minted settings (starting line number, font size, etc.) can be specified before the language, while TCBListing settings (title, label, etc.) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+% Provided with the minted class option. Minted options (starting line number, font size, etc.) can be specified before the language, while TCBListing options (title, label, etc.) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
 {cmd}[<tcblisting options>]
-% Provided with the listings class option. TCBListing settings (title, label, line prefix, etc.) can optionally be specified.
+% Provided with the listings class option. TCBListing options (title, label, line prefix, etc.) can optionally be specified.
 \end{code}
 
 \begin{comment}

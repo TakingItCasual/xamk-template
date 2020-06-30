@@ -40,7 +40,8 @@
 
 % Package options to use if the official layout is used
 \ifundef{\@lessxamkflag}{
-    \PassOptionsToPackage{font={small, singlespacing}, labelsep=period}{caption}
+    \PassOptionsToPackage{font={small, singlespacing}, labelsep=period, listformat=empty%
+        }{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
     \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
@@ -290,20 +291,36 @@
         not category=fullcitedfig and
         not category=fullcitedtab
     }
-
+    
+    \AfterEndPreamble{% Needed because something's modifying these commands later on...
+        \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
+        \let\@oldlabel\label}
+    \newcommand*\@disablecaptioncmds[1]{%
+        \pretocmd{\caption}{\ClassError{xamk}%
+            {caption command not supported in #1 environment, %
+            use citecaption or labelcaption instead}{}}{}{}%
+        \pretocmd{\label}{\ClassError{xamk}%
+            {label command not supported in #1 environment, %
+            use citecaption or labelcaption instead}{}}{}{}}
     % TODO: Figure out how to handle punctuation at end of caption
-    % TODO: Automatically add label? Do other environments need to be considered?
-    % Command to set caption with citation, and prepare bibentry for LoF/LoT
-    \newcommand\@citecaption[2]{%
-        \ifundef{\@lessxamkflag}%
-            {\caption[#2. \protect\fullcite{#1}]{#2 \protect\parencite{#1}}}%
-            {\caption[#2]{#2 \protect\parencite{#1}}}}
+    % Commands to set caption with citation and label, and prepare bibentry for LoF/LoT
+    \newcommand\@makecaptioncmds[3]{%
+        \@disablecaptioncmds{#1}%
+        \newcommand\citecaption[2]{%
+            \ifundef{\@lessxamkflag}%
+                {\@oldcaption[#3 {##2}. \protect\fullcite{##1}]{{##2} \protect\parencite{##1}}}%
+                {\@oldcaption{{##2} \protect\parencite{##1}}}%
+            \@oldlabel{#2:##1}%
+            \addtocategory{fullcited#2}{##1}}%
+        \newcommand\labelcaption[2]{%
+            \ifundef{\@lessxamkflag}%
+                {\@oldcaption[#3 {##2}.]{{##2}}}%
+                {\@oldcaption{{##2}}}%
+            \@oldlabel{#2:##1}}}
     \AtBeginEnvironment{figure}{%
-        \newcommand\citecaption[2]{%
-            \@citecaption{#1}{#2}\addtocategory{fullcitedfig}{#1}}}
+        \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
     \AtBeginEnvironment{table}{%
-        \newcommand\citecaption[2]{%
-            \@citecaption{#1}{#2}\addtocategory{fullcitedtab}{#1}}}
+        \@makecaptioncmds{table}{tab}{\tablename\ \thetable.}}
 
     % Set options for \makebibliography command to show list of figures/tables
     \pgfkeys{
@@ -418,25 +435,11 @@
 
 \setlength{\cftbeforefigskip}{0.6pc} % Add space between LoF entries
 \setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
-% TODO: Figure out how to fix the "Overfull \hbox" warnings
-% TODO: Make indent dynamic (w/ tocbasic?) tex.stackexchange.com/questions/460987
 % Official list of figures/tables formatting (fig/tab numbers >999 will clip caption)
 \newcommand*\@xamkloftlayout{
     \renewcommand{\@tocrmarg}{2.5pc plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
-    \newlength{\@mylen}
-    % Set formatting for LoF
-    \renewcommand{\cftfigpresnum}{Figure } % goes before figure number
-    \renewcommand{\cftfigaftersnum}{.} % Goes after figure number
-    \settowidth{\@mylen}{\cftfigpresnum} % space required to print \cftfigpresnum
-    \addtolength{\@mylen}{\cftfignumwidth} % plus space for the number
-    \renewcommand{\cftfigaftersnumb}{\hspace{\@mylen}} % add space after the zero-spaced number
-    \cftsetindents{figure}{0pc}{0pc} % Remove caption indent, and flush entries with title
-    % Set formatting for LoT
-    \renewcommand{\cfttabpresnum}{Table }
-    \renewcommand{\cfttabaftersnum}{.}
-    \settowidth{\@mylen}{\cfttabpresnum}
-    \addtolength{\@mylen}{\cfttabnumwidth}
-    \renewcommand{\cfttabaftersnumb}{\hspace{\@mylen}}
+    % Remove LoF/LoT indents
+    \cftsetindents{figure}{0pc}{0pc}
     \cftsetindents{table}{0pc}{0pc}
 }
 
