@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/29 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/06/30 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -131,12 +131,13 @@
         left=0pc,right=0pc,% Left padding removed so line numbers show properly
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
-\RequirePackage{everyshi} % Needed for incrementing counters every page
 \RequirePackage[titletoc]{appendix} % Prepends "Appendix #" to appendix sections in ToC
     \pretocmd{\appendix}{\ClassError{xamk}%
         {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
+\RequirePackage{atenddvi} % Needed for getting true last page? (Used for appendix page #s)
+\RequirePackage[user]{zref} % Needed for more flexible labels (Used for appendix page #s)
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
 
@@ -445,22 +446,30 @@
 
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
-    % TODO: Add appendix total page count
     \AtBeginEnvironment{appendices}{
-        \pretocmd{\section}{\clearpage}{}{} % Force appendix sections to start from new pages
+        \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
         \@xamkappendixgeometry
-        \singlespacing
-
-        % Create a counter to indicate appendix section page number
-        \newcounter{xamkappendixpage}[section]
-        \EveryShipout{\stepcounter{xamkappendixpage}}
-
+        \singlespacing % Set line spacing to 1
+        \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
+        
         \chead{\thepage \\ ~\\} % Compensate for increased headheight (place higher)
-        % Add "Appendix # (page #)" to the header
-        \rhead{Appendix \thesection\ (page \number\numexpr\value{xamkappendixpage}+1\relax)}
-
-        % Remove section header numbers
-        \renewcommand*{\@seccntformat}[1]{}
+        % Add "Appendix # (page # of #)" to the right header
+        \rhead{Appendix \thesection\ (\appendixpagenumbers)}
+        
+        \renewcommand*{\@seccntformat}[1]{} % Remove section header numbers
+        
+        % Maintain total page count for each appendix section (82560)
+        \newcounter{pageaux}
+        \def\currentauxref{PAGEAUX1}
+        \newcommand{\appendixpagenumbers}{%
+            \stepcounter{pageaux}% Incremented by rhead every page
+            page \thepageaux\ of \ref*{\currentauxref}}
+        \newcommand{\resetpageaux}{%
+            \clearpage
+            \edef\@currentlabel{\thepageaux}\label{\currentauxref}%
+            \xdef\currentauxref{PAGEAUX\thepage}%
+            \setcounter{pageaux}{0}}
+        \AtEndDvi{\edef\@currentlabel{\thepageaux}\label{\currentauxref}}
     }
     \AtEndEnvironment{appendices}{
         \restoregeometry
@@ -711,8 +720,8 @@
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
-    % I don't understand what happens afterwards, group not needed, but just to be sure
-    \newenvironment{tcbrow}{\begingroup\setlength{\parskip}{\abstractparskip}}{\endgroup}
+    % tcolorbox's [parbox=false] could also be used (154994), but that affects all rows
+    \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}{}
     \@thesisabstractgeometry
     \begin{singlespace}
     \thispagestyle{empty} % Don't print page number
@@ -726,7 +735,7 @@
     colback=white,% Background color
     middle=0pc,boxsep=0.5pc]% Inner margins
         \ifundef{\@lessxamkflag}{\raggedright}{}
-        \noindent\begin{tabularx}{\textwidth}
+        \noindent\begin{tabularx}{\textwidth}% 3 columns -> sum must be exactly 3
         {@{} >{\hsize=1.15\hsize}X >{\hsize=1.15\hsize}X >{\hsize=0.7\hsize}X @{}}
             \textbf{Author}
             \vspace*{0.5pc}
@@ -744,8 +753,8 @@
             \@xamkpaperdate
         \end{tabularx}
     \tcbline
-        \noindent\begin{tabularx}{\textwidth}
-        % Just enough space for a 3 digit number of appendix pages
+        \noindent\begin{tabularx}{\textwidth}%
+        % 2 columns -> sum must be exactly 2 (enough space for up to 999 appendix pages)
         {@{} >{\hsize=1.44\hsize}X >{\hsize=0.56\hsize}X @{}}
         \textbf{Thesis title}
         \vspace*{0.5pc}
