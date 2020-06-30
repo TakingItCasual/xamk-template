@@ -136,10 +136,16 @@
         {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
-\RequirePackage{atenddvi} % Needed for getting true last page? (Used for appendix page #s)
+\RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
 \RequirePackage[user]{zref} % Needed for more flexible labels (Used for appendix page #s)
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
+
+\pretocmd{\embedfile}{\def\@zipembeddedflag{}}{}{}
+\AtEndDocument{% TODO: Detect any .zip file
+    \IfFileExists{./attach.zip}{% \ClassWarning doesn't seem to work
+        \ifundef{\@zipembeddedflag}{\@latex@warning@no@line{%
+            attach.zip file detected, but no files have been embedded into the PDF}}{}}{}}
 
 % Creates the minted "code" environment using tcolorbox
 \ifdef{\@reqmintedflag}{
