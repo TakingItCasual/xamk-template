@@ -216,7 +216,7 @@
         defernumbers=true
         ]{biblatex} % Handles the bibliography and citations
 
-    % Combine numeric and authoryear bibstyles when lessxamk is used
+    % Combine numeric and authoryear bibstyles when lessxamk is used (314071)
     \ifdef{\@lessxamkflag}{\input{numeric.bbx}}{}
 
     \setlength\bibitemsep{0.6pc} % Add space between bibliography entries
@@ -302,11 +302,9 @@
         not category=fullcitedtab}
     \defbibfilter{nofig}{
         category=cited and
-        not category=fullcitedfig and
-        category=fullcitedtab}
+        not category=fullcitedfig}
     \defbibfilter{notab}{
         category=cited and
-        category=fullcitedfig and
         not category=fullcitedtab}
 
     % Set options for \makebibliography command to show list of figures/tables
@@ -329,7 +327,7 @@
         \begin{singlespace}
         \clearpage
         % If \printbibliography is empty, suppress warning
-        % TODO: Apparently outputs nothing if empty, but might not always be the case
+        % TODO: Apparently nothing happens if empty, but might not always be the case
         \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}
         \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{%
             \ifbool{showlof}% References left out of bibliography if in LoF or LoT
@@ -356,9 +354,9 @@
         \phantomsection\addcontentsline{toc}{section}{\listfigurename}%
         \listoffigures}
     \newcommand*\@newtoclot{%
-        \cleardoublepage
-        \phantomsection\addcontentsline{toc}{section}{\listtablename}
-        \listoftables}{}
+        \cleardoublepage%
+        \phantomsection\addcontentsline{toc}{section}{\listtablename}%
+        \listoftables}
 
     % Needed for showextra's \printbibliography
     \AfterEndPreamble{\nocite{*}}
@@ -374,6 +372,8 @@
     \pretocmd{\label}{\ClassError{xamk}%
         {label command not supported in #1 environment, %
         use citecaption or labelcaption instead}{}}{}{}}
+\newrobustcmd*\@fullcitehyper[1]{% Used to move citation hyperrefs to the LoF/LoT
+    \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
 % TODO: Figure out how to handle punctuation at end of caption
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
 \newcommand\@makecaptioncmds[3]{%
@@ -381,7 +381,7 @@
     \ifdef{\@reqbiblatexflag}{%
         \newcommand\citecaption[2]{%
             \ifundef{\@lessxamkflag}%
-                {\@oldcaption[#3 {##2}. \protect\fullcite{##1}]%
+                {\@oldcaption[#3 {##2}. \@fullcitehyper{##1}]%
                     {{##2} \protect\parencite{##1}}}%
                 {\@oldcaption{{##2} \protect\parencite{##1}}}%
             \@oldlabel{#2:##1}%
