@@ -60,14 +60,14 @@ bib
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography commands},label=code:bib-cmds]
 \makebibliography[<options>]
-% Prints the bibliography, and (if configured) list of figures/tables. Use the lof (and/or lot) option(s) to print the list of figures/tables and move figure/table bibliography entries there.
+% Provided with the bib class option. Prints the bibliography and (if configured) list of figures/tables. Use the extra option to add a section for uncited references. Use the lof (and/or lot) option(s) to print the LoF/LoT and move figure/table references to the LoF/LoT.
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Caption commands},label=code:caption-cmds]
 \labelcaption{<label>}{<caption>}
-% Defined for the figure and table environments. Creates label (prefixed with "fig:" for figures and "tab:" for tables). Must be used instead of the \caption and \label commands in these environments.
+% Defined for the figure and table environments. Creates a label (automatically prefixed with "fig:"/"tab:" for figures/tables). Must be used instead of \caption and \label in these environments.
 \citecaption{<cite key/label>}{<caption>}
-% Same as the \labelcaption command, but also inserts citation at end of caption, and configures the bibliography entry to appear under the list of figures/tables rather than the bibliography, if appropriate options set for \makebibliography.
+% Provided with the bib class option. Same as the \labelcaption command, but also inserts citation at end of caption, and configures the reference to appear under the list of figures/tables rather than the bibliography, if appropriate option set for \makebibliography.
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography database fields},label=code:bib-fields]

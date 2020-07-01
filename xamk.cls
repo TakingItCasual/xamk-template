@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/06/30 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/01 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -36,11 +36,14 @@
     \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
     \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
-\RequirePackage[immediate]{silence} % Needed to silence some unavoidable warnings
+\RequirePackage[immediate]{silence} % Needed to silence some unavoidable but harmless warnings
 
 % Package options to use if the official layout is used
 \ifundef{\@lessxamkflag}{
-    \PassOptionsToPackage{font={small, singlespacing}, labelsep=period, listformat=empty%
+    \PassOptionsToPackage{%
+        font={small, singlespacing},% Smaller font, single line spacing
+        labelsep=period,% Replace ":" with "." after fig/tab number
+        listformat=empty% Remove fig/tab numbering in LoF/LoT
         }{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
     \ifdef{\@reqbiblatexflag}{%
@@ -175,16 +178,6 @@
         #1}
 }{}
 
-% Commands to print LoF/LoT, clear page before, and add to ToC (48511)
-\newcommand*\newtoclof{%
-    \cleardoublepage%
-    \phantomsection\addcontentsline{toc}{section}{\listfigurename}%
-    \listoffigures}
-\newcommand*\newtoclot{%
-    \cleardoublepage
-    \phantomsection\addcontentsline{toc}{section}{\listtablename}
-    \listoftables}{}
-
 % filecontents can't be put under anything (44467)
 \begingroup\newif\ifbibincluded
 \ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
@@ -230,6 +223,7 @@
     \setlength\bibhang{0pc} % Remove indent from bibliography
 
     % Create/modify bibliography string constants
+    % Following/preceding periods/colons/spaces/etc. should be specified in the next section
     \NewBibliographyString{wwwdoc, lastmodstr, urlpre}
     \DefineBibliographyStrings{UKenglish}{%
         nodate = {No date},
@@ -246,9 +240,10 @@
         \protected\long\def\blx@imc@mkbibemph#1{#1} % Also disable internal macro
     \renewrobustcmd*{\mkbibacro}{} % Disable text monospacing (e.g. for ISBN/DOI/etc.)
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
-    \DeclareDelimFormat{finalnamedelim}{%
+    \DeclareNameAlias{default}{family-given} % Needed for \fullcite (and others?)
+    \DeclareDelimFormat{finalnamedelim}{% Use "&" instead of "and" (549872)
         \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}% Preserves Oxford Comma option
-        \addspace\&\space}% Redefine (based on original) to use "&" instead of "and" (549872)
+        \addspace\&\space}% Based on biblatex's definition
     \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct}
@@ -256,18 +251,24 @@
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (428193)
-        {\printtext[parens]}%
-        {\setunit*{\addperiod\addspace}\printtext}{}{}
+        {\printtext[parens]}{\setunit*{\addperiod\addspace}\printtext}{}{}
     \DeclareFieldFormat{lastmoddate}{\bibstring{lastmodstr}\addspace#1}
     \DeclareFieldFormat{url}{\bibstring{urlpre}\addcolon\addspace\url{#1}}
     \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
     \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
+    % Default \parencite's and \textcite's postnote to pages, if present
+    % TODO: Clarify when page numbers should be included after citations
     \ifdef{\@lessxamkflag}{}{% Automatic page numbers for numeric citations is confusing
-        \xpatchbibmacro{postnote}% Default citation postnote to pages (TODO: multipostnote?)
-            {{}}% Only replace if postnote not set by user
-            {{\iffieldundef{pages}{}%
+        \letbibmacro*{parencite:postnote}{postnote} % Copy original postnote macro
+        \xpatchbibmacro{parencite:postnote}% Only replace if postnote not set by user
+            {{}}{{\iffieldundef{pages}{}%
                 {\setunit{\printdelim{postnotedelim}}\printfield{pages}}}}{}{}
-        \xpatchbibmacro{textcite:postnote}% authoryear's textcite has its own postnote
+        \DeclareCiteCommand{\parencite}[\mkbibparens]% Make \parencite use the new postnote
+            {\usebibmacro{prenote}}% Based on authoryear's definition
+            {\usebibmacro{citeindex}\usebibmacro{cite}}%
+            {\multicitedelim}%
+            {\usebibmacro{parencite:postnote}}% This line changed
+        \xpatchbibmacro{textcite:postnote}% \textcite already has its own postnote
             {\ifbool{cbx:parens}
                 {\bibcloseparen}
                 {}}% This search-and-replace only works without the % symbols
@@ -291,47 +292,28 @@
             {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
     \DeclarePrintbibliographyDefaults{heading=bibintoc} % Add bibliography to ToC
-    % Citations in figures/tables put into one of these categories
-    \DeclareBibliographyCategory{fullcitedfig}
-    \DeclareBibliographyCategory{fullcitedtab}
-    \defbibfilter{notfullcited}{
+    \DeclareBibliographyCategory{cited} % All cited references added to this
+    \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (6977)
+    \DeclareBibliographyCategory{fullcitedfig} % References cited in figures added to this
+    \DeclareBibliographyCategory{fullcitedtab} % References cited in tables added to this
+    \defbibfilter{nofigtab}{
+        category=cited and
         not category=fullcitedfig and
-        not category=fullcitedtab
-    }
-    
-    \AfterEndPreamble{% Needed because something's modifying these commands later on...
-        \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
-        \let\@oldlabel\label}
-    \newcommand*\@disablecaptioncmds[1]{%
-        \pretocmd{\caption}{\ClassError{xamk}%
-            {caption command not supported in #1 environment, %
-            use citecaption or labelcaption instead}{}}{}{}%
-        \pretocmd{\label}{\ClassError{xamk}%
-            {label command not supported in #1 environment, %
-            use citecaption or labelcaption instead}{}}{}{}}
-    % TODO: Figure out how to handle punctuation at end of caption
-    % Commands to set caption with citation and label, and prepare bibentry for LoF/LoT
-    \newcommand\@makecaptioncmds[3]{%
-        \@disablecaptioncmds{#1}%
-        \newcommand\citecaption[2]{%
-            \ifundef{\@lessxamkflag}%
-                {\@oldcaption[#3 {##2}. \protect\fullcite{##1}]{{##2} \protect\parencite{##1}}}%
-                {\@oldcaption{{##2} \protect\parencite{##1}}}%
-            \@oldlabel{#2:##1}%
-            \addtocategory{fullcited#2}{##1}}%
-        \newcommand\labelcaption[2]{%
-            \ifundef{\@lessxamkflag}%
-                {\@oldcaption[#3 {##2}.]{{##2}}}%
-                {\@oldcaption{{##2}}}%
-            \@oldlabel{#2:##1}}}
-    \AtBeginEnvironment{figure}{%
-        \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
-    \AtBeginEnvironment{table}{%
-        \@makecaptioncmds{table}{tab}{\tablename\ \thetable.}}
+        not category=fullcitedtab}
+    \defbibfilter{nofig}{
+        category=cited and
+        not category=fullcitedfig and
+        category=fullcitedtab}
+    \defbibfilter{notab}{
+        category=cited and
+        category=fullcitedfig and
+        not category=fullcitedtab}
 
     % Set options for \makebibliography command to show list of figures/tables
     \pgfkeys{
         /makebibliography/.is family, /makebibliography,
+        extra/.default = true,
+        extra/.initial = false,
         lof/.default = true,% lof's value if "lof" option given to command (without value)
         lof/.initial = false,% lof's value if "lof" option not given to command
         lot/.default = true,
@@ -340,37 +322,83 @@
     % Command to render bibliography (and optionally LoF/LoT) to own page(s)
     \newcommand\makebibliography[1][]{
         \pgfkeys{/makebibliography, #1}
+        \newbool{showextra}\setbool{showextra}{\pgfkeysvalueof{/makebibliography/extra}}
         \newbool{showlof}\setbool{showlof}{\pgfkeysvalueof{/makebibliography/lof}}
         \newbool{showlot}\setbool{showlot}{\pgfkeysvalueof{/makebibliography/lot}}
 
         \begin{singlespace}
         \clearpage
-        \ifdef{\@lessxamkflag}{\printbibliography}{%
-            % If all references in LoF/LoT, suppress warning (TODO: check if empty before)
-            \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}%
+        % If \printbibliography is empty, suppress warning
+        % TODO: Apparently outputs nothing if empty, but might not always be the case
+        \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}
+        \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{%
             \ifbool{showlof}% References left out of bibliography if in LoF or LoT
                 {\ifbool{showlot}%
-                    {\printbibliography[filter=notfullcited]}%
-                    {\printbibliography[notcategory=fullcitedfig]}}%
+                    {\printbibliography[filter=nofigtab]}%
+                    {\printbibliography[filter=nofig]}}%
                 {\ifbool{showlot}%
-                    {\printbibliography[notcategory=fullcitedtab]}%
-                    {\printbibliography}}%
-            \DeactivateWarningFilters[temp-empty-bib]}
+                    {\printbibliography[filter=notab]}%
+                    {\printbibliography[category=cited]}}}
+        \ifbool{showextra}{\printbibliography[title={Further Reading},notcategory=cited]}{}
+        \DeactivateWarningFilters[temp-empty-bib]
 
-        \ifbool{showlof}{\newtoclof}{}
-        \ifbool{showlot}{\newtoclot}{}
+        \ifbool{showlof}{\@newtoclof}{}
+        \ifbool{showlot}{\@newtoclot}{}
         \end{singlespace}
 
         \clearpage
     }
+    
+    % Commands to print LoF/LoT, clear page before, and add to ToC (48511)
+    % TODO: Do these need to be made available to the user?
+    \newcommand*\@newtoclof{%
+        \cleardoublepage%
+        \phantomsection\addcontentsline{toc}{section}{\listfigurename}%
+        \listoffigures}
+    \newcommand*\@newtoclot{%
+        \cleardoublepage
+        \phantomsection\addcontentsline{toc}{section}{\listtablename}
+        \listoftables}{}
 
-    % Make bibliography entries visible even if uncited
+    % Needed for showextra's \printbibliography
     \AfterEndPreamble{\nocite{*}}
 }{}
 
+\AfterEndPreamble{% Needed because something's modifying these commands later on...
+    \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
+    \let\@oldlabel\label}
+\newcommand*\@disablecaptioncmds[1]{%
+    \pretocmd{\caption}{\ClassError{xamk}%
+        {caption command not supported in #1 environment, %
+        use citecaption or labelcaption instead}{}}{}{}%
+    \pretocmd{\label}{\ClassError{xamk}%
+        {label command not supported in #1 environment, %
+        use citecaption or labelcaption instead}{}}{}{}}
+% TODO: Figure out how to handle punctuation at end of caption
+% Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
+\newcommand\@makecaptioncmds[3]{%
+    \@disablecaptioncmds{#1}%
+    \ifdef{\@reqbiblatexflag}{%
+        \newcommand\citecaption[2]{%
+            \ifundef{\@lessxamkflag}%
+                {\@oldcaption[#3 {##2}. \protect\fullcite{##1}]%
+                    {{##2} \protect\parencite{##1}}}%
+                {\@oldcaption{{##2} \protect\parencite{##1}}}%
+            \@oldlabel{#2:##1}%
+            \addtocategory{fullcited#2}{##1}}}{}%
+    \newcommand\labelcaption[2]{%
+        \ifundef{\@lessxamkflag}%
+            {\@oldcaption[#3 {##2}.]{{##2}}}% TODO: Append "(Made by author)" to caption?
+            {\@oldcaption{{##2}}}%
+        \@oldlabel{#2:##1}}}
+\AtBeginEnvironment{figure}{%
+    \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
+\AtBeginEnvironment{table}{%
+    \@makecaptioncmds{table}{tab}{\tablename\ \thetable.}}
+
 \RequirePackage[
     hidelinks,% Remove annoying borders
-    colorlinks=true,% Re-enable colors disabled by hidelinks
+    colorlinks=true,% Re-enable colors that were disabled by hidelinks
     urlcolor=blue,
     linkcolor=black,
     citecolor=black
@@ -423,10 +451,6 @@
         {\@oldcontentsline{##1}{##2}}%
     }
 
-    % Make appendices use numbers instead of letters
-    \let\@oldappendices\appendices
-    \def\appendices{\@oldappendices\renewcommand{\thesection}{\arabic{section}}}
-
     % Redefine \tableofcontents to add custom geometry and line spacing
     \let\@@oldtableofcontents\tableofcontents
     \renewcommand\tableofcontents{
@@ -442,16 +466,18 @@
 
 \setlength{\cftbeforefigskip}{0.6pc} % Add space between LoF entries
 \setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
-% Official list of figures/tables formatting (fig/tab numbers >999 will clip caption)
+% Official list of figures/tables formatting
 \newcommand*\@xamkloftlayout{
     \renewcommand{\@tocrmarg}{2.5pc plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
-    % Remove LoF/LoT indents
+    % Remove LoF/LoT indents (fig/tab numbers have been moved into captions themselves)
     \cftsetindents{figure}{0pc}{0pc}
     \cftsetindents{table}{0pc}{0pc}
 }
 
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
+    % Make appendices use numbers instead of letters
+    \apptocmd{\appendices}{\renewcommand{\thesection}{\arabic{section}}}{}{}
     \AtBeginEnvironment{appendices}{
         \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
         \@xamkappendixgeometry
@@ -462,7 +488,7 @@
         % Add "Appendix # (page # of #)" to the right header
         \rhead{Appendix \thesection\ (\appendixpagenumbers)}
         
-        \renewcommand*{\@seccntformat}[1]{} % Remove section header numbers
+        \renewcommand*{\@seccntformat}[1]{} % Remove appendix section header numbers
         
         % Maintain total page count for each appendix section (82560)
         \newcounter{pageaux}
@@ -498,6 +524,7 @@
         \pagestyle{fancy}
         \fancyhf{} % Clear whatever defaults the header and footer may have
         \renewcommand\headrulewidth{0pc} % Remove the header bar
+        % TODO: Page numbering as "# of #"? Should appendices be included?
         \chead{\thepage} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification
 }{% Commands to run if the official layout isn't used
