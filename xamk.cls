@@ -120,7 +120,7 @@
         \let\@oldnorm\norm
         \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
-% TODO: Default float placement of H for figures and tables?
+% TODO: Clarify: Default float placement of H for figures and tables?
 \RequirePackage{float} % Needed for "proper" figure placement
 \RequirePackage[
     justification=raggedright,% Disable caption justification
@@ -211,7 +211,7 @@
         datamodel=xamkbibdm,% Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,
         bibstyle=authoryear,
-        dashed=false,% Don't use dashes for duplicate author-years(?)
+        dashed=false,% Don't use dashes for duplicate author-years
         uniquename=init,% Needed so the following option doesn't give a warning
         giveninits=true,% Abbreviate names (except for last name)
         urldate=long,% Output urldate field in natural text format
@@ -251,9 +251,9 @@
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
     % TODO: Handle editor/translator when author included (e.g. add parentheses)?
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct} % Add parentheses (419595)
-    \DeclareFieldAlias{translatortype}{editortype}
+        \DeclareFieldAlias{translatortype}{editortype}
     \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (419595)
-    \DeclareDelimAlias{translatortypedelim}{editortypedelim}
+        \DeclareDelimAlias{translatortypedelim}{editortypedelim}
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (428193)
@@ -263,7 +263,7 @@
     \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
     \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
     % Default \parencite's and \textcite's postnote to pages, if present
-    % TODO: Clarify when page numbers should be included after citations
+    % TODO: Clarify: When should page numbers be included after citations?
     \ifdef{\@lessxamkflag}{}{% Automatic page numbers for numeric citations is confusing
         \letbibmacro*{parencite:postnote}{postnote} % Copy original postnote macro
         \xpatchbibmacro{parencite:postnote}% Only replace if postnote not set by user
@@ -289,7 +289,7 @@
         ]{title}{#1} % Remove title quotes from bibliography (94090)
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
         ]{citetitle}{#1} % Remove title quotes from citations (94090)
-    % TODO: Also apply to doi/eprint?
+    % TODO: Clarify: Also apply to doi/eprint?
     \xpretobibmacro{url+urldate}{% Print doctype and lastmoddate before url+urldate
         {\iffieldundef{url}{}% If doctype not specified, default to wwwdoc string
             {\iffieldundef{doctype}{\bibstring{wwwdoc}}{\printfield{doctype}}%
@@ -394,7 +394,7 @@
             \addtocategory{fullcited#2}{##1}}}{}%
     \NewDocumentCommand\labelcaption{ m O{##3} m }{%
         \ifundef{\@lessxamkflag}%
-            {\@oldcaption[#3 {##2}.]{{##3}}}% TODO: Append "(Made by author)" to caption?
+            {\@oldcaption[#3 {##2}.]{{##3}}}% TODO: Clarify: Add "(Made by author)" to caption?
             {\@oldcaption[{##2}]{{##3}}}%
         \@oldlabel{#2:##1}}}
 \AtBeginEnvironment{figure}{%
@@ -530,7 +530,7 @@
         \pagestyle{fancy}
         \fancyhf{} % Clear whatever defaults the header and footer may have
         \renewcommand\headrulewidth{0pc} % Remove the header bar
-        % TODO: Page numbering as "# of #"? Should appendices be included?
+        % TODO: Clarify: Page numbering as "# of #"? Should appendices be included?
         \chead{\thepage} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification
 }{% Commands to run if the official layout isn't used
@@ -805,7 +805,7 @@
 
         \@xamkappendixpagecount\ page\ifdefstring{\@xamkappendixpagecount}{1}{}{s} of appendices
         \end{tabularx}
-    \tcbline
+    \tcbline% TODO: Clarify: Hide if commissioner not specified?
         \textbf{Commissioned by}
         \vspace*{0.5pc}
 
