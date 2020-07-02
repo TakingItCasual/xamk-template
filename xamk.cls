@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/01 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/02 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -36,6 +36,7 @@
     \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
     \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
+\RequirePackage{xparse} % Needed for creating commands with arbitrary optional arguments
 \RequirePackage[immediate]{silence} % Needed to silence some unavoidable but harmless warnings
 
 % Package options to use if the official layout is used
@@ -65,7 +66,7 @@
     % The "code" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{minted}{tcolorbox}
     
-    % Disable syntax error highlighting, since it gives false positives
+    % Disable syntax error highlighting, since it gives false positives (343506)
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
@@ -296,14 +297,14 @@
     \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (6977)
     \DeclareBibliographyCategory{fullcitedfig} % References cited in figures added to this
     \DeclareBibliographyCategory{fullcitedtab} % References cited in tables added to this
-    \defbibfilter{nofigtab}{
+    \defbibfilter{notfigtab}{
         category=cited and
         not category=fullcitedfig and
         not category=fullcitedtab}
-    \defbibfilter{nofig}{
+    \defbibfilter{notfig}{
         category=cited and
         not category=fullcitedfig}
-    \defbibfilter{notab}{
+    \defbibfilter{nottab}{
         category=cited and
         not category=fullcitedtab}
 
@@ -332,10 +333,10 @@
         \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{%
             \ifbool{showlof}% References left out of bibliography if in LoF or LoT
                 {\ifbool{showlot}%
-                    {\printbibliography[filter=nofigtab]}%
-                    {\printbibliography[filter=nofig]}}%
+                    {\printbibliography[filter=notfigtab]}%
+                    {\printbibliography[filter=notfig]}}%
                 {\ifbool{showlot}%
-                    {\printbibliography[filter=notab]}%
+                    {\printbibliography[filter=nottab]}%
                     {\printbibliography[category=cited]}}}
         \ifbool{showextra}{\printbibliography[title={Further Reading},notcategory=cited]}{}
         \DeactivateWarningFilters[temp-empty-bib]
@@ -376,20 +377,20 @@
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
 % TODO: Figure out how to handle punctuation at end of caption
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
-\newcommand\@makecaptioncmds[3]{%
+\NewDocumentCommand\@makecaptioncmds{ m m m }{%
     \@disablecaptioncmds{#1}%
     \ifdef{\@reqbiblatexflag}{%
-        \newcommand\citecaption[2]{%
+        \NewDocumentCommand\citecaption{ m O{##3} m }{%
             \ifundef{\@lessxamkflag}%
                 {\@oldcaption[#3 {##2}. \@fullcitehyper{##1}]%
-                    {{##2} \protect\parencite{##1}}}%
-                {\@oldcaption{{##2} \protect\parencite{##1}}}%
+                    {{##3} \protect\parencite{##1}}}%
+                {\@oldcaption[{##2}]{{##3} \protect\parencite{##1}}}%
             \@oldlabel{#2:##1}%
             \addtocategory{fullcited#2}{##1}}}{}%
-    \newcommand\labelcaption[2]{%
+    \NewDocumentCommand\labelcaption{ m O{##3} m }{%
         \ifundef{\@lessxamkflag}%
-            {\@oldcaption[#3 {##2}.]{{##2}}}% TODO: Append "(Made by author)" to caption?
-            {\@oldcaption{{##2}}}%
+            {\@oldcaption[#3 {##2}.]{{##3}}}% TODO: Append "(Made by author)" to caption?
+            {\@oldcaption[{##2}]{{##3}}}%
         \@oldlabel{#2:##1}}}
 \AtBeginEnvironment{figure}{%
     \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}

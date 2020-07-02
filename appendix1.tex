@@ -64,9 +64,9 @@ bib
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Caption commands},label=code:caption-cmds]
-\labelcaption{<label>}{<caption>}
-% Defined for the figure and table environments. Creates a label (automatically prefixed with "fig:"/"tab:" for figures/tables). Must be used instead of \caption and \label in these environments.
-\citecaption{<cite key/label>}{<caption>}
+\labelcaption{<label>}[<short caption>]{<caption>}
+% Defined for the figure and table environments. Creates a label (automatically prefixed with "fig:"/"tab:" for figures/tables). Must be used instead of \caption and \label in these environments. A shorter caption can be set to be displayed in the LoF/LoT.
+\citecaption{<cite key/label>}[<short caption>]{<caption>}
 % Provided with the bib class option. Same as the \labelcaption command, but also inserts citation at end of caption, and configures the reference to appear under the list of figures/tables rather than the bibliography, if appropriate option set for \makebibliography.
 \end{code}
 %
