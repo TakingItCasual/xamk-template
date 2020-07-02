@@ -140,6 +140,8 @@
         {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
+\RequirePackage{enumitem} % Needed to remove vertical spacing from lists
+    \setlist{nosep}
 \RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
 \RequirePackage[user]{zref} % Needed for more flexible labels (Used for appendix page #s)
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
