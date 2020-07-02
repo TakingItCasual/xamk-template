@@ -14,7 +14,7 @@ bib
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Standard title page commands},label=code:std-cmds]
-\xamkstudentname{<student name>}{<student number>}{<group ID>}
+\xamkstudent{<student name>}{<student number>}{<group ID>}
 % Specify your full name, student number, and group ID. Can be used multiple times to attribute the document to multiple students.
 \xamkpapertitle{<paper title>}
 % Specify the title of the paper.
@@ -32,13 +32,13 @@ bib
 %
 \begin{code}[firstnumber=last]{latex}[title={Thesis title page commands (reuses title/subtitle/date commands)},label=code:thesis-cmds]
 \xamkstudentname{<student name>}
-% Used in place of \xamkstudentname. Specify your full name (one name only).
+% Used in place of \xamkstudent. Specify your full name (one name only).
 \xamkdegreetype{<degree type>}
 % Used in place of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
 \xamkdegreeprogramme{<degree programme>}
 % Used in place of \xamkcoursename. Specify your degree program.
 \maketitle[thesis]
-% Prints title page in thesis format (must be called after preceding commands).
+% Prints thesis title page (must be called after preceding commands).
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Thesis abstract page commands},label=code:thesis-abstract]
@@ -47,7 +47,7 @@ bib
 \xamkappendixpagecount{<number>}
 % Specify the number of appendix pages.
 \xamkthesiscommissioner{<commissioner>}
-% Specify the commissioning organization/company/etc. of the thesis. Optional, defaults to "N/A".
+% Specify the commissioning organization/company/etc. of the thesis. Optional, defaults to "N/A" (Not Applicable).
 \xamkthesissupervisor{<supervisor>}
 % Specify the full name of the teacher supervising the thesis.
 \xamkthesiskeywords{<keywords>}

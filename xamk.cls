@@ -249,8 +249,11 @@
         \addspace\&\space}% Based on biblatex's definition
     \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
-    \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct}
-    \xpatchbibmacro{bbx:editor}{\addcomma\space}{\space}{}{} % Remove comma
+    % TODO: Handle editor/translator when author included (e.g. add parentheses)?
+    \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct} % Add parentheses (419595)
+    \DeclareFieldAlias{translatortype}{editortype}
+    \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (419595)
+    \DeclareDelimAlias{translatortypedelim}{editortypedelim}
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (428193)

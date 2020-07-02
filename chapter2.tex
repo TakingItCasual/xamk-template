@@ -24,8 +24,6 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 % For physics units, \si{} can be used to distinguish units from variables (variables are italic).
 % The "&"s control alignment. Try moving them around to adjust alignment.
 \begin{align*}
-    % _{} is used for subscript, ^{} is used for superscript
-    V_{cuboid} &= w h l = 20.49\si{mm} \times 20.47\si{mm} \times 18.63\si{mm} \approx 7814\si{mm^{3}} \\ 
     % Notice how this \num{} converts its input into scientific notation
     G &\approx \num{6.674e-11}\si{N.m^{2}.kg^{-2}} \\ 
     % \num{} can also add those small spaces in large/small numbers
@@ -33,6 +31,7 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
     % Algebra
     x &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \\
     % \abs, \norm, and expanding parentheses
+    % _{} is for subscript, ^{} is for superscript (the {} is optional for only 1 character)
     \norm{x}_p &= \left(\sum_i\abs{x_i}^p\right)^{\frac{1}{p}} \\
     % Matrices ("&" doesn't control alignment from within the matrix environment)
     \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}&
@@ -64,6 +63,16 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
     \end{tikzpicture}
     \citecaption{cube}{A cube drawn with TikZ} % See appendix 1
 \end{figure}
+
+\subsection{Lists}
+
+\begin{itemize} % itemize is for unordered lists, for ordered lists use enumerate
+    \item First item
+    \begin{itemize}
+        \item Nested item
+    \end{itemize}
+    \item Second item
+\end{itemize}
 
 \subsection{Graphs}
 
