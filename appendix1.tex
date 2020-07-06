@@ -14,8 +14,8 @@ bib
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Standard title page commands},label=code:std-cmds]
-\xamkstudent{<student name>}{<student number>}{<group ID>}
-% Specify your full name, student number, and group ID. Can be used multiple times to attribute the document to multiple students.
+\xamkstudent{<student name>}[{<student number>}{<group ID>}]
+% Specify your full name, and optionally your student number and group ID. Can be used multiple times to share credit between multiple students.
 \xamkpapertitle{<paper title>}
 % Specify the title of the paper.
 \xamkpapersubtitle{<paper subtitle>}
@@ -30,9 +30,7 @@ bib
 % Prints title page (must be called after preceding commands).
 \end{code}
 %
-\begin{code}[firstnumber=last]{latex}[title={Thesis title page commands (reuses title/subtitle/date commands)},label=code:thesis-cmds]
-\xamkstudentname{<student name>}
-% Used in place of \xamkstudent. Specify your full name (one name only).
+\begin{code}[firstnumber=last]{latex}[title={Thesis title page commands (reuses student/title/subtitle/date commands)},label=code:thesis-cmds]
 \xamkdegreetype{<degree type>}
 % Used in place of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
 \xamkdegreeprogramme{<degree programme>}

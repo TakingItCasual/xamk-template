@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/02 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/06 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -665,10 +665,13 @@
 
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
 
-% The list of students. Defaults to "<Student Name> | <Student Number> | <Group ID>".
-\def\@xamkdefaultstudent{\@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID}\par}
-\newcommand*\xamkstudent[3]{\listadd\@xamkstudentlist{#1 | #2 | #3}}
-\newcommand*\@iteratexamkstudents[1]{{#1\\}}
+% The list of students. Supported formats are "<name> | <number> | <group>", and "<name>".
+\def\@xamkdefaultstudent{\@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID}}
+\def\@xamkdefaultstudentname{\@placehold{First-name Last-name}}
+\NewDocumentCommand\xamkstudent{ m g g }{\IfNoValueTF{#2}%
+    {\listadd\@xamkstudentlist{#1}}%
+    {\listadd\@xamkstudentlist{#1 | #2 | #3}}}
+\newcommand*\@iteratexamkstudents[1]{{#1\par}}
 % The paper title. Defaults to "<Paper Title>".
 \newcommand*\xamkpapertitle[1]{\def\@xamkpapertitle{#1}}
 \xamkpapertitle{\@placehold{Paper Title}}
@@ -684,9 +687,6 @@
 \newcommand*\xamkpaperdate[1]{\def\@xamkpaperdate{#1}}
 \xamkpaperdate{\@placehold{Date}}
 
-% Student's name. Defaults to "<First-name Last-name>".
-\newcommand*\xamkstudentname[1]{\def\@xamkstudentname{#1}}
-\xamkstudentname{\@placehold{First-name Last-name}}
 % The thesis type (Bachelor’s, Master’s, etc.). Defaults to "Bachelor’s Degree".
 \newcommand*\xamkdegreetype[1]{\def\@xamkdegreetype{#1}}
 \xamkdegreetype{Bachelor’s Degree}
@@ -710,13 +710,13 @@
 	\begin{titlepage}
 		\begin{center}
 		    \@titlepageimages
-		{\Large\bf
-		    \notbool{thesistitle}{
-    			\ifdef{\@xamkstudentlist}%
-    			    {\forlistloop\@iteratexamkstudents{\@xamkstudentlist}}%
-    			    {\@xamkdefaultstudent}%
-			}{\@xamkstudentname\par}
-			\vspace*{3pc}
+		{\Large\bf\setlength{\parskip}{1pc}
+			\ifdef{\@xamkstudentlist}%
+			    {{\setlength{\parskip}{0.25pc}%
+			        \forlistloop\@iteratexamkstudents{\@xamkstudentlist}}}%
+			    {\notbool{thesistitle}%
+			        {\@xamkdefaultstudent}{\@xamkdefaultstudentname}\par}
+			\vspace*{2pc}
 			{\huge\@xamkpapertitle\par}
 			\ifdef{\@xamkpapersubtitle}{{\LARGE\@xamkpapersubtitle\par}}{}
 			\vspace*{2pc}
