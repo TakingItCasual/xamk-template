@@ -645,15 +645,15 @@
 }
 % Command to insert the 2 vector graphics into the title page.
 \newcommand*\@titlepageimages{
-	\begin{tikzpicture}[remember picture, overlay, x=1pt, y=1pt]
+    \begin{tikzpicture}[remember picture, overlay, x=1pt, y=1pt]
         \xamkdrawpageborder
-	    \tikzset{align=center, shift={(current page.center)}, yshift=-216pt, xshift=-122pt}
-	    \xamkdrawlogo
-	    \node[text width=260pt, shift={(current page.center)}, yshift=-240pt] at (0, 0)
+        \tikzset{align=center, shift={(current page.center)}, yshift=-216pt, xshift=-122pt}
+        \xamkdrawlogo
+        \node[text width=260pt, shift={(current page.center)}, yshift=-240pt] at (0, 0)
             {\fontseries{b}\fontfamily{phv}\selectfont\Large South-Eastern Finland};
-	    \node[text width=260pt, shift={(current page.center)}, yshift=-261pt] at (0, 0)
+        \node[text width=260pt, shift={(current page.center)}, yshift=-261pt] at (0, 0)
             {\fontseries{b}\fontfamily{phv}\selectfont\Large University of Applied Sciences};
-	\end{tikzpicture}
+    \end{tikzpicture}
 }
 
 % Include the title page in page numbering (172005)
@@ -722,35 +722,35 @@
     \newbool{thesistitle}\setbool{thesistitle}{\pgfkeysvalueof{/maketitle/thesis}}
     \@invalidate@title@cmds{\ClassError{xamk}%
         {This command must be used before the maketitle command}{}}
-
+    
     \@titlepagegeometry
     \begin{singlespace}
-	\begin{titlepage}
-		\begin{center}
+    \begin{titlepage}
+        \begin{center}
         \@titlepageimages
-		{\Large\bf\setlength{\parskip}{1pc}
-			\ifdef{\@xamkstudentlist}%
-			    {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}%
-			    {\notbool{thesistitle}%
-			        {\@xamkdefaultstudent}{\@xamkdefaultstudentname}\par}
-			\vspace*{2pc}
-			{\huge\@xamkpapertitle\par}
-			\ifdef{\@xamkpapersubtitle}{{\LARGE\@xamkpapersubtitle\par}}{}
-			\vspace*{2pc}
-			\notbool{thesistitle}{%
-    			\@xamkpapertype\par
-    			\@xamkcoursename\par
-			}{%
-    			\@xamkdegreetype\par
-    			\@xamkdegreeprogramme\par
-			}
-			\vspace*{2pc}
-			\@xamkpaperdate\par
-		}
-		\end{center}
-	\end{titlepage}
-	\end{singlespace}
-	\restoregeometry
+        {\Large\bf\setlength{\parskip}{1pc}
+            \ifdef{\@xamkstudentlist}%
+                {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}%
+                {\notbool{thesistitle}%
+                    {\@xamkdefaultstudent}{\@xamkdefaultstudentname}\par}
+            \vspace*{2pc}
+            {\huge\@xamkpapertitle\par}
+            \ifdef{\@xamkpapersubtitle}{{\LARGE\@xamkpapersubtitle\par}}{}
+            \vspace*{2pc}
+            \notbool{thesistitle}{%
+                \@xamkpapertype\par
+                \@xamkcoursename\par
+            }{%
+                \@xamkdegreetype\par
+                \@xamkdegreeprogramme\par
+            }
+            \vspace*{2pc}
+            \@xamkpaperdate\par
+        }
+        \end{center}
+    \end{titlepage}
+    \end{singlespace}
+    \restoregeometry
 }
 
 % Number of pages until the appendix. Defaults to "XX".
@@ -791,9 +791,9 @@
     \@thesisabstractgeometry
     \begin{singlespace}
     \thispagestyle{empty} % Don't print page number
-	\begin{tikzpicture}[remember picture, overlay, x=0.33pt, y=0.33pt]
+    \begin{tikzpicture}[remember picture, overlay, x=0.33pt, y=0.33pt]
         \xamkdrawlogo
-	\end{tikzpicture}
+    \end{tikzpicture}
     \begin{tcolorbox}[
     enhanced, space to upper,
     height fill, sharp corners,
@@ -857,7 +857,7 @@
         \@xamkthesiskeywords
     \end{tcolorbox}
     \end{singlespace}
-	\restoregeometry
+    \restoregeometry
 }
 
 \endinput
