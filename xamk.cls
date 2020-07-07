@@ -226,7 +226,7 @@
     \setlength\bibitemsep{0.6pc} % Add space between bibliography entries
     \setlength\bibhang{0pc} % Remove indent from bibliography
 
-    % Prevents long urls from going into page margin by adding arbitrary newline (134281)
+    % Prevents long urls from going into page margin, by adding arbitrary newline (134281)
     \setcounter{biburllcpenalty}{7000}
     \setcounter{biburlucpenalty}{8000}
 
@@ -395,7 +395,7 @@
         use citecaption or labelcaption instead}{}}{}{}}
 \newrobustcmd*\@fullcitehyper[1]{% Used to move citation hyperrefs to the LoF/LoT
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
-\ExplSyntaxOn
+\ExplSyntaxOn % TODO: Expand commands that are passed to this command
 \NewDocumentCommand\@adddotifnotpunct{ m }{ % Adapted from (413719)
     \tl_range:nnn { #1 } { 1 } { \tl_count:n { #1 } - 1 } % Prints all items except last
     \str_case_x:nnF { \tl_item:nn { #1 } { -1 } } % Handles last character
@@ -409,15 +409,15 @@
         \NewDocumentCommand\citecaption{ m O{##3} m }{%
             \ifundef{\@lessxamkflag}%
                 {\@oldcaption[#3 \@adddotifnotpunct{##2} \@fullcitehyper{##1}]%
-                    {{##3} \protect\parencite{##1}}}%
-                {\@oldcaption[{##2} \protect\parencite{##1}]%
-                    {{##3} \protect\parencite{##1}}}%
+                    {##3 \protect\parencite{##1}}}%
+                {\@oldcaption[##2 \protect\parencite{##1}]%
+                    {##3 \protect\parencite{##1}}}%
             \@oldlabel{#2:##1}%
             \addtocategory{fullcited#2}{##1}}}{}%
     \NewDocumentCommand\labelcaption{ m O{##3} m }{%
         \ifundef{\@lessxamkflag}% TODO: Clarify: Add "(Made by author)"?
-            {\@oldcaption[#3 \@adddotifnotpunct{##2}]{{##3}}}%
-            {\@oldcaption[{##2}]{{##3}}}%
+            {\@oldcaption[#3 \@adddotifnotpunct{##2}]{##3}}%
+            {\@oldcaption[##2]{##3}}%
         \@oldlabel{#2:##1}}}
 \AtBeginEnvironment{figure}{%
     \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
