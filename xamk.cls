@@ -226,6 +226,10 @@
     \setlength\bibitemsep{0.6pc} % Add space between bibliography entries
     \setlength\bibhang{0pc} % Remove indent from bibliography
 
+    % Prevents long urls from going into page margin by adding arbitrary newline (134281)
+    \setcounter{biburllcpenalty}{7000}
+    \setcounter{biburlucpenalty}{8000}
+
     % Create/modify bibliography string constants
     % Following/preceding periods/colons/spaces/etc. should be specified in the next section
     \NewBibliographyString{wwwdoc, lastmodstr, urlpre}
@@ -250,11 +254,20 @@
         \addspace\&\space}% Based on biblatex's definition
     \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
-    % TODO: Handle editor/translator when author included (e.g. add parentheses)?
     \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct} % Add parentheses (419595)
         \DeclareFieldAlias{translatortype}{editortype}
     \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (419595)
         \DeclareDelimAlias{translatortypedelim}{editortypedelim}
+    \xpatchbibmacro{byeditor+others}% Add parantheses (241591) TODO: Clarify
+        {\usebibmacro{byeditor+othersstrg}%
+            \setunit{\addspace}\printnames[byeditor]{editor}}%
+        {\printtext[parens]{\usebibmacro{byeditor+othersstrg}%
+            \setunit{\addspace}\printnames[byeditor]{editor}}}{}{}
+    \xpatchbibmacro{bytranslator+others}% Add parantheses
+        {\usebibmacro{bytranslator+othersstrg}%
+            \setunit{\addspace}\printnames[bytranslator]{translator}}%
+        {\printtext[parens]{\usebibmacro{bytranslator+othersstrg}%
+            \setunit{\addspace}\printnames[bytranslator]{translator}}}{}{}
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (428193)
@@ -369,6 +382,7 @@
     \AfterEndPreamble{\nocite{*}}
 }{}
 
+% This section is for setting up the \labelcaption and \citecaption commands
 \AfterEndPreamble{% Needed because something's modifying these commands later on...
     \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
     \let\@oldlabel\label}
@@ -381,21 +395,28 @@
         use citecaption or labelcaption instead}{}}{}{}}
 \newrobustcmd*\@fullcitehyper[1]{% Used to move citation hyperrefs to the LoF/LoT
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
-% TODO: Figure out how to handle punctuation at end of caption
+\ExplSyntaxOn
+\NewDocumentCommand\@adddotifnotpunct{ m }{ % Adapted from (413719)
+    \tl_range:nnn { #1 } { 1 } { \tl_count:n { #1 } - 1 } % Prints all items except last
+    \str_case_x:nnF { \tl_item:nn { #1 } { -1 } } % Handles last character
+        {{.}{.}{,}{,}{?}{?}{!}{!}} % If punctuation, just print
+        { \tl_item:nn { #1 } { -1 } . }} % Otherwise, print and add period
+\ExplSyntaxOff
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
 \NewDocumentCommand\@makecaptioncmds{ m m m }{%
     \@disablecaptioncmds{#1}%
     \ifdef{\@reqbiblatexflag}{%
         \NewDocumentCommand\citecaption{ m O{##3} m }{%
             \ifundef{\@lessxamkflag}%
-                {\@oldcaption[#3 {##2}. \@fullcitehyper{##1}]%
+                {\@oldcaption[#3 \@adddotifnotpunct{##2} \@fullcitehyper{##1}]%
                     {{##3} \protect\parencite{##1}}}%
-                {\@oldcaption[{##2}]{{##3} \protect\parencite{##1}}}%
+                {\@oldcaption[{##2} \protect\parencite{##1}]%
+                    {{##3} \protect\parencite{##1}}}%
             \@oldlabel{#2:##1}%
             \addtocategory{fullcited#2}{##1}}}{}%
     \NewDocumentCommand\labelcaption{ m O{##3} m }{%
-        \ifundef{\@lessxamkflag}%
-            {\@oldcaption[#3 {##2}.]{{##3}}}% TODO: Clarify: Add "(Made by author)" to caption?
+        \ifundef{\@lessxamkflag}% TODO: Clarify: Add "(Made by author)"?
+            {\@oldcaption[#3 \@adddotifnotpunct{##2}]{{##3}}}%
             {\@oldcaption[{##2}]{{##3}}}%
         \@oldlabel{#2:##1}}}
 \AtBeginEnvironment{figure}{%
@@ -437,6 +458,7 @@
         \let\SS@makeulinesect\relax
         \let\SS@makeulinepartchap\relax
     % Makes section headings all caps, and make font size same as paragraphs
+    % TODO: Fix section uppercasing breaking bib ToC hyperref
     \allsectionsfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont}
     \sectionfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont\scshape\MakeUppercase}
 
@@ -484,7 +506,7 @@
 \setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
 % Official list of figures/tables formatting
 \newcommand*\@xamkloftlayout{
-    \renewcommand{\@tocrmarg}{2.5pc plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
+    \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
     % Remove LoF/LoT indents (fig/tab numbers have been moved into captions themselves)
     \cftsetindents{figure}{0pc}{0pc}
     \cftsetindents{table}{0pc}{0pc}
@@ -502,7 +524,7 @@
         
         \chead{\thepage \\ ~\\} % Compensate for increased headheight (place higher)
         % Add "Appendix # (page # of #)" to the right header
-        \rhead{Appendix \thesection\ (\appendixpagenumbers)}
+        \rhead{\raisebox{0.5pc}{Appendix \thesection\ (\appendixpagenumbers)}}
         
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section header numbers
         
