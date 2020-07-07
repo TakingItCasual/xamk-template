@@ -699,6 +699,17 @@
 \newcommand*\xamkdegreeprogramme[1]{\def\@xamkdegreeprogramme{#1}}
 \xamkdegreeprogramme{\href{https://student.xamk.fi/studies-and-supporting-services/Documents/degree_titles.pdf}{\@placehold{Degree Programme}}}
 
+\newcommand*\@invalidate@title@cmds[1]{%
+    \RenewDocumentCommand\xamkstudent{ m g g }{#1}
+    \renewcommand*\xamkpapertitle[1]{#1}
+    \renewcommand*\xamkpapersubtitle[1]{#1}
+    \renewcommand*\xamkpapertype[1]{#1}
+    \renewcommand*\xamkcoursename[1]{#1}
+    \renewcommand*\xamkpaperdate[1]{#1}
+    \renewcommand*\xamkdegreetype[1]{#1}
+    \renewcommand*\xamkdegreeprogramme[1]{#1}
+}
+
 % Set option for \maketitle command to be a thesis title page
 \pgfkeys{
     /maketitle/.is family, /maketitle,
@@ -709,12 +720,14 @@
 \renewcommand*\maketitle[1][]{
     \pgfkeys{/maketitle, #1}
     \newbool{thesistitle}\setbool{thesistitle}{\pgfkeysvalueof{/maketitle/thesis}}
+    \@invalidate@title@cmds{\ClassError{xamk}%
+        {This command must be used before the maketitle command}{}}
 
     \@titlepagegeometry
     \begin{singlespace}
 	\begin{titlepage}
 		\begin{center}
-		    \@titlepageimages
+        \@titlepageimages
 		{\Large\bf\setlength{\parskip}{1pc}
 			\ifdef{\@xamkstudentlist}%
 			    {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}%
@@ -757,9 +770,19 @@
 \xamkthesiskeywords{\@placehold{Keywords}}
 % Abstract for the thesis. Expects a file name as input. Defaults to "<Thesis Abstract>".
 \newcommand*\xamkthesisabstractfile[1]{\def\@xamkthesisabstractfile{#1}}
+\newcommand*\@invalidate@abstract@cmds[1]{%
+    \renewcommand*\xamkpagecount[1]{#1}
+    \renewcommand*\xamkappendixpagecount[1]{#1}
+    \renewcommand*\xamkthesiscommissioner[1]{#1}
+    \renewcommand*\xamkthesissupervisor[1]{#1}
+    \renewcommand*\xamkthesiskeywords[1]{#1}
+    \renewcommand*\xamkthesisabstractfile[1]{#1}
+}
 
 % Command for rendering the thesis abstract
 \newcommand*\makethesisabstract{
+    \@invalidate@abstract@cmds{\ClassError{xamk}%
+        {This command must be used before the makethesisabstract command}{}}
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
@@ -783,7 +806,7 @@
             \textbf{Author (authors)}
             \vspace*{0.5pc}
 
-			\ifdef{\@xamkstudentlist}{\@printxamkstudentlist}{\@xamkdefaultstudentname}
+            \ifdef{\@xamkstudentlist}{\@printxamkstudentlist}{\@xamkdefaultstudentname}
             &
             \textbf{Degree}
             \vspace*{0.5pc}
