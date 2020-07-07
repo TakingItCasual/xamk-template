@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/06 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/07 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -138,10 +138,11 @@
 \RequirePackage[titletoc]{appendix} % Prepends "Appendix #" to appendix sections in ToC
     \pretocmd{\appendix}{\ClassError{xamk}%
         {appendix command not supported, use appendices environment instead}{}}{}{}
-\RequirePackage[titles]{tocloft} % Needed for ToC, LoF, and LoT formatting
+\RequirePackage[titles% Custom ToC formatting doesn't work without this...
+    ]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
 \RequirePackage{enumitem} % Needed to remove vertical spacing from lists
-    \setlist{nosep}
+    \setlist{nosep} % (10689)
 \RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
 \RequirePackage[user]{zref} % Needed for more flexible labels (Used for appendix page #s)
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
@@ -151,7 +152,7 @@
 \AtEndDocument{% TODO: Detect any .zip file
     \IfFileExists{./attach.zip}{% \ClassWarning doesn't seem to work
         \ifundef{\@zipembeddedflag}{\@latex@warning@no@line{%
-            attach.zip file detected, but no files have been embedded into the PDF}}{}}{}}
+            attach.zip file detected, but the embedfile command has not been used}}{}}{}}
 
 % Creates the minted "code" environment using tcolorbox
 \ifdef{\@reqmintedflag}{
@@ -470,6 +471,15 @@
     }
 }
 
+% Removes page number(s) from ToC (works with multiple pages)
+\let\@oldtableofcontents\tableofcontents
+\renewcommand\tableofcontents{
+    \pagestyle{empty}
+    \@oldtableofcontents
+    \cleardoublepage
+    \ifdef{\@lessxamkflag}{\pagestyle{plain}}{\pagestyle{fancy}}
+}
+
 \setlength{\cftbeforefigskip}{0.6pc} % Add space between LoF entries
 \setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
 % Official list of figures/tables formatting
@@ -533,21 +543,7 @@
         % TODO: Clarify: Page numbering as "# of #"? Should appendices be included?
         \chead{\thepage} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification
-}{% Commands to run if the official layout isn't used
-    % Make captions include the section they're in.
-    \numberwithin{equation}{section}
-    \numberwithin{figure}{section}
-    \numberwithin{table}{section}
-}
-
-% Removes page number(s) from ToC (works with multiple pages)
-\let\@oldtableofcontents\tableofcontents
-\renewcommand\tableofcontents{
-    \pagestyle{empty}
-    \@oldtableofcontents
-    \cleardoublepage
-    \ifdef{\@lessxamkflag}{\pagestyle{plain}}{\pagestyle{fancy}}
-}
+}{}
 
 % Colors used in title page
 \definecolor{xamklightblue}{RGB}{200, 200, 255}
@@ -668,10 +664,19 @@
 % The list of students. Supported formats are "<name> | <number> | <group>", and "<name>".
 \def\@xamkdefaultstudent{\@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID}}
 \def\@xamkdefaultstudentname{\@placehold{First-name Last-name}}
-\NewDocumentCommand\xamkstudent{ m g g }{\IfNoValueTF{#2}%
-    {\listadd\@xamkstudentlist{#1}}%
-    {\listadd\@xamkstudentlist{#1 | #2 | #3}}}
-\newcommand*\@iteratexamkstudents[1]{{#1\par}}
+\newcounter{studentcount}
+\newcounter{studentcounttemp}
+\NewDocumentCommand\xamkstudent{ m g g }{%
+    \stepcounter{studentcount}%
+    \IfNoValueTF{#3}%
+        {\listadd\@xamkstudentlist{#1}}%
+        {\listadd\@xamkstudentlist{#1 | #2 | #3}}}%
+\newcommand*\@printxamkstudentlist{% Print list without \par for last element (33840)
+    \setcounter{studentcounttemp}{\value{studentcount}}%
+    \def\do##1{%
+        \ifnumequal{\value{studentcounttemp}}{1}{##1}{##1\par}%
+        \addtocounter{studentcounttemp}{-1}}%
+    \dolistloop{\@xamkstudentlist}}
 % The paper title. Defaults to "<Paper Title>".
 \newcommand*\xamkpapertitle[1]{\def\@xamkpapertitle{#1}}
 \xamkpapertitle{\@placehold{Paper Title}}
@@ -712,8 +717,7 @@
 		    \@titlepageimages
 		{\Large\bf\setlength{\parskip}{1pc}
 			\ifdef{\@xamkstudentlist}%
-			    {{\setlength{\parskip}{0.25pc}%
-			        \forlistloop\@iteratexamkstudents{\@xamkstudentlist}}}%
+			    {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}%
 			    {\notbool{thesistitle}%
 			        {\@xamkdefaultstudent}{\@xamkdefaultstudentname}\par}
 			\vspace*{2pc}
@@ -776,10 +780,10 @@
         \ifundef{\@lessxamkflag}{\raggedright}{}
         \noindent\begin{tabularx}{\textwidth}% 3 columns -> sum must be exactly 3
         {@{} >{\hsize=1.15\hsize}X >{\hsize=1.15\hsize}X >{\hsize=0.7\hsize}X @{}}
-            \textbf{Author}
+            \textbf{Author (authors)}
             \vspace*{0.5pc}
 
-            \@xamkstudentname
+			\ifdef{\@xamkstudentlist}{\@printxamkstudentlist}{\@xamkdefaultstudentname}
             &
             \textbf{Degree}
             \vspace*{0.5pc}
