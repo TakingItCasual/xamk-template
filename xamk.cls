@@ -4,6 +4,7 @@
 % For comments with a number in parentheses, append the number to "tex.stackexchange.com/a/"
 
 % TODO: Create proper formatting for bibliography
+% TODO: Clarify: Formatting and example for (list of) equations
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{xamk}[2020/07/08 TakingItCasual's XAMK assignment/thesis template]
@@ -44,9 +45,7 @@
     \PassOptionsToPackage{%
         font={small, singlespacing},% Smaller font, single line spacing
         labelsep=period,% Replace ":" with "." after fig/tab number
-        listformat=empty,% Remove fig/tab numbering in LoF/LoT
-        figureposition=below,% Sets spacing expecting caption below
-        tableposition=above% Sets spacing expecting caption above
+        listformat=empty% Remove fig/tab numbering in LoF/LoT
         }{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
     \ifdef{\@reqbiblatexflag}{%
@@ -123,6 +122,9 @@
         \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
 \RequirePackage{float} % Needed for forcing caption placement, and provides [H] option
+    \ifundef{\@lessxamkflag}{%
+        \floatstyle{plaintop}\restylefloat{table}% Place table captions above tables
+        \floatstyle{plain}\restylefloat{figure}}{}% Place figure captions below figures
 \RequirePackage[
     justification=raggedright,% Disable caption justification
     singlelinecheck=false% Disable automatic centering when caption fits on 1 line
@@ -391,10 +393,6 @@
     \AfterEndPreamble{\nocite{*}}
 }{}
 
-\ifundef{\@lessxamkflag}{%
-    \floatstyle{plaintop}\restylefloat{table}% Force table captions to go above table
-    \floatstyle{plain}\restylefloat{figure}}{}% Force figure captions to go below figure
-
 % This section is for setting up the \labelcaption and \citecaption commands
 \AfterEndPreamble{% Needed because something's modifying these commands later on...
     \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
@@ -471,7 +469,6 @@
         \let\SS@makeulinesect\relax
         \let\SS@makeulinepartchap\relax
     % Makes section headings all caps, and make font size same as paragraphs
-    % TODO: Fix section uppercasing breaking bib ToC hyperref
     \allsectionsfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont}
     \sectionfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont\scshape\MakeUppercase}
 
@@ -535,16 +532,17 @@
         \singlespacing % Set line spacing to 1
         \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
         
-        \chead{\thepage \\ ~\\} % Compensate for increased headheight (place higher)
+        % Compensate for increased headheight (place higher)
+        \chead{\textcolor{gray}{\thepage} \\ ~\\}
         % Add "Appendix # (page # of #)" to the right header
-        \rhead{\raisebox{0.5pc}{Appendix \thesection\ (\appendixpagenumbers)}}
+        \rhead{\raisebox{0.5pc}{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}}
         
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section header numbers
         
         % Maintain total page count for each appendix section (82560)
         \newcounter{pageaux}
         \def\currentauxref{PAGEAUX1}
-        \newcommand{\appendixpagenumbers}{%
+        \newcommand{\apppagenumbers}{%
             \stepcounter{pageaux}% Incremented by rhead every page
             page \thepageaux\ of \ref*{\currentauxref}}
         \newcommand{\resetpageaux}{%
@@ -556,7 +554,7 @@
     }
     \AtEndEnvironment{appendices}{
         \restoregeometry
-        \chead{\thepage}
+        \chead{\textcolor{gray}{\thepage}}
         \rhead{}
     }
 }
@@ -576,7 +574,7 @@
         \fancyhf{} % Clear whatever defaults the header and footer may have
         \renewcommand\headrulewidth{0pc} % Remove the header bar
         % TODO: Clarify: Page numbering as "# of #"? Should appendices be included?
-        \chead{\thepage} % Print page number to center of header
+        \chead{\textcolor{gray}{\thepage}} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification
 }{}
 
@@ -705,7 +703,7 @@
     \stepcounter{studentcount}%
     \IfNoValueTF{#3}%
         {\listadd\@xamkstudentlist{#1}}%
-        {\listadd\@xamkstudentlist{#1 | #2 | #3}}}%
+        {\listadd\@xamkstudentlist{#1 | #2 | #3}}}
 \newcommand*\@printxamkstudentlist{% Print list without \par for last element (33840)
     \setcounter{studentcounttemp}{\value{studentcount}}%
     \def\do##1{%
