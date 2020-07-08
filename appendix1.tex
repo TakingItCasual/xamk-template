@@ -31,20 +31,12 @@ bib
 % Prints title page (must be called after preceding commands).
 \end{code}
 %
-\begin{code}[firstnumber=last]{latex}[title={Thesis title page commands (reuses student/title/subtitle/date commands)},label=code:thesis-cmds]
+\begin{code}[firstnumber=last]{latex}[title={Thesis title and abstract page commands},label=code:thesis-cmds]
+% The previously shown \xamkstudent, \xamkpapertitle, \xamkpapersubtitle, and \xamkpaperdate commands are needed as well.
 \xamkdegreetype{<degree type>}
 % Used in place of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
 \xamkdegreeprogramme{<degree programme>}
 % Used in place of \xamkcoursename. Specify your degree program.
-\maketitle[thesis]
-% Prints thesis title page (must be called after preceding commands).
-\end{code}
-%
-\begin{code}[firstnumber=last]{latex}[title={Thesis abstract page commands},label=code:thesis-abstract]
-\xamkpagecount{<number>}
-% Specify the number of pages, not including appendix pages.
-\xamkappendixpagecount{<number>}
-% Specify the number of appendix pages.
 \xamkthesiscommissioner{<commissioner>}
 % Specify the commissioning organization/company/etc. of the thesis. Optional, defaults to "N/A" (Not Applicable).
 \xamkthesissupervisor{<supervisor>}
@@ -53,8 +45,8 @@ bib
 % Specify a comma-separated list of keywords for the thesis.
 \xamkthesisabstractfile{<abstract file>}
 % Specify the .tex file containing the text of the abstract.
-\makethesisabstract
-% Prints thesis abstract (must be called after preceding commands).
+\maketitle[thesis]
+% Prints thesis title and abstract pages (must be called after preceding commands).
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography commands},label=code:bib-cmds]

@@ -147,7 +147,7 @@
 \RequirePackage{enumitem} % Needed to remove vertical spacing from lists
     \setlist{nosep} % (10689)
 \RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
-\RequirePackage[user]{zref} % Needed for more flexible labels (Used for appendix page #s)
+\RequirePackage[lastpage, user]{zref} % Needed for better labels (Used for appendix page #s)
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
 
@@ -522,6 +522,8 @@
     \cftsetindents{table}{0pc}{0pc}
 }
 
+% Force new page, and create label for getting first appendix page's page number
+\AtBeginEnvironment{appendices}{\clearpage\zref@label{firstappstart}}{}
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
     % Make appendices use numbers instead of letters
@@ -752,7 +754,7 @@
 % Command for rendering the title page
 \renewcommand*\maketitle[1][]{
     \pgfkeys{/maketitle, #1}
-    \newbool{thesistitle}\setbool{thesistitle}{\pgfkeysvalueof{/maketitle/thesis}}
+    \newbool{thesisformat}\setbool{thesisformat}{\pgfkeysvalueof{/maketitle/thesis}}
     \@invalidate@title@cmds{\ClassError{xamk}%
         {This command must be used before the maketitle command}{}}
     
@@ -764,13 +766,13 @@
         {\Large\bf\setlength{\parskip}{1pc}
             \ifdef{\@xamkstudentlist}%
                 {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}%
-                {\notbool{thesistitle}%
+                {\notbool{thesisformat}%
                     {\@xamkdefaultstudent}{\@xamkdefaultstudentname}\par}
             \vspace*{2pc}
             {\huge\@xamkpapertitle\par}
             \ifdef{\@xamkpapersubtitle}{{\LARGE\@xamkpapersubtitle\par}}{}
             \vspace*{2pc}
-            \notbool{thesistitle}{%
+            \notbool{thesisformat}{%
                 \@xamkpapertype\par
                 \@xamkcoursename\par
             }{%
@@ -784,14 +786,19 @@
     \end{titlepage}
     \end{singlespace}
     \restoregeometry
+    \ifbool{thesisformat}{\@makethesisabstract}{}
 }
 
-% Number of pages until the appendix. Defaults to "XX".
-\newcommand*\xamkpagecount[1]{\def\@xamkpagecount{#1}}
-\xamkpagecount{XX}
-% Number of appendix pages. Defaults to "X".
-\newcommand*\xamkappendixpagecount[1]{\def\@xamkappendixpagecount{#1}}
-\xamkappendixpagecount{X}
+% Number of pages until the appendix.
+\def\@xamkpagecount{%
+    \zref@ifrefundefined{firstappstart}%
+        {\zpageref{LastPage}}%
+        {\the\numexpr\zref@extractdefault{firstappstart}{page}{1}-1\relax}}
+% Number of appendix pages.
+\def\@xamkappendixpagecount{%
+    \zref@ifrefundefined{firstappstart}{0}%
+        {\the\numexpr\zref@extractdefault{LastPage}{page}{1}%
+            -\zref@extractdefault{firstappstart}{page}{1}+1\relax}}
 % Who commissioned the thesis. Defaults to "N/A".
 \newcommand*\xamkthesiscommissioner[1]{\def\@xamkthesiscommissioner{#1}}
 \xamkthesiscommissioner{N/A}
@@ -804,8 +811,6 @@
 % Abstract for the thesis. Expects a file name as input. Defaults to "<Thesis Abstract>".
 \newcommand*\xamkthesisabstractfile[1]{\def\@xamkthesisabstractfile{#1}}
 \newcommand*\@invalidate@abstract@cmds[1]{%
-    \renewcommand*\xamkpagecount[1]{#1}
-    \renewcommand*\xamkappendixpagecount[1]{#1}
     \renewcommand*\xamkthesiscommissioner[1]{#1}
     \renewcommand*\xamkthesissupervisor[1]{#1}
     \renewcommand*\xamkthesiskeywords[1]{#1}
@@ -813,9 +818,12 @@
 }
 
 % Command for rendering the thesis abstract
-\newcommand*\makethesisabstract{
+\newcommand*\@makethesisabstract{
     \@invalidate@abstract@cmds{\ClassError{xamk}%
-        {This command must be used before the makethesisabstract command}{}}
+        {This command must be used before the maketitle command}{}}
+    % Early expansion needed so ifdefstring test works
+    \edef\@xamk@pc{\@xamkpagecount}
+    \edef\@xamk@apc{\@xamkappendixpagecount}
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
@@ -861,9 +869,9 @@
         \@xamkpapertitle
         \ifdef{\@xamkpapersubtitle}{\par\@xamkpapersubtitle}{}
         &% "s" is added after "page" if page count is anything other than "1"
-        \@xamkpagecount\ page\ifdefstring{\@xamkpagecount}{1}{}{s}
+        \@xamk@pc\ page\ifdefstring{\@xamk@pc}{1}{}{s}
 
-        \@xamkappendixpagecount\ page\ifdefstring{\@xamkappendixpagecount}{1}{}{s} of appendices
+        \@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices
         \end{tabularx}
     \tcbline% TODO: Clarify: Hide if commissioner not specified?
         \textbf{Commissioned by}
