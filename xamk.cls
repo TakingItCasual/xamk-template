@@ -6,7 +6,7 @@
 % TODO: Create proper formatting for bibliography
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/07 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/08 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -44,7 +44,9 @@
     \PassOptionsToPackage{%
         font={small, singlespacing},% Smaller font, single line spacing
         labelsep=period,% Replace ":" with "." after fig/tab number
-        listformat=empty% Remove fig/tab numbering in LoF/LoT
+        listformat=empty,% Remove fig/tab numbering in LoF/LoT
+        figureposition=below,% Sets spacing expecting caption below
+        tableposition=above% Sets spacing expecting caption above
         }{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
     \ifdef{\@reqbiblatexflag}{%
@@ -120,8 +122,7 @@
         \let\@oldnorm\norm
         \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
-% TODO: Clarify: Default float placement of H for figures and tables?
-\RequirePackage{float} % Needed for "proper" figure placement
+\RequirePackage{float} % Needed for forcing caption placement, and provides [H] option
 \RequirePackage[
     justification=raggedright,% Disable caption justification
     singlelinecheck=false% Disable automatic centering when caption fits on 1 line
@@ -311,7 +312,6 @@
         \iffieldundef{lastmodyear}{}% (244144)
             {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
-    \DeclarePrintbibliographyDefaults{heading=bibintoc} % Add bibliography to ToC
     \DeclareBibliographyCategory{cited} % All cited references added to this
     \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (6977)
     \DeclareBibliographyCategory{fullcitedfig} % References cited in figures added to this
@@ -326,6 +326,15 @@
     \defbibfilter{nottab}{
         category=cited and
         not category=fullcitedtab}
+
+    % TODO: Find fix for hyperrefs that doesn't require \cleardoublepage to work reliably
+    \defbibheading{mybibintoc}[\refname]{% Fix bibliography ToC hyperrefs (552622)
+        \cleardoublepage
+        \phantomsection
+        \addcontentsline{toc}{section}{#1}%
+        \section*{#1}%
+        \@mkboth{\abx@MakeMarkcase{#1}}{\abx@MakeMarkcase{#1}}}
+    \DeclarePrintbibliographyDefaults{heading=mybibintoc} % Add bibliography to ToC
 
     % Set options for \makebibliography command to show list of figures/tables
     \pgfkeys{
@@ -345,7 +354,6 @@
         \newbool{showlot}\setbool{showlot}{\pgfkeysvalueof{/makebibliography/lot}}
 
         \begin{singlespace}
-        \clearpage
         % If \printbibliography is empty, suppress warning
         % TODO: Apparently nothing happens if empty, but might not always be the case
         \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}
@@ -368,6 +376,7 @@
     }
     
     % Commands to print LoF/LoT, clear page before, and add to ToC (48511)
+    % tocbibind package method breaks ToC hyperref links, this doesn't
     % TODO: Do these need to be made available to the user?
     \newcommand*\@newtoclof{%
         \cleardoublepage%
@@ -382,6 +391,10 @@
     \AfterEndPreamble{\nocite{*}}
 }{}
 
+\ifundef{\@lessxamkflag}{%
+    \floatstyle{plaintop}\restylefloat{table}% Force table captions to go above table
+    \floatstyle{plain}\restylefloat{figure}}{}% Force figure captions to go below figure
+
 % This section is for setting up the \labelcaption and \citecaption commands
 \AfterEndPreamble{% Needed because something's modifying these commands later on...
     \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
@@ -395,7 +408,7 @@
         use citecaption or labelcaption instead}{}}{}{}}
 \newrobustcmd*\@fullcitehyper[1]{% Used to move citation hyperrefs to the LoF/LoT
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
-\ExplSyntaxOn % TODO: Expand commands that are passed to this command
+\ExplSyntaxOn % TODO: Expand commands passed to this command (e.g. \lipsum, \cite, etc.)
 \NewDocumentCommand\@adddotifnotpunct{ m }{ % Adapted from (413719)
     \tl_range:nnn { #1 } { 1 } { \tl_count:n { #1 } - 1 } % Prints all items except last
     \str_case_x:nnF { \tl_item:nn { #1 } { -1 } } % Handles last character

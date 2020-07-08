@@ -8,8 +8,6 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 \begin{table}[H]
     %\centering % Uncomment to center the table
     %\captionsetup{justification=centering} % Uncomment to center the caption
-    % Table captions should go above their tables, according to XAMK guidelines
-    \labelcaption{table-eg}{An example table} % See appendix 1
     % extra | before first l and missing | after the last l
     \begin{tabular}[b]{ || l | l  }
         \hline % "\\" adds a linebreak, "\hline" adds a horizontal line
@@ -17,6 +15,7 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
         Measurement 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
         Measurement 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
     \end{tabular}
+    \labelcaption{table-eg}{An example table} % See appendix 1
 \end{table}
 
 \subsection{Mathematics}
@@ -146,8 +145,9 @@ private void StoreItemClicked(object sender, SelectionChangedEventArgs e) {
 \subsection{Images}
 
 A figure containing an image and a caption:
-% By default, figures (and tables) will reorder your layout if they're forced onto the next page.
-% Using the [H] option for all figures and tables will prevent this from happening.
+% By default, figures and tables can reorder your layout (e.g. if they go into the next page).
+% Using the [H] option for figures/tables will prevent this from happening.
+% To set [H] as the default for all figures, use \floatplacement{figure}{H} in the preamble.
 % You could also manually reduce a figure's width or scale to fit within its page.
 % If the figure caption and label aren't needed, you only need the \includegraphics command.
 \begin{figure}[H]
