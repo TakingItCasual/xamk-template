@@ -2,6 +2,7 @@
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
 % For comments with a number in parentheses, append the number to "tex.stackexchange.com/a/"
+% Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live installation
 
 % TODO: Create proper formatting for bibliography
 % TODO: Clarify: Formatting and example for (list of) equations
@@ -37,7 +38,7 @@
     \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
     \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
-\RequirePackage{xparse} % Needed for creating commands with arbitrary optional arguments
+\RequirePackage{xparse} % Needed for creating advanced commands, and for LaTeX3
 \RequirePackage[immediate]{silence} % Needed to silence some unavoidable but harmless warnings
 
 % Package options to use if the official layout is used
@@ -468,7 +469,7 @@
     \DeactivateWarningFilters[temp-sectsty]
         \let\SS@makeulinesect\relax
         \let\SS@makeulinepartchap\relax
-    % Makes section headings all caps, and make font size same as paragraphs
+    % Make section/subsection/etc. font size text-sized, and make sections all caps
     \allsectionsfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont}
     \sectionfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont\scshape\MakeUppercase}
 
@@ -478,7 +479,7 @@
     \renewcommand{\cftsecfont}{}
     \renewcommand{\cftsecpagefont}{}
 
-    % Make sections within ToC uppercase (156917)
+    % Make sections in ToC uppercase (156917)
     \let\@oldcontentsline\contentsline
     \def\contentsline##1##2{%
         \expandafter\ifx\csname l@##1\endcsname\l@section
@@ -512,8 +513,9 @@
     \ifdef{\@lessxamkflag}{\pagestyle{plain}}{\pagestyle{fancy}}
 }
 
-\setlength{\cftbeforefigskip}{0.6pc} % Add space between LoF entries
-\setlength{\cftbeforetabskip}{0.6pc} % Add space between LoT entries
+% Add space between LoF/LoT entries
+\setlength{\cftbeforefigskip}{0.6pc}
+\setlength{\cftbeforetabskip}{0.6pc}
 % Official list of figures/tables formatting
 \newcommand*\@xamkloftlayout{
     \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
@@ -526,7 +528,7 @@
 \AtBeginEnvironment{appendices}{\clearpage\zref@label{firstappstart}}{}
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
-    % Make appendices use numbers instead of letters
+    % Make appendix section titles use numbers instead of letters
     \apptocmd{\appendices}{\renewcommand{\thesection}{\arabic{section}}}{}{}
     \AtBeginEnvironment{appendices}{
         \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
@@ -539,7 +541,7 @@
         % Add "Appendix # (page # of #)" to the right header
         \rhead{\raisebox{0.5pc}{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}}
         
-        \renewcommand*{\@seccntformat}[1]{} % Remove appendix section header numbers
+        \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
         
         % Maintain total page count for each appendix section (82560)
         \newcounter{pageaux}
@@ -554,7 +556,7 @@
             \setcounter{pageaux}{0}}
         \AtEndDvi{\edef\@currentlabel{\thepageaux}\label{\currentauxref}}
     }
-    \AtEndEnvironment{appendices}{
+    \AtEndEnvironment{appendices}{ % Nothing should come after appendices
         \restoregeometry
         \chead{\textcolor{gray}{\thepage}}
         \rhead{}
