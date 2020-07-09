@@ -7,7 +7,7 @@
 % TODO: Clarify: Formatting and example for (list of) equations
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/08 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/09 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -408,9 +408,9 @@
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
 \ExplSyntaxOn % TODO: Expand commands passed to this command (e.g. \lipsum, \cite, etc.)
 \NewDocumentCommand\@adddotifnotpunct{ m }{ % Adapted from (413719)
-    \tl_range:nnn { #1 } { 1 } { \tl_count:n { #1 } - 1 } % Prints all items except last
-    \str_case_x:nnF { \tl_item:nn { #1 } { -1 } } % Handles last character
-        {{.}{.}{,}{,}{?}{?}{!}{!}} % If punctuation, just print
+    \tl_range:nnn { #1 } { 1 } { -2 } % Prints all items except last
+    \str_case_e:nnTF { \tl_item:nn { #1 } { -1 } } % Handles last character
+        {{.}{.}{,}{,}{?}{?}{!}{!}}{} % If punctuation, just print
         { \tl_item:nn { #1 } { -1 } . }} % Otherwise, print and add period
 \ExplSyntaxOff
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
