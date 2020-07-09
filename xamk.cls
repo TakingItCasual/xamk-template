@@ -106,8 +106,8 @@
 \RequirePackage[T1]{fontenc} % Fixes problems related to using special/accented characters
 \RequirePackage[utf8]{inputenc} % Allows for Unicode characters
 \RequirePackage[
-	left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm
-	]{geometry} % Set page margins
+    left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm
+    ]{geometry} % Set page margins
 \RequirePackage{tikz} % Needed for drawing shapes
     \usetikzlibrary{backgrounds}
 \RequirePackage[fleqn]{amsmath} % Needed for math equations/formulas
@@ -153,7 +153,7 @@
 %\RequirePackage{lipsum} % Needed for filler text
 
 \pretocmd{\embedfile}{\def\@zipembeddedflag{}}{}{}
-\AtEndDocument{% TODO: Detect any .zip file
+\AtEndDocument{% TODO: Detect any .zip file (tex.stackexchange.com/q/7653)
     \IfFileExists{./attach.zip}{% \ClassWarning doesn't seem to work
         \ifundef{\@zipembeddedflag}{\@latex@warning@no@line{%
             attach.zip file detected, but the embedfile command has not been used}}{}}{}}
@@ -172,8 +172,7 @@
             breaklines,% Breaks lines rather than running off the page
             autogobble,% Removes common leading whitespace
             #1},
-        #3}
-}{}
+        #3}}{}
 % Creates the listings "cmd" environment using tcolorbox
 \ifdef{\@reqlistingsflag}{
     \DeclareTCBListing{cmd}{O{}}{
@@ -183,8 +182,7 @@
         listing options={% Inherits from listings' lstset command
             basicstyle=\small\ttfamily,% Use small font, and properly apply inconsolata
             lineskip=0.2pc},% Sets line spacing to 1.2 (same as code env's)
-        #1}
-}{}
+        #1}}{}
 
 % filecontents can't be put under anything (44467)
 \begingroup\newif\ifbibincluded
@@ -410,8 +408,8 @@
 \ExplSyntaxOn % TODO: Expand commands passed to this command (e.g. \lipsum, \cite, etc.)
 \NewDocumentCommand\@adddotifnotpunct{ m }{ % Adapted from (413719)
     \tl_range:nnn { #1 } { 1 } { -2 } % Prints all items except last
-    \str_case_e:nnTF { \tl_item:nn { #1 } { -1 } } % Handles last character
-        {{.}{.}{,}{,}{?}{?}{!}{!}}{} % If punctuation, just print
+    \str_case_e:nnF { \tl_item:nn { #1 } { -1 } } % Handles last character
+        {{.}{.}{,}{,}{?}{?}{!}{!}} % If punctuation, just print
         { \tl_item:nn { #1 } { -1 } . }} % Otherwise, print and add period
 \ExplSyntaxOff
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
@@ -524,8 +522,10 @@
     \cftsetindents{table}{0pc}{0pc}
 }
 
-% Force new page, and create label for getting first appendix page's page number
-\AtBeginEnvironment{appendices}{\clearpage\zref@label{firstappstart}}{}
+\AtBeginEnvironment{appendices}{%
+    \clearpage
+    \pretocmd{\section}{\ifundef{\@firstapppass}{% Label used to get first appendix page number
+        \def\@firstapppass{}\zref@label{firstappstart}}{}}{}{}}
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
     % Make appendix section titles use numbers instead of letters
@@ -788,19 +788,9 @@
     \end{titlepage}
     \end{singlespace}
     \restoregeometry
-    \ifbool{thesisformat}{\@makethesisabstract}{}
+    \ifbool{thesisformat}{\clearpage\@makethesisabstract}{}
 }
 
-% Number of pages until the appendix.
-\def\@xamkpagecount{%
-    \zref@ifrefundefined{firstappstart}%
-        {\zpageref{LastPage}}%
-        {\the\numexpr\zref@extractdefault{firstappstart}{page}{1}-1\relax}}
-% Number of appendix pages.
-\def\@xamkappendixpagecount{%
-    \zref@ifrefundefined{firstappstart}{0}%
-        {\the\numexpr\zref@extractdefault{LastPage}{page}{1}%
-            -\zref@extractdefault{firstappstart}{page}{1}+1\relax}}
 % Who commissioned the thesis. Defaults to "N/A".
 \newcommand*\xamkthesiscommissioner[1]{\def\@xamkthesiscommissioner{#1}}
 \xamkthesiscommissioner{N/A}
@@ -824,8 +814,14 @@
     \@invalidate@abstract@cmds{\ClassError{xamk}%
         {This command must be used before the maketitle command}{}}
     % Early expansion needed so ifdefstring test works
-    \edef\@xamk@pc{\@xamkpagecount}
-    \edef\@xamk@apc{\@xamkappendixpagecount}
+    \edef\@xamk@pc{% Number of pages until appendices
+        \zref@ifrefundefined{firstappstart}%
+            {\zpageref{LastPage}}%
+            {\the\numexpr\zref@extractdefault{firstappstart}{page}{1}-1\relax}}
+    \edef\@xamk@apc{% Number of appendix pages
+        \zref@ifrefundefined{firstappstart}%
+            {0}{\the\numexpr\zref@extractdefault{LastPage}{page}{1}%
+                -\zref@extractdefault{firstappstart}{page}{1}+1\relax}}
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}

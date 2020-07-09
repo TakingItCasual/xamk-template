@@ -22,24 +22,25 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 
 % For physics units, \si{} can be used to distinguish units from variables (variables are italic).
 % The "&"s control alignment. Try moving them around to adjust alignment.
-\begin{align*}
+\begin{align} % Use the {align*} environment instead to disable equation numbering
     % Notice how this \num{} converts its input into scientific notation
-    G &\approx \num{6.674e-11}\si{N.m^{2}.kg^{-2}} \\ 
+    G &\approx \num{6.674e-11}\si{N.m^{2}.kg^{-2}} \label{eq:grav-constant}\\ 
     % \num{} can also add those small spaces in large/small numbers
     \num{1000000} &= \num{1e6} = \num{1000000000000} \times \num{0.000001} \\
     % Algebra
     x &= \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \\
     % \abs, \norm, and expanding parentheses
-    % _{} is for subscript, ^{} is for superscript (the {} is optional for only 1 character)
+    % _{} is for subscript, ^{} is for superscript (the {} is optional when there's 1 character)
     \norm{x}_p &= \left(\sum_i\abs{x_i}^p\right)^{\frac{1}{p}} \\
     % Matrices ("&" doesn't control alignment from within the matrix environment)
     \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}&
         \begin{bmatrix} 7 & 8 \\ 9 & 10 \\ 11 & 12 \end{bmatrix} =
         \begin{bmatrix} 58 & 64 \\ 139 & 154 \end{bmatrix}
     % If \\ was included after the last row it'd create an extra empty line of space below
-\end{align*}
-% Empty lines should be avoided around an align* environment, to preserve page space.
-% Alternatively, a comment (even a "%" by itself) can be used.
+\end{align}
+% Empty lines above/below an align environment will create excessive whitespace.
+% A comment at the start of the line (even a "%" by itself) can prevent this.
+Equations can be referenced like so: \eqref{eq:grav-constant}
 
 \subsection{Graphics}
 
