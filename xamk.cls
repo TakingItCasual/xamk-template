@@ -8,7 +8,7 @@
 % TODO: Clarify: Formatting and example for (list of) equations
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/09 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/13 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -158,9 +158,11 @@
         \ifundef{\@zipembeddedflag}{\@latex@warning@no@line{%
             attach.zip file detected, but the embedfile command has not been used}}{}}{}}
 
+% TODO: Also create input commands with \DeclareTCBInputListing?
+% TODO: Add counter/label system (e.g. with "auto counter")?
 % Creates the minted "code" environment using tcolorbox
 \ifdef{\@reqmintedflag}{
-    \DeclareTCBListing{code}{O{} m! O{}}{% 1st optional, 2nd mandatory, 3rd optional
+    \DeclareTCBListing{code}{ O{} m O{} }{% 1st optional, 2nd mandatory, 3rd optional
         top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         listing only,% Disable the secondary code display
         listing engine=minted,% Use minted for syntax hightlighting
@@ -175,7 +177,7 @@
         #3}}{}
 % Creates the listings "cmd" environment using tcolorbox
 \ifdef{\@reqlistingsflag}{
-    \DeclareTCBListing{cmd}{O{}}{
+    \DeclareTCBListing{cmd}{ O{} }{
         top=-0.5pc,bottom=-0.5pc,% Padding works differently for this, for some reason
         listing only,% Not available without minted/listings (don't put into tcbset)
         listing engine=listings,

@@ -11,9 +11,10 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
     % extra | before first l and missing | after the last l
     \begin{tabular}[b]{ || l | l  }
         \hline % "\\" adds a linebreak, "\hline" adds a horizontal line
-        Measurement 1 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
-        Measurement 2 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
-        Measurement 3 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
+        \textbf{Time} & \textbf{Measurement} \\\hline
+        13:02 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
+        13:04 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
+        14:32 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
     \end{tabular}
     \labelcaption{table-eg}{An example table} % See appendix 1
 \end{table}
@@ -40,7 +41,6 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 \end{align}
 % Empty lines above/below an align environment will create excessive whitespace.
 % A comment at the start of the line (even a "%" by itself) can prevent this.
-Equations can be referenced like so: \eqref{eq:grav-constant}
 
 \subsection{Graphics}
 
@@ -64,14 +64,15 @@ A cube with a hole through the top. Try changing the value of \texttt{cubex}.
     \citecaption{cube}{A cube drawn with TikZ} % See appendix 1
 \end{figure}
 
-\subsection{Lists}
+\subsection{Lists and label references}
 
 \begin{itemize} % itemize is for unordered lists, for ordered lists use enumerate
-    \item First item
-    \begin{itemize}
-        \item Nested item
+    \item Labels can be referenced in various ways.
+    \item \verb|\ref| for figure/table/section/etc. numbers (e.g. "See figure \ref{fig:latex-logo}").
+    \begin{itemize} % Sub-lists are created by nesting itemize/enumerate environments
+        \item \verb|\eqref| for equation numbers (e.g. "See equation \eqref{eq:grav-constant}").
     \end{itemize}
-    \item Second item
+    \item \verb|\pageref| for page numbers (e.g. "See table \ref{tab:table-eg} on page \pageref{tab:table-eg}").
 \end{itemize}
 
 \subsection{Graphs}
@@ -117,14 +118,14 @@ Some inlined paths: \lstinline{C:\Windows}, \lstinline{~/.bashrc} % \verb|| work
 
 % Settings within square brackets "[]" are optional.
 % The $, #, and space characters must be escaped to work properly.
-\begin{cmd}[title={Some command-line commands},label=code:linux-cmd,every listing line={\$\#>\ }]
+\begin{cmd}[title={Some command-line commands},every listing line={\$\#>\ }]
 wget http://tex.stackexchange.com
 echo "is this thing working?" > test.txt
 \end{cmd}
 
 % The starting line number is set with minted's "firstnumber".
 % {python} sets the language, see https://pygments.org/docs/lexers/ for the language list.
-\begin{code}[firstnumber=11]{python}[title={Some Python code with syntax highlighting},label=code:python-eg]
+\begin{code}[firstnumber=11]{python}[title={Some Python code with syntax highlighting}]
 def zip_gen(tuple_list):
     for index in range(min(len(tuple_list[0]), len(tuple_list[1]))):
         yield {tuple_list[0][index]: tuple_list[1][index]}
@@ -132,7 +133,7 @@ def zip_gen(tuple_list):
 
 \begin{comment} % This section is hidden due to the comment environment
 % {csharp} sets syntax highlighting to C#.
-\begin{code}{csharp}[title={Some C\# code with syntax highlighting},label=code:csharp-eg]
+\begin{code}{csharp}[title={Some C\# code with syntax highlighting}]
 private void StoreItemClicked(object sender, SelectionChangedEventArgs e) {
     if(Store.SelectedIndex != -1) {
         booksInCart.Add(booksInStore[Store.SelectedIndex]);
