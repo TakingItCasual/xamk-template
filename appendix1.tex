@@ -1,12 +1,12 @@
 \section{New and Modified Commands/Options/Etc.}
 
-\begin{code}{latex}[title={\texttt{xamk} document class options},label=code:class-options]
+\begin{code}{latex}[title={xamk document class options},label=code:class-options]
 lessxamk
 % By default, lots of formatting is done with spacings, margins, the bibliography and citations, fonts, justification, etc. Using this option brings the formatting closer to LaTeX's defaults.
 minted
-% Enables the minted package, used for code blocks with syntax highlighting. Requires Python and Python's Pygments package to be installed. Provides the "code" environment.
+% Enables the minted package, used for code blocks with syntax highlighting. Requires Python's Pygments package to be installed.
 listings
-% Enables the listings package, used for command-line snippets. Provides the "cmd" environment. (Simpler to use than minted.)
+% Enables the listings package, used for command-line snippets. (Simpler to use than minted.)
 pgfplots
 % Enables the pgfplots package, used for graphs. Sets some default grid stylings.
 bib
@@ -51,14 +51,14 @@ bib
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography commands},label=code:bib-cmds]
 \makebibliography[<options>]
-% Provided with the bib class option. Prints the bibliography and (if configured) list of figures/tables. Use the extra option to add a section for uncited references. Use the lof (and/or lot) option(s) to print the LoF/LoT and move figure/table references to the LoF/LoT.
+% Provided with bib class option. Prints the bibliography and (if configured) list of figures/tables. Use the extra option to add a section for uncited references. Use the lof (and/or lot) option(s) to print the LoF/LoT and move figure/table references to the LoF/LoT.
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Caption commands},label=code:caption-cmds]
 \labelcaption{<label>}[<short caption>]{<caption>}
 % Defined for the figure and table environments. Creates a label (automatically prefixed with "fig:"/"tab:" for figures/tables). Must be used instead of \caption and \label in these environments. A shorter caption can be set to be displayed in the LoF/LoT.
 \citecaption{<cite key/label>}[<short caption>]{<caption>}
-% Provided with the bib class option. Same as the \labelcaption command, but also inserts citation at end of caption, and configures the reference to appear under the list of figures/tables rather than the bibliography, if appropriate option set for \makebibliography.
+% Provided with bib class option. Same as the \labelcaption command, but also inserts citation at end of caption, and configures the reference to appear under the list of figures/tables rather than the bibliography, if appropriate option set for \makebibliography.
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography database fields},label=code:bib-fields]
@@ -68,11 +68,15 @@ lastmoddate
 % Goes with the url field. Specifies the date when the document was last modified.
 \end{code}
 %
-\begin{code}[firstnumber=last]{latex}[title={Environments},label=code:envs]
+\begin{code}[firstnumber=last]{latex}[title={tcolorbox environments and commands},label=code:tcolorbox]
 {code}[<minted options>]{<language>}[<tcblisting options>]
-% Provided with the minted class option. Minted options (starting line number, font size, etc.) can be specified before the language, while TCBListing options (title, color, etc.) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+% Environment. Provided with minted class option. Minted options (starting line number, font size, etc.) can be specified before the language, while TCBListing options (title, color, etc.) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+\codeinput{<file>}[<minted options>]{<language>}[<tcblisting options>]
+% Same as code environment, but gets contents from file. (The firstline and lastline minted options may be of use.)
 {cmd}[<tcblisting options>]
-% Provided with the listings class option. TCBListing options (title, line prefix, etc.) can optionally be specified.
+% Environment. Provided with listings class option. TCBListing options (title, line prefix, etc.) can optionally be specified.
+\cmdinput{<file>}[<tcblisting options>]
+% Same as cmd environment, but gets contents from file.
 \end{code}
 
 \begin{comment}

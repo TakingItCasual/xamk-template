@@ -122,6 +122,8 @@ Some inlined paths: \lstinline{C:\Windows}, \lstinline{~/.bashrc} % \verb|| work
 wget http://tex.stackexchange.com
 echo "is this thing working?" > test.txt
 \end{cmd}
+% Alternatively, import content from file
+%\cmdinput{test.txt}[title={Some command-line commands},every listing line={\$\#>\ }]
 
 % The starting line number is set with minted's "firstnumber".
 % {python} sets the language, see https://pygments.org/docs/lexers/ for the language list.
@@ -130,6 +132,8 @@ def zip_gen(tuple_list):
     for index in range(min(len(tuple_list[0]), len(tuple_list[1]))):
         yield {tuple_list[0][index]: tuple_list[1][index]}
 \end{code}
+% Alternatively, import content from file
+%\codeinput{thesis-abstract.tex}[firstline=9,lastline=13]{latex}[title={Part of the thesis abstract}]
 
 \begin{comment} % This section is hidden due to the comment environment
 % {csharp} sets syntax highlighting to C#.

@@ -8,7 +8,7 @@
 % TODO: Clarify: Formatting and example for (list of) equations
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/13 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/14 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -54,7 +54,10 @@
 }{% Package options to use if the official layout is not used
     \PassOptionsToPackage{title}{appendix} % Prepends "Appendix #" to appendix sections
     \ifdef{\@reqbiblatexflag}{%
-        \PassOptionsToPackage{citestyle=numeric}{biblatex}}{}
+        \PassOptionsToPackage{%
+            citestyle=numeric,% Part of process for combining numeric and authoryear styles
+            sorting=none% References are only sorted by the order they're cited in
+            }{biblatex}}{}
 }
 
 % minted depends on Python's Pygments package, so its usage has been made optional
@@ -68,6 +71,11 @@
     % The "code" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{minted}{tcolorbox}
     
+    \setminted{% Set default options for minted and code environments
+        linenos,% Enable line numbering
+        breaklines,% Break lines rather than running off the page
+        autogobble}% Remove common leading whitespace
+    
     % Disable syntax error highlighting, since it gives false positives (343506)
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
@@ -80,9 +88,9 @@
     % The "cmd" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{listings}{tcolorbox}
 
-    \lstset{
-        basicstyle=\ttfamily,% Used to properly apply inconsolata
-        breaklines=true,% Breaks lines rather than running off the page
+    \lstset{% Set default options for listings and cmd environments
+        basicstyle=\ttfamily,% Properly apply inconsolata font
+        breaklines=true,% Break lines rather than running off the page
         postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
 }{}
 
@@ -158,33 +166,35 @@
         \ifundef{\@zipembeddedflag}{\@latex@warning@no@line{%
             attach.zip file detected, but the embedfile command has not been used}}{}}{}}
 
-% TODO: Also create input commands with \DeclareTCBInputListing?
-% TODO: Add counter/label system (e.g. with "auto counter")?
-% Creates the minted "code" environment using tcolorbox
+% TODO: Add counter/label system (e.g. with "auto counter")? Title would then be mandatory.
+% Create the minted "code" environment and input command using tcolorbox
 \ifdef{\@reqmintedflag}{
-    \DeclareTCBListing{code}{ O{} m O{} }{% 1st optional, 2nd mandatory, 3rd optional
+    \tcbset{mintedstyle/.style 2 args={%
         top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         listing only,% Disable the secondary code display
         listing engine=minted,% Use minted for syntax hightlighting
-        minted language=#2,
-        minted options={
+        minted language=#1,%
+        minted options={% Inherits from minted's setminted command
             baselinestretch=1.2,% Sets line spacing to 1.2
-            fontsize=\small,
-            linenos,% Enable line numbering
-            breaklines,% Breaks lines rather than running off the page
-            autogobble,% Removes common leading whitespace
-            #1},
-        #3}}{}
-% Creates the listings "cmd" environment using tcolorbox
-\ifdef{\@reqlistingsflag}{
-    \DeclareTCBListing{cmd}{ O{} }{
+            fontsize=\small,%
+            #2}}}
+    \NewTCBListing{code}{ O{} m O{} }{% 1st optional, 2nd mandatory, 3rd optional
+        mintedstyle={#2}{#1}, #3}
+    \NewTCBInputListing{\codeinput}{ m O{} m O{} }{%
+        listing file={#1}, mintedstyle={#3}{#2}, #4}
+}{}
+% Create the listings "cmd" environment and input command using tcolorbox
+\ifdef{\@reqlistingsflag}{% TODO: Find best way to also allow listings options to be set
+    \tcbset{listingsstyle/.style={%
         top=-0.5pc,bottom=-0.5pc,% Padding works differently for this, for some reason
-        listing only,% Not available without minted/listings (don't put into tcbset)
-        listing engine=listings,
+        listing only,% Not available without minted/listings (don't put into global tcbset)
+        listing engine=listings,%
         listing options={% Inherits from listings' lstset command
             basicstyle=\small\ttfamily,% Use small font, and properly apply inconsolata
-            lineskip=0.2pc},% Sets line spacing to 1.2 (same as code env's)
-        #1}}{}
+            lineskip=0.2pc}}}% Sets line spacing to 1.2 (same as code env's)
+    \NewTCBListing{cmd}{ O{} }{listingsstyle, #1}
+    \NewTCBInputListing{\cmdinput}{ m O{} }{listing file={#1}, listingsstyle, #2}
+}{}
 
 % filecontents can't be put under anything (44467)
 \begingroup\newif\ifbibincluded
@@ -215,7 +225,7 @@
     \RequirePackage[
         datamodel=xamkbibdm,% Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,
-        bibstyle=authoryear,
+        bibstyle=authoryear,% Default style closest to Harvard, citestyle set elsewhere
         dashed=false,% Don't use dashes for duplicate author-years
         uniquename=init,% Needed so the following option doesn't give a warning
         giveninits=true,% Abbreviate names (except for last name)
