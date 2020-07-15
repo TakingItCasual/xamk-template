@@ -16,7 +16,7 @@ bib
 \begin{code}[firstnumber=last]{latex}[title={Standard title page commands},label=code:std-cmds]
 \xamkstudent{<student name>}
 \xamkstudent{<student name>}{<student number>}{<group ID>}
-% Specify your full name, and optionally your student number and group ID. Can be used multiple times to share credit between multiple students.
+% Specify your full name, and optionally your student number and group ID. Can be used multiple times to share credit between students.
 \xamkpapertitle{<paper title>}
 % Specify the title of the paper.
 \xamkpapersubtitle{<paper subtitle>}
@@ -34,9 +34,9 @@ bib
 \begin{code}[firstnumber=last]{latex}[title={Thesis title and abstract page commands},label=code:thesis-cmds]
 % The previously shown \xamkstudent, \xamkpapertitle, \xamkpapersubtitle, and \xamkpaperdate commands are needed as well.
 \xamkdegreetype{<degree type>}
-% Used in place of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
+% Used instead of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
 \xamkdegreeprogramme{<degree programme>}
-% Used in place of \xamkcoursename. Specify your degree program.
+% Used instead of \xamkcoursename. Specify your degree program.
 \xamkthesiscommissioner{<commissioner>}
 % Specify the commissioning organization/company/etc. of the thesis. Optional, defaults to "N/A" (Not Applicable).
 \xamkthesissupervisor{<supervisor>}
@@ -51,7 +51,7 @@ bib
 %
 \begin{code}[firstnumber=last]{latex}[title={Bibliography commands},label=code:bib-cmds]
 \makebibliography[<options>]
-% Provided with bib class option. Prints the bibliography and (if configured) list of figures/tables. Use the extra option to add a section for uncited references. Use the lof (and/or lot) option(s) to print the LoF/LoT and move figure/table references to the LoF/LoT.
+% Provided with bib class option. Prints the bibliography. Use the extra option to add a section for uncited references. Use the lof (and/or lot) option(s) to add the list-of-figures/tables section(s) and move figure/table references to the LoF/LoT.
 \end{code}
 %
 \begin{code}[firstnumber=last]{latex}[title={Caption commands},label=code:caption-cmds]
@@ -70,7 +70,7 @@ lastmoddate
 %
 \begin{code}[firstnumber=last]{latex}[title={tcolorbox environments and commands},label=code:tcolorbox]
 {code}[<minted options>]{<language>}[<tcblisting options>]
-% Environment. Provided with minted class option. Minted options (starting line number, font size, etc.) can be specified before the language, while TCBListing options (title, color, etc.) can be specified after the language. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
+% Environment. Provided with minted class option. Minted options (starting line number, font size, etc.) can be specified before the language, while TCBListing options (title, color, etc.) can be specified after. Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
 \codeinput{<file>}[<minted options>]{<language>}[<tcblisting options>]
 % Same as code environment, but gets contents from file. (The firstline and lastline minted options may be of use.)
 {cmd}[<tcblisting options>]

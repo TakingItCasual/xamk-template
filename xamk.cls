@@ -8,7 +8,7 @@
 % TODO: Clarify: Formatting and example for (list of) equations
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/14 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/15 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -23,20 +23,7 @@
 \RequirePackage{etoolbox} % Needed for logic in this class file
 \RequirePackage{pgfkeys} % Needed for named command options
 \RequirePackage{xcolor} % Needed for background color behind code blocks
-\RequirePackage[mono]{inconsolata} % Better tt font (must be loaded before text encoding)
-    % Inconsolata doesn't have italics, refer italics/slanted requests to normal font (224262)
-    \@namedef{T1/zi4/m/it}{<->ssub*zi4/m/n}
-    \@namedef{T1/zi4/b/it}{<->ssub*zi4/b/n}
-    \@namedef{T1/zi4/bx/it}{<->ssub*zi4/b/n}
-    \@namedef{T1/zi4/m/sl}{<->ssub*zi4/m/n}
-    \@namedef{T1/zi4/b/sl}{<->ssub*zi4/b/n}
-    \@namedef{T1/zi4/bx/sl}{<->ssub*zi4/b/n}
-    \@namedef{TS1/zi4/m/it}{<->ssub*zi4/m/n}
-    \@namedef{TS1/zi4/b/it}{<->ssub*zi4/b/n}
-    \@namedef{TS1/zi4/bx/it}{<->ssub*zi4/b/n}
-    \@namedef{TS1/zi4/m/sl}{<->ssub*zi4/m/n}
-    \@namedef{TS1/zi4/b/sl}{<->ssub*zi4/b/n}
-    \@namedef{TS1/zi4/bx/sl}{<->ssub*zi4/b/n}
+\RequirePackage[scaled=0.85]{beramono} % Better tt font (must be loaded before text encoding)
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
 \RequirePackage{xparse} % Needed for creating advanced commands, and for LaTeX3
 \RequirePackage[immediate]{silence} % Needed to silence some unavoidable but harmless warnings
@@ -44,7 +31,7 @@
 % Package options to use if the official layout is used
 \ifundef{\@lessxamkflag}{
     \PassOptionsToPackage{%
-        font={small, singlespacing},% Smaller font, single line spacing
+        font={footnotesize, singlespacing},% 10pt font size, single line spacing
         labelsep=period,% Replace ":" with "." after fig/tab number
         listformat=empty% Remove fig/tab numbering in LoF/LoT
         }{caption}
@@ -89,7 +76,7 @@
     \PassOptionsToPackage{listings}{tcolorbox}
 
     \lstset{% Set default options for listings and cmd environments
-        basicstyle=\ttfamily,% Properly apply inconsolata font
+        basicstyle=\ttfamily,% Properly apply tt font
         breaklines=true,% Break lines rather than running off the page
         postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
 }{}
@@ -190,7 +177,7 @@
         listing only,% Not available without minted/listings (don't put into global tcbset)
         listing engine=listings,%
         listing options={% Inherits from listings' lstset command
-            basicstyle=\small\ttfamily,% Use small font, and properly apply inconsolata
+            basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
             lineskip=0.2pc}}}% Sets line spacing to 1.2 (same as code env's)
     \NewTCBListing{cmd}{ O{} }{listingsstyle, #1}
     \NewTCBInputListing{\cmdinput}{ m O{} }{listing file={#1}, listingsstyle, #2}
