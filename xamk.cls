@@ -8,7 +8,7 @@
 % TODO: Clarify: Formatting and example for (list of) equations
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/15 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/16 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -404,30 +404,29 @@
         use citecaption or labelcaption instead}{}}{}{}}
 \newrobustcmd*\@fullcitehyper[1]{% Used to move citation hyperrefs to the LoF/LoT
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
-\ExplSyntaxOn % TODO: Expand commands passed to this command (e.g. \lipsum, \cite, etc.)
-\NewDocumentCommand\@adddotifnotpunct{ m }{ % Adapted from (413719)
-    \tl_range:nnn { #1 } { 1 } { -2 } % Prints all items except last
-    \str_case_e:nnF { \tl_item:nn { #1 } { -1 } } % Handles last character
-        {{.}{.}{,}{,}{?}{?}{!}{!}} % If punctuation, just print
-        { \tl_item:nn { #1 } { -1 } . }} % Otherwise, print and add period
-\ExplSyntaxOff
+\ExplSyntaxOn % TODO: Doesn't detect punctuation from commands? (e.g. \lipsum)
+\NewDocumentCommand\@adddotifnotpunct{ m }{
+    #1\str_case_e:nnF { \tl_item:Nn { #1 } { -1 } } % Check last character
+        {{.}{}{,}{}{?}{}{!}{}} % If punctuation, do nothing
+        {.}} % Otherwise, add period
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
-\NewDocumentCommand\@makecaptioncmds{ m m m }{%
-    \@disablecaptioncmds{#1}%
-    \ifdef{\@reqbiblatexflag}{%
-        \NewDocumentCommand\citecaption{ m O{##3} m }{%
-            \ifundef{\@lessxamkflag}%
-                {\@oldcaption[#3 \@adddotifnotpunct{##2} \@fullcitehyper{##1}]%
-                    {##3 \protect\parencite{##1}}}%
-                {\@oldcaption[##2 \protect\parencite{##1}]%
-                    {##3 \protect\parencite{##1}}}%
-            \@oldlabel{#2:##1}%
-            \addtocategory{fullcited#2}{##1}}}{}%
-    \NewDocumentCommand\labelcaption{ m O{##3} m }{%
-        \ifundef{\@lessxamkflag}% TODO: Clarify: Add "(Made by author)"?
-            {\@oldcaption[#3 \@adddotifnotpunct{##2}]{##3}}%
-            {\@oldcaption[##2]{##3}}%
+\NewDocumentCommand\@makecaptioncmds{ m m m }{
+    \@disablecaptioncmds{#1}
+    \ifdef{\@reqbiblatexflag}{
+        \NewDocumentCommand\citecaption{ m O{##3} m }{
+            \ifundef{\@lessxamkflag}
+                {\@oldcaption[#3~\@adddotifnotpunct{##2}~\@fullcitehyper{##1}]
+                    {##3~\protect\parencite{##1}}}
+                {\@oldcaption[##2~\protect\parencite{##1}]
+                    {##3~\protect\parencite{##1}}}
+            \@oldlabel{#2:##1}
+            \addtocategory{fullcited#2}{##1}}}{}
+    \NewDocumentCommand\labelcaption{ m O{##3} m }{
+        \ifundef{\@lessxamkflag} % TODO: Clarify: Add "(Made by author)"?
+            {\@oldcaption[#3~\@adddotifnotpunct{##2}]{##3}}
+            {\@oldcaption[##2]{##3}}
         \@oldlabel{#2:##1}}}
+\ExplSyntaxOff
 \AtBeginEnvironment{figure}{%
     \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
 \AtBeginEnvironment{table}{%
