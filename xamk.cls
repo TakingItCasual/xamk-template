@@ -6,9 +6,10 @@
 
 % TODO: Create proper formatting for bibliography
 % TODO: Clarify: Formatting and example for (list of) equations
+% TODO: Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/16 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/20 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -173,7 +174,7 @@
 % Create the listings "cmd" environment and input command using tcolorbox
 \ifdef{\@reqlistingsflag}{% TODO: Find best way to also allow listings options to be set
     \tcbset{listingsstyle/.style={%
-        top=-0.5pc,bottom=-0.5pc,% Padding works differently for this, for some reason
+        top=-0.5pc,bottom=-0.5pc,% Padding works differently for listings, for some reason
         listing only,% Not available without minted/listings (don't put into global tcbset)
         listing engine=listings,%
         listing options={% Inherits from listings' lstset command
@@ -697,7 +698,8 @@
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
 
 % The list of students. Supported formats are "<name> | <number> | <group>", and "<name>".
-\def\@xamkdefaultstudent{\@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID}}
+\def\@xamkdefaultstudent{%
+    \@placehold{Student Name} | \@placehold{Student Number} | \@placehold{Group ID}}
 \def\@xamkdefaultstudentname{\@placehold{First-name Last-name}}
 \newcounter{studentcount}
 \newcounter{studentcounttemp}
@@ -734,7 +736,7 @@
 \newcommand*\xamkdegreeprogramme[1]{\def\@xamkdegreeprogramme{#1}}
 \xamkdegreeprogramme{\href{https://student.xamk.fi/studies-and-supporting-services/Documents/degree_titles.pdf}{\@placehold{Degree Programme}}}
 
-\newcommand*\@invalidate@title@cmds[1]{%
+\newcommand*\@invalidate@title@cmds[1]{% Redefine commands to give error
     \RenewDocumentCommand\xamkstudent{ m g g }{#1}
     \renewcommand*\xamkpapertitle[1]{#1}
     \renewcommand*\xamkpapersubtitle[1]{#1}
@@ -800,7 +802,7 @@
 \xamkthesiskeywords{\@placehold{Keywords}}
 % Abstract for the thesis. Expects a file name as input. Defaults to "<Thesis Abstract>".
 \newcommand*\xamkthesisabstractfile[1]{\def\@xamkthesisabstractfile{#1}}
-\newcommand*\@invalidate@abstract@cmds[1]{%
+\newcommand*\@invalidate@abstract@cmds[1]{% Redefine commands to give error
     \renewcommand*\xamkthesiscommissioner[1]{#1}
     \renewcommand*\xamkthesissupervisor[1]{#1}
     \renewcommand*\xamkthesiskeywords[1]{#1}
@@ -832,15 +834,18 @@
         \xamkdrawlogo
     \end{tikzpicture}
     \begin{tcolorbox}[
-    enhanced, space to upper,
-    height fill, sharp corners,
-    segmentation style=solid,
+    enhanced,% Needed for segmentation style option
+    segmentation style={% Use solid rather than dashed divider lines
+        black, solid, line width=1pt},%
+    space to upper,% Make extra empty space go above \tcblower
+    height fill,% Make table fill the remaining page height
+    sharp corners,% Ensure table corners are sharp rather than rounded
     colback=white,% Background color
     middle=0pc,boxsep=0.5pc]% Inner margins
         \ifundef{\@lessxamkflag}{\raggedright}{}
         \noindent\begin{tabularx}{\textwidth}% 3 columns -> sum must be exactly 3
         {@{} >{\hsize=1.15\hsize}X >{\hsize=1.15\hsize}X >{\hsize=0.7\hsize}X @{}}
-            \textbf{Author (authors)}
+            \textbf{Author (authors)} % TODO: Clarify: Detect plural?
             \vspace*{0.5pc}
 
             \ifdef{\@xamkstudentlist}{\@printxamkstudentlist}{\@xamkdefaultstudentname}
@@ -859,7 +864,7 @@
         \noindent\begin{tabularx}{\textwidth}%
         % 2 columns -> sum must be exactly 2 (enough space for up to 999 appendix pages)
         {@{} >{\hsize=1.44\hsize}X >{\hsize=0.56\hsize}X @{}}
-        \textbf{Thesis title}
+        \textbf{Thesis title} % TODO: Clarify: Detect subtitle presence?
         \vspace*{0.5pc}
 
         \@xamkpapertitle
@@ -868,7 +873,7 @@
         \@xamk@pc\ page\ifdefstring{\@xamk@pc}{1}{}{s}
 
         \@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices
-        \end{tabularx}
+        \end{tabularx} % TODO: Clarify: Rephrase as "# appendix page(s)"? More space.
     \tcbline% TODO: Clarify: Hide if commissioner not specified?
         \textbf{Commissioned by}
         \vspace*{0.5pc}
