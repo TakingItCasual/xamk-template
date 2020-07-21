@@ -128,7 +128,7 @@
     ]{caption} % Needed for formatting captions
 \RequirePackage{setspace} % Needed for setting line spacing
 \RequirePackage{tabularx} % Needed for horizontal table stretching
-\RequirePackage[many, breakable]{tcolorbox} % Needed for abstract page and cmd/code boxes
+\RequirePackage[skins, breakable]{tcolorbox} % Needed for abstract page and cmd/code boxes
     \tcbset{
         colback=blue!5!white,% Set background to light blue
         sharp corners,% XAMK is all about those sharp edges, judging from its logo
@@ -157,6 +157,7 @@
 % TODO: Add counter/label system (e.g. with "auto counter")? Title would then be mandatory.
 % Create the minted "code" environment and input command using tcolorbox
 \ifdef{\@reqmintedflag}{
+    \tcbuselibrary{xparse}
     \tcbset{mintedstyle/.style 2 args={%
         top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         listing only,% Disable the secondary code display
@@ -173,6 +174,7 @@
 }{}
 % Create the listings "cmd" environment and input command using tcolorbox
 \ifdef{\@reqlistingsflag}{% TODO: Find best way to also allow listings options to be set
+    \ifundef{\@reqmintedflag}{\tcbuselibrary{xparse}}{} % Don't redo
     \tcbset{listingsstyle/.style={%
         top=-0.5pc,bottom=-0.5pc,% Padding works differently for listings, for some reason
         listing only,% Not available without minted/listings (don't put into global tcbset)
@@ -789,6 +791,7 @@
     \end{singlespace}
     \restoregeometry
     \ifbool{thesisformat}{\clearpage\@makethesisabstract}{}
+    \clearpage
 }
 
 % Who commissioned the thesis. Defaults to "N/A".
@@ -901,5 +904,10 @@
     \end{singlespace}
     \restoregeometry
 }
+
+% Uncomment and place more '\listeadd's to find compilation bottlenecks
+%\listeadd\@timerlist{end: \the\pdfelapsedtime}
+%\renewcommand*{\do}[1]{\typeout{#1}}
+%\dolistloop{\@timerlist}
 
 \endinput
