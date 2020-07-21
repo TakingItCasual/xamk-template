@@ -5,11 +5,11 @@
 % Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live installation
 
 % TODO: Create proper formatting for bibliography
-% TODO: Clarify: Formatting and example for (list of) equations
-% TODO: Clarify: If thesis changes format, thesis will need to become class option
+% Clarify: Formatting and example for (list of) equations
+% Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/20 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/21 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -260,7 +260,7 @@
         \DeclareFieldAlias{translatortype}{editortype}
     \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (419595)
         \DeclareDelimAlias{translatortypedelim}{editortypedelim}
-    \xpatchbibmacro{byeditor+others}% Add parantheses (241591) TODO: Clarify
+    \xpatchbibmacro{byeditor+others}% Clarify: Keep parantheses? (241591)
         {\usebibmacro{byeditor+othersstrg}%
             \setunit{\addspace}\printnames[byeditor]{editor}}%
         {\printtext[parens]{\usebibmacro{byeditor+othersstrg}%
@@ -279,7 +279,7 @@
     \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
     \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
     % Default \parencite's and \textcite's postnote to pages, if present
-    % TODO: Clarify: When should page numbers be included after citations?
+    % Clarify: When should page numbers be included after citations?
     \ifdef{\@lessxamkflag}{}{% Automatic page numbers for numeric citations is confusing
         \letbibmacro*{parencite:postnote}{postnote} % Copy original postnote macro
         \xpatchbibmacro{parencite:postnote}% Only replace if postnote not set by user
@@ -305,7 +305,7 @@
         ]{title}{#1} % Remove title quotes from bibliography (94090)
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
         ]{citetitle}{#1} % Remove title quotes from citations (94090)
-    % TODO: Clarify: Also apply to doi/eprint?
+    % Clarify: Also apply to doi/eprint?
     \xpretobibmacro{url+urldate}{% Print doctype and lastmoddate before url+urldate
         {\iffieldundef{url}{}% If doctype not specified, default to wwwdoc string
             {\iffieldundef{doctype}{\bibstring{wwwdoc}}{\printfield{doctype}}%
@@ -423,7 +423,7 @@
             \@oldlabel{#2:##1}
             \addtocategory{fullcited#2}{##1}}}{}
     \NewDocumentCommand\labelcaption{ m O{##3} m }{
-        \ifundef{\@lessxamkflag} % TODO: Clarify: Add "(Made by author)"?
+        \ifundef{\@lessxamkflag} % Clarify: Add "(Made by author)"?
             {\@oldcaption[#3~\@adddotifnotpunct{##2}]{##3}}
             {\@oldcaption[##2]{##3}}
         \@oldlabel{#2:##1}}}
@@ -576,7 +576,7 @@
         \pagestyle{fancy}
         \fancyhf{} % Clear whatever defaults the header and footer may have
         \renewcommand\headrulewidth{0pc} % Remove the header bar
-        % TODO: Clarify: Page numbering as "# of #"? Should appendices be included?
+        % Clarify: Page numbering as "# of #"? Should appendices be included?
         \chead{\textcolor{gray}{\thepage}} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification
 }{}
@@ -845,7 +845,7 @@
         \ifundef{\@lessxamkflag}{\raggedright}{}
         \noindent\begin{tabularx}{\textwidth}% 3 columns -> sum must be exactly 3
         {@{} >{\hsize=1.15\hsize}X >{\hsize=1.15\hsize}X >{\hsize=0.7\hsize}X @{}}
-            \textbf{Author (authors)} % TODO: Clarify: Detect plural?
+            \textbf{Author\ifnumgreater{\value{studentcount}}{1}{s}{}} % "s" added if multiple
             \vspace*{0.5pc}
 
             \ifdef{\@xamkstudentlist}{\@printxamkstudentlist}{\@xamkdefaultstudentname}
@@ -864,7 +864,7 @@
         \noindent\begin{tabularx}{\textwidth}%
         % 2 columns -> sum must be exactly 2 (enough space for up to 999 appendix pages)
         {@{} >{\hsize=1.44\hsize}X >{\hsize=0.56\hsize}X @{}}
-        \textbf{Thesis title} % TODO: Clarify: Detect subtitle presence?
+        \textbf{Thesis title} % Clarify: Detect subtitle presence?
         \vspace*{0.5pc}
 
         \@xamkpapertitle
@@ -872,9 +872,9 @@
         &% "s" is added after "page" if page count is anything other than "1"
         \@xamk@pc\ page\ifdefstring{\@xamk@pc}{1}{}{s}
 
-        \@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices
-        \end{tabularx} % TODO: Clarify: Rephrase as "# appendix page(s)"? More space.
-    \tcbline% TODO: Clarify: Hide if commissioner not specified?
+        \@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices % Clarify: Hide if 0?
+        \end{tabularx} % Clarify: Rephrase as "# appendix page(s)"? More space.
+    \tcbline% Clarify: Hide if commissioner not specified?
         \textbf{Commissioned by}
         \vspace*{0.5pc}
 
