@@ -1,7 +1,7 @@
 % Unofficial LaTeX class file for XAMK assignments/theses/reports/etc.
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
-% For comments with a number in parentheses, append the number to "tex.stackexchange.com/a/"
+% For comments with a number in parentheses, append to "tex.stackexchange.com"
 % Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live installation
 
 % TODO: Create proper formatting for bibliography
@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/21 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/22 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -48,54 +48,43 @@
             }{biblatex}}{}
 }
 
-% minted depends on Python's Pygments package, so its usage has been made optional
+% Load minted package (needs Python's Pygments), more done with tcolorbox later
 \ifdef{\@reqmintedflag}{
-    \RequirePackage{currfile-abspath} % Apparently only works reliably with TeX Live? (548869)
+    \RequirePackage{currfile-abspath} % Only works reliably with TeX Live? (/a/548869)
         \getabspath{\jobname.log}
         \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
             {}{\PassOptionsToPackage{outputdir=\theabsdir}{minted}}
+    % TODO: Why doesn't cache option work if minted imported after tcolorbox?
     \RequirePackage[cache=false% Needed to prevent errors in TeXstudio
         ]{minted} % Needed for code blocks with syntax highlighting
     % The "code" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{minted}{tcolorbox}
     
-    \setminted{% Set default options for minted and code environments
-        linenos,% Enable line numbering
-        breaklines,% Break lines rather than running off the page
-        autogobble}% Remove common leading whitespace
-    
-    % Disable syntax error highlighting, since it gives false positives (343506)
+    % Disable syntax error highlighting, since it gives false positives (/a/343506)
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
     \xpatchcmd{\mintinline}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
 }{}
-
+% Load listings package, more done with tcolorbox later
 \ifdef{\@reqlistingsflag}{
     \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
     % The "cmd" TCBListing environment is declared after tcolorbox is loaded
     \PassOptionsToPackage{listings}{tcolorbox}
-
-    \lstset{% Set default options for listings and cmd environments
-        basicstyle=\ttfamily,% Properly apply tt font
-        breaklines=true,% Break lines rather than running off the page
-        postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
 }{}
-
-% pgfplots is quite a large package (slows compilation), so its usage has been made optional
+% Load pgfplots package (large, slow) and set defaults
 \ifdef{\@reqpgfplotsflag}{
     \RequirePackage{pgfplots} % Needed for fancy graphs
-    	\pgfplotsset{compat=newest} % (139695)
-
     % Set default options for pgfplots graphs (most are related to the grid).
     \pgfplotsset{
-        xlabel style={align=center},
-        ylabel style={align=center},
-        axis lines=left,
-        grid=both,
-        major grid style={line width=0.2pt, draw=gray!50},
-        grid style={line width=0.1pt, draw=gray!10},
-        minor tick num=4}
+        compat=1.16,% Lock version compatibility (check log file to see current version)
+        xlabel style={align=center},% Needed for line-breaks to work in label
+        ylabel style={align=center},% -||-
+        axis lines=left,% Place axis lines to left/bottom 
+        grid=both,% Draw both major and minor grid lines
+        major grid style={line width=0.2pt, draw=gray!50},% Make major grid lines thicker
+        grid style={line width=0.1pt, draw=gray!10},% Make minor grid lines thinner
+        minor tick num=4}% Draw 4 minor grid lines between major grid lines
 }{}
 
 \RequirePackage[UKenglish]{babel} % Ensures consistent output regardless of system locale
@@ -110,7 +99,7 @@
     \patchcmd{\env@matrix}% Default to right-aligning matrices
         {\array{*\c@MaxMatrixCols c}}%
         {\array{*\c@MaxMatrixCols r}}{}{}
-\RequirePackage{mathtools} % Needed for abs/norm commands (43009)
+\RequirePackage{mathtools} % Needed for abs/norm commands (/a/43009)
     \DeclarePairedDelimiter\abs{\lvert}{\rvert}
         \let\@oldabs\abs
         \def\abs{\@ifstar{\@oldabs}{\@oldabs*}} % Make starred version default
@@ -132,6 +121,7 @@
     \tcbset{
         colback=blue!5!white,% Set background to light blue
         sharp corners,% XAMK is all about those sharp edges, judging from its logo
+        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         left=0pc,right=0pc,% Left padding removed so line numbers show properly
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
@@ -142,14 +132,14 @@
     ]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
 \RequirePackage{enumitem} % Needed to remove vertical spacing from lists
-    \setlist{nosep} % (10689)
+    \setlist{nosep} % (/a/10689)
 \RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
 \RequirePackage[lastpage, user]{zref} % Needed for better labels (Used for appendix page #s)
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
 
 \pretocmd{\embedfile}{\def\@zipembeddedflag{}}{}{}
-\AtEndDocument{% TODO: Detect any .zip file (tex.stackexchange.com/q/7653)
+\AtEndDocument{% TODO: Detect any .zip file (/q/7653)
     \IfFileExists{./attach.zip}{% \ClassWarning doesn't seem to work
         \ifundef{\@zipembeddedflag}{\@latex@warning@no@line{%
             attach.zip file detected, but the embedfile command has not been used}}{}}{}}
@@ -157,42 +147,45 @@
 % TODO: Add counter/label system (e.g. with "auto counter")? Title would then be mandatory.
 % Create the minted "code" environment and input command using tcolorbox
 \ifdef{\@reqmintedflag}{
+    \setminted{% Set default options for minted and code environments/commands
+        fontsize=\small,%
+        linenos,% Enable line numbering
+        breaklines,% Break lines rather than running off the page
+        autogobble}% Remove common leading whitespace
+    \ifundef{\@lessxamkflag}{\setminted{baselinestretch=1.2}}{} % Set line spacing to 1.2
+
     \tcbuselibrary{xparse}
-    \tcbset{mintedstyle/.style 2 args={%
-        top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
+    \tcbset{mintedstyle/.style={%
         listing only,% Disable the secondary code display
         listing engine=minted,% Use minted for syntax hightlighting
-        minted language=#1,%
-        minted options={% Inherits from minted's setminted command
-            baselinestretch=1.2,% Sets line spacing to 1.2
-            fontsize=\small,%
-            #2}}}
-    \NewTCBListing{code}{ O{} m O{} }{% 1st optional, 2nd mandatory, 3rd optional
-        mintedstyle={#2}{#1}, #3}
-    \NewTCBInputListing{\codeinput}{ m O{} m O{} }{%
-        listing file={#1}, mintedstyle={#3}{#2}, #4}
+        minted language=#1}}% Default minted options inherited from \setminted command(s)
+    \NewTCBListing{code}{ m O{} }{mintedstyle={#1}, #2}
+    \NewTCBInputListing{\codeinput}{ m m O{} }{listing file={#1}, mintedstyle={#2}, #3}
 }{}
 % Create the listings "cmd" environment and input command using tcolorbox
-\ifdef{\@reqlistingsflag}{% TODO: Find best way to also allow listings options to be set
+\ifdef{\@reqlistingsflag}{
+    \lstset{% Set default options for listings and cmd environments/commands
+        style=tcblatex,% Formatting can get screwed up without this (/a/554568)
+        basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
+        breaklines,% Break lines rather than running off the page
+        postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
+    \ifundef{\@lessxamkflag}{\lstset{lineskip=0.2pc}}{} % Set line spacing to 1.2
+
     \ifundef{\@reqmintedflag}{\tcbuselibrary{xparse}}{} % Don't redo
     \tcbset{listingsstyle/.style={%
-        top=-0.5pc,bottom=-0.5pc,% Padding works differently for listings, for some reason
         listing only,% Not available without minted/listings (don't put into global tcbset)
-        listing engine=listings,%
-        listing options={% Inherits from listings' lstset command
-            basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
-            lineskip=0.2pc}}}% Sets line spacing to 1.2 (same as code env's)
+        listing engine=listings}} % Default listing options inherited from \lstset command(s)
     \NewTCBListing{cmd}{ O{} }{listingsstyle, #1}
     \NewTCBInputListing{\cmdinput}{ m O{} }{listing file={#1}, listingsstyle, #2}
 }{}
 
-% filecontents can't be put under anything (44467)
+% filecontents can't be put under anything (/a/44467)
 \begingroup\newif\ifbibincluded
 \ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
 \ifbibincluded
 \WarningFilter[temp-file]{latex}{Writing or overwriting file}
-% Add doctype and lastmoddate bibliography database fields (244144)
-\begin{filecontents}[overwrite]{xamkbibdm.dbx}
+% Add doctype and lastmoddate bibliography database fields (/a/244144)
+\begin{filecontents*}[overwrite]{xamkbibdm.dbx}
 \DeclareDatamodelFields[type=field, datatype=literal]{doctype}
 \DeclareDatamodelFields[type=field, datatype=datepart]{
     lastmodyear,
@@ -206,7 +199,7 @@
 }
 \DeclareDatamodelFields[type=field, datatype=date, skipout]{lastmoddate}
 \DeclareDatamodelEntryfields{doctype, lastmoddate}
-\end{filecontents}
+\end{filecontents*}
 \DeactivateWarningFilters[temp-file]
 \fi\endgroup
 
@@ -221,16 +214,16 @@
         giveninits=true,% Abbreviate names (except for last name)
         urldate=long,% Output urldate field in natural text format
         dateabbrev=false,% Use full month names instead of abbreviations
-        defernumbers=true
+        defernumbers=true% Keep numbering consistent between bibliographies
         ]{biblatex} % Handles the bibliography and citations
 
-    % Combine numeric and authoryear bibstyles when lessxamk is used (314071)
+    % Combine numeric and authoryear bibstyles when lessxamk is used (/a/314071)
     \ifdef{\@lessxamkflag}{\input{numeric.bbx}}{}
 
     \setlength\bibitemsep{0.6pc} % Add space between bibliography entries
     \setlength\bibhang{0pc} % Remove indent from bibliography
 
-    % Prevents long urls from going into page margin, by adding arbitrary newline (134281)
+    % Prevents long urls from going into page margin, by adding arbitrary newline (/a/134281)
     \setcounter{biburllcpenalty}{7000}
     \setcounter{biburlucpenalty}{8000}
 
@@ -248,21 +241,21 @@
     % general:    github.com/plk/biblatex/blob/master/tex/latex/biblatex/biblatex.def
     % authoryear: github.com/plk/biblatex/blob/master/tex/latex/biblatex/cbx/authoryear.cbx
     % Biblatex bibliography/citation format modifications
-    \renewrobustcmd*{\mkbibemph}{} % Disable all bib italics (e.g. for titles) (296150)
+    \renewrobustcmd*{\mkbibemph}{} % Disable all bib italics (e.g. for titles) (/a/296150)
         \protected\long\def\blx@imc@mkbibemph#1{#1} % Also disable internal macro
     \renewrobustcmd*{\mkbibacro}{} % Disable text monospacing (e.g. for ISBN/DOI/etc.)
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
     \DeclareNameAlias{default}{family-given} % Needed for \fullcite (and others?)
-    \DeclareDelimFormat{finalnamedelim}{% Use "&" instead of "and" (549872)
+    \DeclareDelimFormat{finalnamedelim}{% Use "&" instead of "and" (/a/549872)
         \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}% Preserves Oxford Comma option
         \addspace\&\space}% Based on biblatex's definition
     \DefineBibliographyExtras{UKenglish}{\def\finalandcomma{\addcomma}} % Enable Oxford Comma
     \DeclareFieldFormat{titlecase}{\MakeSentenceCase{#1}} % Make titles lowercase
-    \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct} % Add parentheses (419595)
+    \DeclareFieldFormat{editortype}{\mkbibparens{#1}\nopunct} % Add parentheses (/a/419595)
         \DeclareFieldAlias{translatortype}{editortype}
-    \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (419595)
+    \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (/a/419595)
         \DeclareDelimAlias{translatortypedelim}{editortypedelim}
-    \xpatchbibmacro{byeditor+others}% Clarify: Keep parantheses? (241591)
+    \xpatchbibmacro{byeditor+others}% Clarify: Keep parantheses? (/a/241591)
         {\usebibmacro{byeditor+othersstrg}%
             \setunit{\addspace}\printnames[byeditor]{editor}}%
         {\printtext[parens]{\usebibmacro{byeditor+othersstrg}%
@@ -272,9 +265,9 @@
             \setunit{\addspace}\printnames[bytranslator]{translator}}%
         {\printtext[parens]{\usebibmacro{bytranslator+othersstrg}%
             \setunit{\addspace}\printnames[bytranslator]{translator}}}{}{}
-    \DeclareLabeldate{% Remove urldate as fallback date in bibliography (525164)
+    \DeclareLabeldate{% Remove urldate as fallback date in bibliography (/a/525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
-    \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (428193)
+    \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (/a/428193)
         {\printtext[parens]}{\setunit*{\addperiod\addspace}\printtext}{}{}
     \DeclareFieldFormat{lastmoddate}{\bibstring{lastmodstr}\addspace#1}
     \DeclareFieldFormat{url}{\bibstring{urlpre}\addcolon\addspace\url{#1}}
@@ -304,19 +297,19 @@
                     \printfield{pages}\bibcloseparen}}{}{}}
     \DeclareFieldFormat{urldate}{\mkbibbrackets{\bibstring{urlseen}\addspace#1}}
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
-        ]{title}{#1} % Remove title quotes from bibliography (94090)
+        ]{title}{#1} % Remove title quotes from bibliography (/a/94090)
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
-        ]{citetitle}{#1} % Remove title quotes from citations (94090)
+        ]{citetitle}{#1} % Remove title quotes from citations (/a/94090)
     % Clarify: Also apply to doi/eprint?
     \xpretobibmacro{url+urldate}{% Print doctype and lastmoddate before url+urldate
         {\iffieldundef{url}{}% If doctype not specified, default to wwwdoc string
             {\iffieldundef{doctype}{\bibstring{wwwdoc}}{\printfield{doctype}}%
             \setunit*{\addperiod\addspace}}}%
-        \iffieldundef{lastmodyear}{}% (244144)
+        \iffieldundef{lastmodyear}{}% (/a/244144)
             {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
     \DeclareBibliographyCategory{cited} % All cited references added to this
-    \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (6977)
+    \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (/a/6977)
     \DeclareBibliographyCategory{fullcitedfig} % References cited in figures added to this
     \DeclareBibliographyCategory{fullcitedtab} % References cited in tables added to this
     \defbibfilter{notfigtab}{
@@ -331,7 +324,7 @@
         not category=fullcitedtab}
 
     % TODO: Find fix for hyperrefs that doesn't require \cleardoublepage to work reliably
-    \defbibheading{mybibintoc}[\refname]{% Fix bibliography ToC hyperrefs (552622)
+    \defbibheading{mybibintoc}[\refname]{% Fix bibliography ToC hyperrefs (/a/552622)
         \cleardoublepage
         \phantomsection
         \addcontentsline{toc}{section}{#1}%
@@ -378,7 +371,7 @@
         \clearpage
     }
     
-    % Commands to print LoF/LoT, clear page before, and add to ToC (48511)
+    % Commands to print LoF/LoT, clear page before, and add to ToC (/a/48511)
     % tocbibind package method breaks ToC hyperref links, this doesn't
     % TODO: Do these need to be made available to the user?
     \newcommand*\@newtoclof{%
@@ -410,7 +403,7 @@
 \ExplSyntaxOn % TODO: Doesn't detect punctuation from commands? (e.g. \lipsum)
 \NewDocumentCommand\@adddotifnotpunct{ m }{
     #1\str_case_e:nnF { \tl_item:Nn { #1 } { -1 } } % Check last character
-        {{.}{}{,}{}{?}{}{!}{}} % If punctuation, do nothing
+        {{.}{}{,}{}{?}{}{!}{}} % If punctuation (.,?!), do nothing
         {.}} % Otherwise, add period
 % Commands to set caption with label (and citation, and prepare reference for LoF/LoT)
 \NewDocumentCommand\@makecaptioncmds{ m m m }{
@@ -463,7 +456,7 @@
 
 % Official section/ToC formatting
 \newcommand*\@xamktoclayout{
-    \WarningFilter[temp-sectsty]{latex}{Command} % (311003)
+    \WarningFilter[temp-sectsty]{latex}{Command} % (/a/311003)
     \RequirePackage{sectsty} % Needed for formatting table of contents
     \DeactivateWarningFilters[temp-sectsty]
         \let\SS@makeulinesect\relax
@@ -478,7 +471,7 @@
     \renewcommand{\cftsecfont}{}
     \renewcommand{\cftsecpagefont}{}
 
-    % Make sections in ToC uppercase (156917)
+    % Make sections in ToC uppercase (/a/156917)
     \let\@oldcontentsline\contentsline
     \def\contentsline##1##2{%
         \expandafter\ifx\csname l@##1\endcsname\l@section
@@ -517,7 +510,7 @@
 \setlength{\cftbeforetabskip}{0.6pc}
 % Official list of figures/tables formatting
 \newcommand*\@xamkloftlayout{
-    \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries to ragged-right (62006)
+    \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries ragged-right (/a/62006)
     % Remove LoF/LoT indents (fig/tab numbers have been moved into captions themselves)
     \cftsetindents{figure}{0pc}{0pc}
     \cftsetindents{table}{0pc}{0pc}
@@ -544,7 +537,7 @@
         
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
         
-        % Maintain total page count for each appendix section (82560)
+        % Maintain total page count for each appendix section (/a/82560)
         \newcounter{pageaux}
         \def\currentauxref{PAGEAUX1}
         \newcommand{\apppagenumbers}{%
@@ -694,7 +687,7 @@
     \end{tikzpicture}
 }
 
-% Include the title page in page numbering (172005)
+% Include the title page in page numbering (/a/172005)
 \renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
 
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
@@ -710,7 +703,7 @@
     \IfNoValueTF{#3}%
         {\listadd\@xamkstudentlist{#1}}%
         {\listadd\@xamkstudentlist{#1 | #2 | #3}}}
-\newcommand*\@printxamkstudentlist{% Print list without \par for last element (33840)
+\newcommand*\@printxamkstudentlist{% Print list without \par for last element (/a/33840)
     \setcounter{studentcounttemp}{\value{studentcount}}%
     \def\do##1{%
         \ifnumequal{\value{studentcounttemp}}{1}{##1}{##1\par}%
@@ -828,7 +821,7 @@
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
-    % tcolorbox's [parbox=false] could also be used (154994), but that affects all rows
+    % tcolorbox's [parbox=false] could also be used (/a/154994), but that affects all rows
     \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}{}
     \@thesisabstractgeometry
     \begin{singlespace}

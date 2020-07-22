@@ -123,17 +123,17 @@ wget http://tex.stackexchange.com
 echo "is this thing working?" > test.txt
 \end{cmd}
 % Alternatively, import content from file
-%\cmdinput{test.txt}[title={Some command-line commands},every listing line={\$\#>\ }]
+%\cmdinput{thesis-abstract.tex}[title={Paragraph 5 of the thesis abstract},listing options={firstline=20,lastline=23}]
 
 % The starting line number is set with minted's "firstnumber".
 % {python} sets the language, see https://pygments.org/docs/lexers/ for the language list.
-\begin{code}[firstnumber=11]{python}[title={Some Python code with syntax highlighting}]
+\begin{code}{python}[title={Some Python code with syntax highlighting},minted options={firstnumber=11}]
 def zip_gen(tuple_list):
     for index in range(min(len(tuple_list[0]), len(tuple_list[1]))):
         yield {tuple_list[0][index]: tuple_list[1][index]}
 \end{code}
 % Alternatively, import content from file
-%\codeinput{thesis-abstract.tex}[firstline=9,lastline=13]{latex}[title={Part of the thesis abstract}]
+%\codeinput{thesis-abstract.tex}{latex}[title={Paragraph 3 of the thesis abstract},minted options={firstline=9,lastline=13}]
 
 \begin{comment} % This section is hidden due to the comment environment
 % {csharp} sets syntax highlighting to C#.
