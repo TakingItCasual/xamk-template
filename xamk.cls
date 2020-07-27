@@ -156,7 +156,8 @@
         fontsize=\small,%
         baselinestretch=1,% Set line spacing to single
         linenos,% Enable line numbering
-        breaklines,% Break lines rather than running off the page
+        breaklines,% Break lines rather than run off the page
+        breakanywhere,% Break even if no spaces or other ideal breaking points
         autogobble}% Remove common leading whitespace
 
     \tcbuselibrary{xparse}
@@ -168,11 +169,12 @@
     \NewTCBInputListing{\codeinput}{ m m O{} }{listing file={#1}, mintedstyle={#2}, #3}
 }{}
 % Create the listings "cmd" environment and input command using tcolorbox
-\ifdef{\@reqlistingsflag}{% TODO: Find single line-spacing method without side-effects
+% TODO: Find single line-spacing method without side-effects, find breakanywhere equivalent
+\ifdef{\@reqlistingsflag}{
     \lstset{% Set default options for listings and cmd environments/commands
         style=tcblatex,% Formatting can get screwed up without this (/a/554568)
         basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
-        breaklines,% Break lines rather than running off the page
+        breaklines,% Break lines rather than run off the page
         postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
 
     \ifundef{\@reqmintedflag}{\tcbuselibrary{xparse}}{} % Don't redo
@@ -460,14 +462,9 @@
 
 % Official section/ToC formatting
 \newcommand*\@xamktoclayout{
-    \WarningFilter[temp-sectsty]{latex}{Command} % (/a/311003)
-    \RequirePackage{sectsty} % Needed for formatting table of contents
-    \DeactivateWarningFilters[temp-sectsty]
-        \let\SS@makeulinesect\relax
-        \let\SS@makeulinepartchap\relax
-    % Make section/subsection/etc. font size text-sized, and make sections all caps
-    \allsectionsfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont}
-    \sectionfont{\fontsize{\@@ptsize}{\@@ptsize}\selectfont\scshape\MakeUppercase}
+    % Make section/subsection normal-sized, and make sections all caps
+    \patchcmd{\section}{\Large\bfseries}{\normalsize\bfseries\MakeUppercase}{}{}
+    \patchcmd{\subsection}{\large}{\normalsize}{}{}
 
     \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
     \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Add dotted line to sections in ToC
@@ -728,9 +725,9 @@
 \newcommand*\xamkpaperdate[1]{\def\@xamkpaperdate{#1}}
 \xamkpaperdate{\@placehold{Date}}
 
-% The thesis type (Bachelor’s, Master’s, etc.). Defaults to "Bachelor’s Degree".
+% The thesis type (Bachelor's, Master's, etc.). Defaults to "Bachelor's Degree".
 \newcommand*\xamkdegreetype[1]{\def\@xamkdegreetype{#1}}
-\xamkdegreetype{Bachelor’s Degree}
+\xamkdegreetype{Bachelor's Degree}
 % The degree programme the thesis was written for. Defaults to "<Degree Programme>".
 \newcommand*\xamkdegreeprogramme[1]{\def\@xamkdegreeprogramme{#1}}
 \xamkdegreeprogramme{\href{https://student.xamk.fi/studies-and-supporting-services/Documents/degree_titles.pdf}{\@placehold{Degree Programme}}}
