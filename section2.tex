@@ -2,14 +2,14 @@
 
 \subsection{Tables}
 
-Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their effects.
+% Most special characters will work as delimiters for \verb, not just |
+Notice the missing \verb'|' and \verb|\hline| in the \verb|chapter2.tex| file and their effects.
 
 % If the caption/label aren't needed, you only need the tabular environment.
 \begin{table}[H]
     %\centering % Uncomment to center the table
     %\captionsetup{justification=centering} % Uncomment to center the caption
-    % extra | before first l and missing | after the last l
-    \begin{tabular}[b]{ || l | l  }
+    \begin{tabular}[b]{ || l | l  } % extra | before first l and missing | after the last l
         \hline % "\\" adds a linebreak, "\hline" adds a horizontal line
         \textbf{Time} & \textbf{Measurement} \\\hline
         13:02 & $(20.49 \pm 0.01)\si{mm}$ \\\hline
@@ -21,7 +21,7 @@ Notice the missing | and \verb|\hline| in the \verb|chapter2.tex| file and their
 
 \subsection{Mathematics}
 
-% For physics units, \si{} can be used to distinguish units from variables (variables are italic).
+% For physics units, \si{} can be used to distinguish units from italic variables.
 % The "&"s control alignment. Try moving them around to adjust alignment.
 \begin{align} % Use the {align*} environment instead to disable equation numbering
     % Notice how this \num{} converts its input into scientific notation

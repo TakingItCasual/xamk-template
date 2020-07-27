@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/22 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/27 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -33,6 +33,7 @@
 \ifundef{\@lessxamkflag}{
     \PassOptionsToPackage{%
         font={footnotesize, singlespacing},% 10pt font size, single line spacing
+        justification=raggedright,% Disable caption justification
         labelsep=period,% Replace ":" with "." after fig/tab number
         listformat=empty% Remove fig/tab numbering in LoF/LoT
         }{caption}
@@ -77,7 +78,7 @@
     \RequirePackage{pgfplots} % Needed for fancy graphs
     % Set default options for pgfplots graphs (most are related to the grid).
     \pgfplotsset{
-        compat=1.16,% Lock version compatibility (check log file to see current version)
+        compat=1.16,% Lock version compatibility (search "compat" in log file for version)
         xlabel style={align=center},% Needed for line-breaks to work in label
         ylabel style={align=center},% -||-
         axis lines=left,% Place axis lines to left/bottom 
@@ -87,6 +88,8 @@
         minor tick num=4}% Draw 4 minor grid lines between major grid lines
 }{}
 
+\ifdef{\@lessxamkflag}{% Improves justification spacing (not needed with ragged-right)
+    \RequirePackage{microtype}}{}
 \RequirePackage[UKenglish]{babel} % Ensures consistent output regardless of system locale
 \RequirePackage[T1]{fontenc} % Fixes problems related to using special/accented characters
 \RequirePackage[utf8]{inputenc} % Allows for Unicode characters
@@ -95,10 +98,13 @@
     ]{geometry} % Set page margins
 \RequirePackage{tikz} % Needed for drawing shapes
     \usetikzlibrary{backgrounds}
-\RequirePackage[fleqn]{amsmath} % Needed for math equations/formulas
+\RequirePackage[fleqn% Align equations to left rather than center
+    ]{amsmath} % Needed for math equations/formulas
     \patchcmd{\env@matrix}% Default to right-aligning matrices
         {\array{*\c@MaxMatrixCols c}}%
         {\array{*\c@MaxMatrixCols r}}{}{}
+% TODO: Do more with math? (e.g. math class option, more stylings, etc.)
+%\RequirePackage{amssymb} % Needed for various math symbol commands
 \RequirePackage{mathtools} % Needed for abs/norm commands (/a/43009)
     \DeclarePairedDelimiter\abs{\lvert}{\rvert}
         \let\@oldabs\abs
@@ -106,14 +112,13 @@
     \DeclarePairedDelimiter\norm{\lVert}{\rVert}
         \let\@oldnorm\norm
         \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
+\RequirePackage{textcomp} % Needed for compatibility between siunitx and microtype (/a/74673)
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
 \RequirePackage{float} % Needed for forcing caption placement, and provides [H] option
     \ifundef{\@lessxamkflag}{%
         \floatstyle{plaintop}\restylefloat{table}% Place table captions above tables
         \floatstyle{plain}\restylefloat{figure}}{}% Place figure captions below figures
-\RequirePackage[
-    justification=raggedright,% Disable caption justification
-    singlelinecheck=false% Disable automatic centering when caption fits on 1 line
+\RequirePackage[singlelinecheck=false% Disable automatic centering when caption fits on 1 line
     ]{caption} % Needed for formatting captions
 \RequirePackage{setspace} % Needed for setting line spacing
 \RequirePackage{tabularx} % Needed for horizontal table stretching
@@ -149,10 +154,10 @@
 \ifdef{\@reqmintedflag}{
     \setminted{% Set default options for minted and code environments/commands
         fontsize=\small,%
+        baselinestretch=1,% Set line spacing to single
         linenos,% Enable line numbering
         breaklines,% Break lines rather than running off the page
         autogobble}% Remove common leading whitespace
-    \ifundef{\@lessxamkflag}{\setminted{baselinestretch=1.2}}{} % Set line spacing to 1.2
 
     \tcbuselibrary{xparse}
     \tcbset{mintedstyle/.style={%
@@ -163,13 +168,12 @@
     \NewTCBInputListing{\codeinput}{ m m O{} }{listing file={#1}, mintedstyle={#2}, #3}
 }{}
 % Create the listings "cmd" environment and input command using tcolorbox
-\ifdef{\@reqlistingsflag}{
+\ifdef{\@reqlistingsflag}{% TODO: Find single line-spacing method without side-effects
     \lstset{% Set default options for listings and cmd environments/commands
         style=tcblatex,% Formatting can get screwed up without this (/a/554568)
         basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
         breaklines,% Break lines rather than running off the page
         postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
-    \ifundef{\@lessxamkflag}{\lstset{lineskip=0.2pc}}{} % Set line spacing to 1.2
 
     \ifundef{\@reqmintedflag}{\tcbuselibrary{xparse}}{} % Don't redo
     \tcbset{listingsstyle/.style={%
@@ -573,7 +577,7 @@
         \renewcommand\headrulewidth{0pc} % Remove the header bar
         % Clarify: Page numbering as "# of #"? Should appendices be included?
         \chead{\textcolor{gray}{\thepage}} % Print page number to center of header
-    \AtBeginDocument{\raggedright} % Disable text justification
+    \AtBeginDocument{\raggedright} % Disable text justification (TODO: Is ragged2e needed?)
 }{}
 
 % Colors used in title page
