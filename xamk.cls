@@ -2,14 +2,14 @@
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
 % For comments with a number in parentheses, append to "tex.stackexchange.com"
-% Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live installation
+% Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live 2020 installation
 
 % TODO: Create proper formatting for bibliography
 % Clarify: Formatting and example for (list of) equations
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/27 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/07/30 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -58,7 +58,7 @@
     % TODO: Why doesn't cache option work if minted imported after tcolorbox?
     \RequirePackage[cache=false% Needed to prevent errors in TeXstudio
         ]{minted} % Needed for code blocks with syntax highlighting
-    % The "code" TCBListing environment is declared after tcolorbox is loaded
+    % The "code" TCBListing environment & input command are later created with tcolorbox
     \PassOptionsToPackage{minted}{tcolorbox}
     
     % Disable syntax error highlighting, since it gives false positives (/a/343506)
@@ -70,7 +70,7 @@
 % Load listings package, more done with tcolorbox later
 \ifdef{\@reqlistingsflag}{
     \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
-    % The "cmd" TCBListing environment is declared after tcolorbox is loaded
+    % The "cmd" TCBListing environment & input command are later created with tcolorbox
     \PassOptionsToPackage{listings}{tcolorbox}
 }{}
 % Load pgfplots package (large, slow) and set defaults
@@ -136,6 +136,7 @@
 \RequirePackage[titles% Custom ToC formatting doesn't work without this...
     ]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
+\RequirePackage[nottoc, notbib]{tocbibind} % Needed to add LoF/LoT to ToC
 \RequirePackage{enumitem} % Needed to remove vertical spacing from lists
     \setlist{nosep} % (/a/10689)
 \RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
@@ -314,6 +315,7 @@
         \iffieldundef{lastmodyear}{}% (/a/244144)
             {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
+    \DeclarePrintbibliographyDefaults{heading=bibintoc} % Add bibliography to ToC
     \DeclareBibliographyCategory{cited} % All cited references added to this
     \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (/a/6977)
     \DeclareBibliographyCategory{fullcitedfig} % References cited in figures added to this
@@ -328,15 +330,6 @@
     \defbibfilter{nottab}{
         category=cited and
         not category=fullcitedtab}
-
-    % TODO: Find fix for hyperrefs that doesn't require \cleardoublepage to work reliably
-    \defbibheading{mybibintoc}[\refname]{% Fix bibliography ToC hyperrefs (/a/552622)
-        \cleardoublepage
-        \phantomsection
-        \addcontentsline{toc}{section}{#1}%
-        \section*{#1}%
-        \@mkboth{\abx@MakeMarkcase{#1}}{\abx@MakeMarkcase{#1}}}
-    \DeclarePrintbibliographyDefaults{heading=mybibintoc} % Add bibliography to ToC
 
     % Set options for \makebibliography command to show list of figures/tables
     \pgfkeys{
@@ -355,6 +348,7 @@
         \newbool{showlof}\setbool{showlof}{\pgfkeysvalueof{/makebibliography/lof}}
         \newbool{showlot}\setbool{showlot}{\pgfkeysvalueof{/makebibliography/lot}}
 
+        \clearpage
         \begin{singlespace}
         % If \printbibliography is empty, suppress warning
         % TODO: Apparently nothing happens if empty, but might not always be the case
@@ -370,24 +364,13 @@
         \ifbool{showextra}{\printbibliography[title={Further Reading},notcategory=cited]}{}
         \DeactivateWarningFilters[temp-empty-bib]
 
-        \ifbool{showlof}{\@newtoclof}{}
-        \ifbool{showlot}{\@newtoclot}{}
+        \clearpage % TODO: Add space below LoF/LoT section titles
+        \ifbool{showlof}{\listoffigures}{}
+        \ifbool{showlot}{\listoftables}{}
         \end{singlespace}
 
         \clearpage
     }
-    
-    % Commands to print LoF/LoT, clear page before, and add to ToC (/a/48511)
-    % tocbibind package method breaks ToC hyperref links, this doesn't
-    % TODO: Do these need to be made available to the user?
-    \newcommand*\@newtoclof{%
-        \cleardoublepage%
-        \phantomsection\addcontentsline{toc}{section}{\listfigurename}%
-        \listoffigures}
-    \newcommand*\@newtoclot{%
-        \cleardoublepage%
-        \phantomsection\addcontentsline{toc}{section}{\listtablename}%
-        \listoftables}
 
     % Needed for showextra's \printbibliography
     \AfterEndPreamble{\nocite{*}}
@@ -461,10 +444,22 @@
         headheight=42.0pt, headsep=0pt}}
 
 % Official section/ToC formatting
+\ExplSyntaxOn
 \newcommand*\@xamktoclayout{
-    % Make section/subsection normal-sized, and make sections all caps
-    \patchcmd{\section}{\Large\bfseries}{\normalsize\bfseries\MakeUppercase}{}{}
+    % Make section/subsection text size same as normal text
+    \patchcmd{\section}{\Large}{\normalsize}{}{}
     \patchcmd{\subsection}{\large}{\normalsize}{}{}
+    % Capitalize sections
+    \let\@oldsection\section
+    \RenewDocumentCommand{\section}{ s o m }{
+        % \text_uppercase will replace \tl_upper_case in later l3token versions
+        \tl_set:Nx\@section_upper{\cs_if_exist:NTF{\text_uppercase:n}
+            {\text_uppercase:n{##3}}{\tl_upper_case:n{##3}}}
+        \IfBooleanTF{##1}
+            {\@oldsection*{\@section_upper}}
+            {\IfNoValueTF{##2}
+                {\@oldsection{\@section_upper}}
+                {\@oldsection[##2]{\@section_upper}}}}
 
     \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
     \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Add dotted line to sections in ToC
@@ -496,6 +491,7 @@
         \restoregeometry
     }
 }
+\ExplSyntaxOff
 
 % Removes page number(s) from ToC (works with multiple pages)
 \let\@oldtableofcontents\tableofcontents
@@ -751,7 +747,7 @@
 }
 % Command for rendering the title page
 \renewcommand*\maketitle[1][]{
-    \pgfkeys{/maketitle, #1}
+    \pgfkeys{/maketitle, #1} % Clarify: Is thesis abstract optional?
     \newbool{thesisformat}\setbool{thesisformat}{\pgfkeysvalueof{/maketitle/thesis}}
     \@invalidate@title@cmds{\ClassError{xamk}%
         {This command must be used before the maketitle command}{}}
