@@ -248,7 +248,7 @@
     % general:    github.com/plk/biblatex/blob/master/tex/latex/biblatex/biblatex.def
     % authoryear: github.com/plk/biblatex/blob/master/tex/latex/biblatex/cbx/authoryear.cbx
     % Biblatex bibliography/citation format modifications
-    \renewrobustcmd*{\mkbibemph}{} % Disable all bib italics (e.g. for titles) (/a/296150)
+    \renewrobustcmd*{\mkbibemph}{} % Disable all bib italics (e.g. for titles) (/a/551547)
         \protected\long\def\blx@imc@mkbibemph#1{#1} % Also disable internal macro
     \renewrobustcmd*{\mkbibacro}{} % Disable text monospacing (e.g. for ISBN/DOI/etc.)
     \DeclareNameAlias{sortname}{family-given} % Make last names come before first names
@@ -378,7 +378,7 @@
 
 % This section is for setting up the \labelcaption and \citecaption commands
 \AfterEndPreamble{% Needed because something's modifying these commands later on...
-    \let\@oldcaption\caption% TODO: Find more direct way to disable direct usage
+    \let\@oldcaption\caption% TODO: Do something about other forms (e.g. starred)?
     \let\@oldlabel\label}
 \newcommand*\@disablecaptioncmds[1]{%
     \pretocmd{\caption}{\ClassError{xamk}%
@@ -449,10 +449,10 @@
     % Make section/subsection text size same as normal text
     \patchcmd{\section}{\Large}{\normalsize}{}{}
     \patchcmd{\subsection}{\large}{\normalsize}{}{}
-    % Capitalize sections
+    % Capitalize sections (/a/555656)
     \let\@oldsection\section
     \RenewDocumentCommand{\section}{ s o m }{
-        % \text_uppercase will replace \tl_upper_case in later l3token versions
+        % TODO: Remove \tl_upper_case fallback (OL2020 and TL2021?)
         \tl_set:Nx\@section_upper{\cs_if_exist:NTF{\text_uppercase:n}
             {\text_uppercase:n{##3}}{\tl_upper_case:n{##3}}}
         \IfBooleanTF{##1}
