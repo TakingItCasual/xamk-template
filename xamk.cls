@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/07/30 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/03 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -38,6 +38,9 @@
         listformat=empty% Remove fig/tab numbering in LoF/LoT
         }{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
+        % Readd space under LoF/LoT section title (/a/544983) (TODO: Remove when bug fixed)
+        \addtocontents{lof}{\vspace*{1pc}} % parskip's skip - \cftbeforefigskip
+        \addtocontents{lot}{\vspace*{1pc}} % parskip's skip - \cftbeforetabskip
     \ifdef{\@reqbiblatexflag}{%
         \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
 }{% Package options to use if the official layout is not used
@@ -88,8 +91,9 @@
         minor tick num=4}% Draw 4 minor grid lines between major grid lines
 }{}
 
-\ifdef{\@lessxamkflag}{% Improves justification spacing (not needed with ragged-right)
-    \RequirePackage{microtype}}{}
+\ifdef{\@lessxamkflag}{%
+    \RequirePackage{microtype}% Improves justification spacing (not needed with ragged-right)
+    \RequirePackage{textcomp}}{} % Makes siunitx and microtype compatible (/a/74673)
 \RequirePackage[UKenglish]{babel} % Ensures consistent output regardless of system locale
 \RequirePackage[T1]{fontenc} % Fixes problems related to using special/accented characters
 \RequirePackage[utf8]{inputenc} % Allows for Unicode characters
@@ -112,7 +116,6 @@
     \DeclarePairedDelimiter\norm{\lVert}{\rVert}
         \let\@oldnorm\norm
         \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
-\RequirePackage{textcomp} % Needed for compatibility between siunitx and microtype (/a/74673)
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
 \RequirePackage{float} % Needed for forcing caption placement, and provides [H] option
     \ifundef{\@lessxamkflag}{%
@@ -364,7 +367,7 @@
         \ifbool{showextra}{\printbibliography[title={Further Reading},notcategory=cited]}{}
         \DeactivateWarningFilters[temp-empty-bib]
 
-        \clearpage % TODO: Add space below LoF/LoT section titles
+        \clearpage
         \ifbool{showlof}{\listoffigures}{}
         \ifbool{showlot}{\listoftables}{}
         \end{singlespace}
@@ -503,8 +506,8 @@
 }
 
 % Add space between LoF/LoT entries
-\setlength{\cftbeforefigskip}{0.6pc}
-\setlength{\cftbeforetabskip}{0.6pc}
+\setlength{\cftbeforefigskip}{0.5pc}
+\setlength{\cftbeforetabskip}{0.5pc}
 % Official list of figures/tables formatting
 \newcommand*\@xamkloftlayout{
     \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries ragged-right (/a/62006)
