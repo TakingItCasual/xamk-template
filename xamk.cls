@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/03 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/05 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -97,9 +97,6 @@
 \RequirePackage[UKenglish]{babel} % Ensures consistent output regardless of system locale
 \RequirePackage[T1]{fontenc} % Fixes problems related to using special/accented characters
 \RequirePackage[utf8]{inputenc} % Allows for Unicode characters
-\RequirePackage[
-    left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm
-    ]{geometry} % Set page margins
 \RequirePackage{tikz} % Needed for drawing shapes
     \usetikzlibrary{backgrounds}
 \RequirePackage[fleqn% Align equations to left rather than center
@@ -230,7 +227,7 @@
     % Combine numeric and authoryear bibstyles when lessxamk is used (/a/314071)
     \ifdef{\@lessxamkflag}{\input{numeric.bbx}}{}
 
-    \setlength\bibitemsep{0.6pc} % Add space between bibliography entries
+    \setlength\bibitemsep{0.5pc} % Add space between bibliography entries
     \setlength\bibhang{0pc} % Remove indent from bibliography
 
     % Prevents long urls from going into page margin, by adding arbitrary newline (/a/134281)
@@ -318,6 +315,14 @@
         \iffieldundef{lastmodyear}{}% (/a/244144)
             {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
 
+    \defbibenvironment{notnumbers}% Needed for authoryear-like bibstyle (/a/314071)
+        {\list{}{%
+            \setlength{\leftmargin}{\bibhang}%
+            \setlength{\itemindent}{-\leftmargin}%
+            \setlength{\itemsep}{\bibitemsep}%
+            \setlength{\parsep}{\bibparsep}}}%
+        {\endlist}{\item}
+
     \DeclarePrintbibliographyDefaults{heading=bibintoc} % Add bibliography to ToC
     \DeclareBibliographyCategory{cited} % All cited references added to this
     \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (/a/6977)
@@ -354,7 +359,7 @@
         \clearpage
         \begin{singlespace}
         % If \printbibliography is empty, suppress warning
-        % TODO: Apparently nothing happens if empty, but might not always be the case
+        % TODO: Apparently section not output if empty, but might not always be the case
         \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}
         \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{%
             \ifbool{showlof}% References left out of bibliography if in LoF or LoT
@@ -364,7 +369,11 @@
                 {\ifbool{showlot}%
                     {\printbibliography[filter=nottab]}%
                     {\printbibliography[category=cited]}}}
-        \ifbool{showextra}{\printbibliography[title={Further Reading},notcategory=cited]}{}
+        \ifbool{showextra}{% Print section for uncited references
+            \ifdef{\@lessxamkflag}% If bibstyle numeric, make authoryear-like
+                {\printbibliography[title={Further Reading},notcategory=cited,%
+                    env=notnumbers,omitnumbers]}%
+                {\printbibliography[title={Further Reading},notcategory=cited]}}{}
         \DeactivateWarningFilters[temp-empty-bib]
 
         \clearpage
@@ -427,6 +436,8 @@
     linkcolor=black,
     citecolor=black
     ]{hyperref} % Needed for urls/hyperlinks/etc. (must be loaded after biblatex)
+\RequirePackage[left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm
+    ]{geometry} % Set page margins (must be loaded after hyperref? (/a/26592))
 
 % Official XAMK page margins.
 \newcommand*\@xamkpagegeometry{%
@@ -866,6 +877,7 @@
         \@xamkpapertitle
         \ifdef{\@xamkpapersubtitle}{\par\@xamkpapersubtitle}{}
         &% "s" is added after "page" if page count is anything other than "1"
+        \vspace*{-0.5pc} % Center page counts (gets pushed down even with negative vspace?)
         \@xamk@pc\ page\ifdefstring{\@xamk@pc}{1}{}{s}
 
         \@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices % Clarify: Hide if 0?
