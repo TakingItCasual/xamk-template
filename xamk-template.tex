@@ -37,8 +37,7 @@
 
     \tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
     
-    % tex files can be imported with \input{} or \include{}
-    % \input{} just imports the file, while \include{} also ensures page breaks before and after
+    % tex files can be imported with \input{} (the \include{} command is not supported)
     \input{section1} % Imports section1.tex from the same directory as xamk-template.tex
     \input{section2}
     
@@ -47,6 +46,6 @@
     
     % Appendix sections are expected to be within the appendices environment
     \begin{appendices}
-        \include{appendix1}
+        \input{appendix1}
     \end{appendices}
 \end{document}

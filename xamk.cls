@@ -38,7 +38,7 @@
         listformat=empty% Remove fig/tab numbering in LoF/LoT
         }{caption}
     \PassOptionsToPackage{skip=1.5pc}{parskip} % Increase spacing between paragraphs
-        % Readd space under LoF/LoT section title (/a/544983) (TODO: Remove when bug fixed)
+        % Readd space under LoF/LoT section titles (/a/544983) (TODO: Remove when bug fixed)
         \addtocontents{lof}{\vspace*{1pc}} % parskip's skip - \cftbeforefigskip
         \addtocontents{lot}{\vspace*{1pc}} % parskip's skip - \cftbeforetabskip
     \ifdef{\@reqbiblatexflag}{%
@@ -584,6 +584,8 @@
         % Clarify: Page numbering as "# of #"? Should appendices be included?
         \chead{\textcolor{gray}{\thepage}} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification (TODO: Is ragged2e needed?)
+    \pretocmd{\include}{\ClassError{xamk}% There shouldn't be incomplete pages between sections
+        {include command not supported, use input command instead}{}}{}{}
 }{}
 
 % Colors used in title page
@@ -845,7 +847,7 @@
         black, solid, line width=1pt},%
     space to upper,% Make extra empty space go above \tcblower
     height fill,% Make table fill the remaining page height
-    sharp corners,% Ensure table corners are sharp rather than rounded
+    sharp corners,% Make table corners sharp rather than rounded
     colback=white,% Background color
     middle=0pc,boxsep=0.5pc]% Inner margins
         \ifundef{\@lessxamkflag}{\raggedright}{}
