@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/05 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/06 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -128,6 +128,7 @@
         sharp corners,% XAMK is all about those sharp edges, judging from its logo
         top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
         left=0pc,right=0pc,% Left padding removed so line numbers show properly
+        fontupper=\linespread{1}\selectfont,% Set line spacing to single
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage[titletoc]{appendix} % Prepends "Appendix #" to appendix sections in ToC
@@ -155,7 +156,6 @@
 \ifdef{\@reqmintedflag}{
     \setminted{% Set default options for minted and code environments/commands
         fontsize=\small,%
-        baselinestretch=1,% Set line spacing to single
         linenos,% Enable line numbering
         breaklines,% Break lines rather than run off the page
         breakanywhere,% Break even if no spaces or other ideal breaking points
@@ -170,8 +170,7 @@
     \NewTCBInputListing{\codeinput}{ m m O{} }{listing file={#1}, mintedstyle={#2}, #3}
 }{}
 % Create the listings "cmd" environment and input command using tcolorbox
-% TODO: Find single line-spacing method without side-effects, find breakanywhere equivalent
-\ifdef{\@reqlistingsflag}{
+\ifdef{\@reqlistingsflag}{% TODO: Find breakanywhere equivalent
     \lstset{% Set default options for listings and cmd environments/commands
         style=tcblatex,% Formatting can get screwed up without this (/a/554568)
         basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
