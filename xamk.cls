@@ -79,7 +79,7 @@
 % Load pgfplots package (large, slow) and set defaults
 \ifdef{\@reqpgfplotsflag}{
     \RequirePackage{pgfplots} % Needed for fancy graphs
-    % Set default options for pgfplots graphs (most are related to the grid).
+    % Set default options for pgfplots graphs (most are related to the grid)
     \pgfplotsset{
         compat=1.16,% Lock version compatibility (search "compat" in log file for version)
         xlabel style={align=center},% Needed for line-breaks to work in label
@@ -281,7 +281,7 @@
     \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
     % Default \parencite's and \textcite's postnote to pages, if present
     % Clarify: When should page numbers be included after citations?
-    \ifdef{\@lessxamkflag}{}{% Automatic page numbers for numeric citations is confusing
+    \ifundef{\@lessxamkflag}{% Automatic page numbers for numeric citations is confusing
         \letbibmacro*{parencite:postnote}{postnote} % Copy original postnote macro
         \xpatchbibmacro{parencite:postnote}% Only replace if postnote not set by user
             {{}}{{\iffieldundef{pages}{}%
@@ -300,7 +300,7 @@
                 {\ifbool{cbx:parens}%
                     {\setunit{\printdelim{postnotedelim}}}%
                     {\setunit{\printdelim{extpostnotedelim}\bibopenparen}}%
-                    \printfield{pages}\bibcloseparen}}{}{}}
+                    \printfield{pages}\bibcloseparen}}{}{}}{}
     \DeclareFieldFormat{urldate}{\mkbibbrackets{\bibstring{urlseen}\addspace#1}}
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
         ]{title}{#1} % Remove title quotes from bibliography (/a/94090)
@@ -438,11 +438,12 @@
 \RequirePackage[left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm
     ]{geometry} % Set page margins (must be loaded after hyperref? (/a/26592))
 
-% Official XAMK page margins.
+% Official XAMK page margins
+% Used in preamble, so \restoregeometry reverts to this (unless lessxamk is used)
 \newcommand*\@xamkpagegeometry{%
     \newgeometry{left=4.3cm, right=2.0cm, top=2.25cm, bottom=1.25cm,%
-        headheight=14.5pt}}
-% Custom page margins for the title page.
+        headheight=15pt, headsep=15pt}} % Places page number ~1cm from top of page
+% Custom page margins for the title page
 \newcommand*\@titlepagegeometry{%
     \newgeometry{left=3.0cm, right=3.0cm, top=3.0cm, bottom=3.0cm}}
 % Custom page margins for thesis abstract
@@ -451,10 +452,10 @@
 % Custom page margins for the table of contents
 \newcommand*\@tableofcontentsgeometry{%
     \newgeometry{left=1.75cm, right=1.75cm, top=1.75cm, bottom=1.75cm}}
-% Custom page margins for appendices (large headheight to allow for header)
+% Custom page margins for appendices
 \newcommand*\@xamkappendixgeometry{%
     \newgeometry{left=4.3cm, right=2.0cm, top=2.25cm, bottom=1.25cm,%
-        headheight=42.0pt, headsep=0pt}}
+        headheight=30pt, headsep=0pt}}% Larger headheight allows for tiered header
 
 % Official section/ToC formatting
 \ExplSyntaxOn
@@ -527,9 +528,10 @@
 }
 
 \AtBeginEnvironment{appendices}{%
-    \clearpage
-    \pretocmd{\section}{\ifundef{\@firstapppass}{% Label used to get first appendix page number
-        \def\@firstapppass{}\zref@label{firstappstart}}{}}{}{}}
+    \clearpage\pretocmd{\section}{%
+        \ifundef{\@firstapppass}{% Label used to get first appendix page number
+            \def\@firstapppass{}% Only run once (on first appendix)
+            \zref@label{firstappstart}}{}}{}{}}
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
     % Make appendix section titles use numbers instead of letters
@@ -540,10 +542,11 @@
         \singlespacing % Set line spacing to 1
         \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
         
+        % Clarify: In Word template, appendix header pushes content down, imitate?
         % Compensate for increased headheight (place higher)
-        \chead{\textcolor{gray}{\thepage} \\ ~\\}
+        \chead{\raisebox{15pt}{\textcolor{gray}{\thepage}}}
         % Add "Appendix # (page # of #)" to the right header
-        \rhead{\raisebox{0.5pc}{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}}
+        \rhead{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}
         
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
         
@@ -567,7 +570,7 @@
     }
 }
 
-% Apply the official XAMK layout. Can be disabled with the lessxamk class option.
+% Apply the official XAMK layout (can be disabled with the lessxamk class option)
 \ifundef{\@lessxamkflag}{
     \@xamkpagegeometry
     \RequirePackage{helvet} % Provides the helvet font
@@ -592,7 +595,7 @@
 \definecolor{xamklightblue}{RGB}{200, 200, 255}
 \definecolor{xamkdarkblue}{RGB}{11, 124, 164}
 
-% TikZ code for the page border used in the title page.
+% TikZ code for the page border used in the title page
 \newcommand*\xamkdrawpageborder{
     \coordinate[xshift=0.75cm , yshift=-0.75cm] (b1)  at (current page.north west);
     \coordinate[xshift=-0.65cm, yshift=-0.75cm] (b2)  at (current page.north);
@@ -612,7 +615,7 @@
     \coordinate[xshift=0.75cm , yshift=0.65cm ] (b16) at (current page.west);
     \draw[draw=xamklightblue, line width=8pt] (b1) -- (b2) -- (b3) -- (b4) -- (b5) -- (b6) -- (b7) -- (b8) -- (b9) -- (b10) -- (b11) -- (b12) -- (b13) -- (b14) -- (b15) -- (b16) -- cycle;
 }
-% TikZ code for the XAMK logo.
+% TikZ code for the XAMK logo
 \newcommand*\xamkdrawlogo{
     % The fat background X
     \coordinate (l1)  at (0  , 0 );
@@ -686,7 +689,7 @@
         (lk1_1) -- (lk1_2) -- (lk1_3) -- (lk1_4) -- (lk1_1)
         (lk2_1) -- (lk2_2) -- (lk2_3) -- (lk2_4) -- (lk2_5) -- (lk2_6) -- (lk2_1);
 }
-% Command to insert the 2 vector graphics into the title page.
+% Command to insert the 2 vector graphics into the title page
 \newcommand*\@titlepageimages{
     \begin{tikzpicture}[remember picture, overlay, x=1pt, y=1pt]
         \xamkdrawpageborder
@@ -832,7 +835,8 @@
                 -\zref@extractdefault{firstappstart}{page}{1}+1\relax}}
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
-        {\setlength{\abstractparskip}{\parskip}}{\setlength{\abstractparskip}{1pc}}
+        {\setlength{\abstractparskip}{\parskip}}%
+        {\setlength{\abstractparskip}{1pc}}
     % tcolorbox's [parbox=false] could also be used (/a/154994), but that affects all rows
     \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}{}
     \@thesisabstractgeometry
