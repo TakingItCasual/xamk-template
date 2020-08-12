@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/06 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/12 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -58,23 +58,15 @@
         \getabspath{\jobname.log}
         \ifdefstrequal{\theabsdir}{\thepwd}% Detect changed output dir and pass to minted
             {}{\PassOptionsToPackage{outputdir=\theabsdir}{minted}}
-    % TODO: Why doesn't cache option work if minted imported after tcolorbox?
+    % TODO: Why doesn't cache option work if minted imported later?
     \RequirePackage[cache=false% Needed to prevent errors in TeXstudio
         ]{minted} % Needed for code blocks with syntax highlighting
-    % The "code" TCBListing environment & input command are later created with tcolorbox
-    \PassOptionsToPackage{minted}{tcolorbox}
     
     % Disable syntax error highlighting, since it gives false positives (/a/343506)
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
     \xpatchcmd{\inputminted}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
     \xpatchcmd{\mintinline}{\minted@fvset}{\minted@fvset\@disablefcolorbox}{}{}
-}{}
-% Load listings package, more done with tcolorbox later
-\ifdef{\@reqlistingsflag}{
-    \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
-    % The "cmd" TCBListing environment & input command are later created with tcolorbox
-    \PassOptionsToPackage{listings}{tcolorbox}
 }{}
 % Load pgfplots package (large, slow) and set defaults
 \ifdef{\@reqpgfplotsflag}{
@@ -104,7 +96,7 @@
     \patchcmd{\env@matrix}% Default to right-aligning matrices
         {\array{*\c@MaxMatrixCols c}}%
         {\array{*\c@MaxMatrixCols r}}{}{}
-% TODO: Do more with math? (e.g. math class option, more stylings, etc.)
+% TODO: Do more with math? (e.g. math class option, more stylings, (/a/28452), etc.)
 %\RequirePackage{amssymb} % Needed for various math symbol commands
 \RequirePackage{mathtools} % Needed for abs/norm commands (/a/43009)
     \DeclarePairedDelimiter\abs{\lvert}{\rvert}
@@ -123,7 +115,7 @@
 \RequirePackage{setspace} % Needed for setting line spacing
 \RequirePackage{tabularx} % Needed for horizontal table stretching
 \RequirePackage[skins, breakable]{tcolorbox} % Needed for abstract page and cmd/code boxes
-    \tcbset{
+    \tcbset{%
         colback=blue!5!white,% Set background to light blue
         sharp corners,% XAMK is all about those sharp edges, judging from its logo
         top=0pc,bottom=0pc,% Corners are sharp, so extra padding is unnecessary
@@ -161,7 +153,7 @@
         breakanywhere,% Break even if no spaces or other ideal breaking points
         autogobble}% Remove common leading whitespace
 
-    \tcbuselibrary{xparse}
+    \tcbuselibrary{minted, xparse}
     \tcbset{mintedstyle/.style={%
         listing only,% Disable the secondary code display
         listing engine=minted,% Use minted for syntax hightlighting
@@ -171,12 +163,14 @@
 }{}
 % Create the listings "cmd" environment and input command using tcolorbox
 \ifdef{\@reqlistingsflag}{% TODO: Find breakanywhere equivalent
+    \RequirePackage{listings} % Useful for command-line snippets, less baggage than minted
     \lstset{% Set default options for listings and cmd environments/commands
         style=tcblatex,% Formatting can get screwed up without this (/a/554568)
         basicstyle=\small\ttfamily,% Use small font, and properly apply tt font
         breaklines,% Break lines rather than run off the page
         postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}}% Similar to minted's
 
+    \tcbuselibrary{listings}
     \ifundef{\@reqmintedflag}{\tcbuselibrary{xparse}}{} % Don't redo
     \tcbset{listingsstyle/.style={%
         listing only,% Not available without minted/listings (don't put into global tcbset)
@@ -211,7 +205,7 @@
 
 % biblatex complains if no .bib resources are given, so its usage has been made optional
 \ifdef{\@reqbiblatexflag}{
-    \RequirePackage[
+    \RequirePackage[%
         datamodel=xamkbibdm,% Load entry/field definitions from xamkbibdm.dbx file
         backend=biber,
         bibstyle=authoryear,% Default style closest to Harvard, citestyle set elsewhere
@@ -428,34 +422,39 @@
 \AtBeginEnvironment{table}{%
     \@makecaptioncmds{table}{tab}{\tablename\ \thetable.}}
 
-\RequirePackage[
+% TODO: Check (/a/54607) for fix for page broken urls affecting footer/header
+\RequirePackage[%
     hidelinks,% Remove annoying borders
     colorlinks=true,% Re-enable colors that were disabled by hidelinks
-    urlcolor=blue,
-    linkcolor=black,
-    citecolor=black
+    urlcolor=blue,%
+    linkcolor=black,%
+    citecolor=black%
     ]{hyperref} % Needed for urls/hyperlinks/etc. (must be loaded after biblatex)
-\RequirePackage[left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm
-    ]{geometry} % Set page margins (must be loaded after hyperref? (/a/26592))
 
-% Official XAMK page margins
 % Used in preamble, so \restoregeometry reverts to this (unless lessxamk is used)
-\newcommand*\@xamkpagegeometry{%
+\newcommand*\@xamkpagegeometry{% Official XAMK page margins
     \newgeometry{left=4.3cm, right=2.0cm, top=2.25cm, bottom=1.25cm,%
         headheight=15pt, headsep=15pt}} % Places page number ~1cm from top of page
-% Custom page margins for the title page
-\newcommand*\@titlepagegeometry{%
+\newcommand*\@titlepagegeometry{% Custom page margins for the title page
     \newgeometry{left=3.0cm, right=3.0cm, top=3.0cm, bottom=3.0cm}}
-% Custom page margins for thesis abstract
-\newcommand*\@thesisabstractgeometry{%
+\newcommand*\@thesisabstractgeometry{% Custom page margins for thesis abstract
     \newgeometry{left=1.5cm, right=1.5cm, top=1.5cm, bottom=1.5cm}}
-% Custom page margins for the table of contents
-\newcommand*\@tableofcontentsgeometry{%
+\newcommand*\@tableofcontentsgeometry{% Custom page margins for the table of contents
     \newgeometry{left=1.75cm, right=1.75cm, top=1.75cm, bottom=1.75cm}}
-% Custom page margins for appendices
-\newcommand*\@xamkappendixgeometry{%
-    \newgeometry{left=4.3cm, right=2.0cm, top=2.25cm, bottom=1.25cm,%
-        headheight=30pt, headsep=0pt}}% Larger headheight allows for tiered header
+\RequirePackage[left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm%
+    ]{geometry} % Set page margins (must be loaded after hyperref? (/a/26592))
+    \ifundef{\@lessxamkflag}{\@xamkpagegeometry}{}
+
+% Allows customization of the header and footer
+\RequirePackage{fancyhdr} % Must be loaded after setting default geometry in preamble
+    \pagestyle{fancy}
+    \fancyhf{} % Clear header and footer defaults (/a/13897)
+    \renewcommand\headrulewidth{0pc} % Remove header bar (/a/13897)
+    % Clarify: Keep color? Page numbering as "# / #"? Should appendices be included?
+    \ifundef{\@lessxamkflag}% Also print total page count after current page number
+        {\fancyhead[C]{\makebox[\textwidth][c]{% Centering not needed now, but maybe later?
+            \textcolor{gray}{\thepage\ / \zpageref{LastPage}}}}}% (/a/201063)
+        {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / \zpageref{LastPage}}}}%
 
 % Official section/ToC formatting
 \ExplSyntaxOn
@@ -513,7 +512,7 @@
     \pagestyle{empty}
     \@oldtableofcontents
     \cleardoublepage
-    \ifdef{\@lessxamkflag}{\pagestyle{plain}}{\pagestyle{fancy}}
+    \pagestyle{fancy}
 }
 
 % Add space between LoF/LoT entries
@@ -537,16 +536,16 @@
     % Make appendix section titles use numbers instead of letters
     \apptocmd{\appendices}{\renewcommand{\thesection}{\arabic{section}}}{}{}
     \AtBeginEnvironment{appendices}{
+        % TODO: Find better fix
+        \@xamkpagegeometry % Redundant, but needed for appendix page counting to work properly
         \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
-        \@xamkappendixgeometry
         \singlespacing % Set line spacing to 1
         \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
         
         % Clarify: In Word template, appendix header pushes content down, imitate?
-        % Compensate for increased headheight (place higher)
-        \chead{\raisebox{15pt}{\textcolor{gray}{\thepage}}}
+        \fancyhead[C]{\textcolor{gray}{\thepage\ / \zpageref{LastPage}}}
         % Add "Appendix # (page # of #)" to the right header
-        \rhead{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}
+        \fancyhead[R]{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}
         
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
         
@@ -554,7 +553,7 @@
         \newcounter{pageaux}
         \def\currentauxref{PAGEAUX1}
         \newcommand{\apppagenumbers}{%
-            \stepcounter{pageaux}% Incremented by rhead every page
+            \stepcounter{pageaux}% Incremented by right header every page
             page \thepageaux\ of \ref*{\currentauxref}}
         \newcommand{\resetpageaux}{%
             \clearpage
@@ -565,14 +564,13 @@
     }
     \AtEndEnvironment{appendices}{ % Nothing should come after appendices
         \restoregeometry
-        \chead{\textcolor{gray}{\thepage}}
-        \rhead{}
+        \fancyhead[C]{\textcolor{gray}{\thepage\ / \zpageref{LastPage}}}
+        \fancyhead[R]{}
     }
 }
 
 % Apply the official XAMK layout (can be disabled with the lessxamk class option)
 \ifundef{\@lessxamkflag}{
-    \@xamkpagegeometry
     \RequirePackage{helvet} % Provides the helvet font
         \renewcommand*{\familydefault}{\sfdefault} % Set Helvet as default font
         \RequirePackage[helvet]{sfmath} % Set Helvet as default font for math
@@ -580,12 +578,6 @@
     \@xamkloftlayout % Apply official list of figures/tables formatting
     \@xamkapplayout % Apply official appendix formatting
     \onehalfspacing % Set line spacing to 1.5
-    \RequirePackage{fancyhdr} % Allows customization of the header and footer
-        \pagestyle{fancy}
-        \fancyhf{} % Clear whatever defaults the header and footer may have
-        \renewcommand\headrulewidth{0pc} % Remove the header bar
-        % Clarify: Page numbering as "# of #"? Should appendices be included?
-        \chead{\textcolor{gray}{\thepage}} % Print page number to center of header
     \AtBeginDocument{\raggedright} % Disable text justification (TODO: Is ragged2e needed?)
     \pretocmd{\include}{\ClassError{xamk}% There shouldn't be incomplete pages between sections
         {include command not supported, use input command instead}{}}{}{}
@@ -769,7 +761,7 @@
     \newbool{thesisformat}\setbool{thesisformat}{\pgfkeysvalueof{/maketitle/thesis}}
     \@invalidate@title@cmds{\ClassError{xamk}%
         {This command must be used before the maketitle command}{}}
-    
+
     \@titlepagegeometry
     \begin{singlespace}
     \begin{titlepage}
@@ -839,13 +831,14 @@
         {\setlength{\abstractparskip}{1pc}}
     % tcolorbox's [parbox=false] could also be used (/a/154994), but that affects all rows
     \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}{}
+
     \@thesisabstractgeometry
     \begin{singlespace}
     \thispagestyle{empty} % Don't print page number
     \begin{tikzpicture}[remember picture, overlay, x=0.33pt, y=0.33pt]
         \xamkdrawlogo
     \end{tikzpicture}
-    \begin{tcolorbox}[
+    \begin{tcolorbox}[%
     enhanced,% Needed for segmentation style option
     segmentation style={% Use solid rather than dashed divider lines
         black, solid, line width=1pt},%
