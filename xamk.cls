@@ -9,7 +9,7 @@
 % Clarify: If thesis changes format, thesis will need to become class option
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/12 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/13 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -22,15 +22,13 @@
 \LoadClass[a4paper, \@@ptsize]{article}
 
 \RequirePackage{etoolbox} % Needed for logic in this class file
-\RequirePackage{pgfkeys} % Needed for named command options
 \RequirePackage{xcolor} % Needed for background color behind code blocks
 \RequirePackage[scaled=0.85]{beramono} % Better tt font (must be loaded before text encoding)
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
 \RequirePackage{xparse} % Needed for creating advanced commands, and for LaTeX3
 \RequirePackage[immediate]{silence} % Needed to silence some unavoidable but harmless warnings
 
-% Package options to use if the official layout is used
-\ifundef{\@lessxamkflag}{
+\ifundef{\@lessxamkflag}{% Package options to use if the official layout is used
     \PassOptionsToPackage{%
         font={footnotesize, singlespacing},% 10pt font size, single line spacing
         justification=raggedright,% Disable caption justification
@@ -41,8 +39,7 @@
         % Readd space under LoF/LoT section titles (/a/544983) (TODO: Remove when bug fixed)
         \addtocontents{lof}{\vspace*{1pc}} % parskip's skip - \cftbeforefigskip
         \addtocontents{lot}{\vspace*{1pc}} % parskip's skip - \cftbeforetabskip
-    \ifdef{\@reqbiblatexflag}{%
-        \PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
+    \ifdef{\@reqbiblatexflag}{\PassOptionsToPackage{citestyle=authoryear}{biblatex}}{}
 }{% Package options to use if the official layout is not used
     \PassOptionsToPackage{title}{appendix} % Prepends "Appendix #" to appendix sections
     \ifdef{\@reqbiblatexflag}{%
@@ -61,7 +58,7 @@
     % TODO: Why doesn't cache option work if minted imported later?
     \RequirePackage[cache=false% Needed to prevent errors in TeXstudio
         ]{minted} % Needed for code blocks with syntax highlighting
-    
+
     % Disable syntax error highlighting, since it gives false positives (/a/343506)
     \def\@disablefcolorbox{\renewcommand\fcolorbox[4][]{##4}}
     \AtBeginEnvironment{minted}{\@disablefcolorbox}
@@ -74,8 +71,8 @@
     % Set default options for pgfplots graphs (most are related to the grid)
     \pgfplotsset{
         compat=1.16,% Lock version compatibility (search "compat" in log file for version)
-        xlabel style={align=center},% Needed for line-breaks to work in label
-        ylabel style={align=center},% -||-
+        xlabel style={align=center},% Needed for line-breaks to work in xlabel
+        ylabel style={align=center},% Needed for line-breaks to work in ylabel
         axis lines=left,% Place axis lines to left/bottom 
         grid=both,% Draw both major and minor grid lines
         major grid style={line width=0.2pt, draw=gray!50},% Make major grid lines thicker
@@ -107,9 +104,6 @@
         \def\norm{\@ifstar{\@oldnorm}{\@oldnorm*}} % Make starred version default
 \RequirePackage{siunitx} % Makes dealing with SI units easier, adds some number formatting
 \RequirePackage{float} % Needed for forcing caption placement, and provides [H] option
-    \ifundef{\@lessxamkflag}{%
-        \floatstyle{plaintop}\restylefloat{table}% Place table captions above tables
-        \floatstyle{plain}\restylefloat{figure}}{}% Place figure captions below figures
 \RequirePackage[singlelinecheck=false% Disable automatic centering when caption fits on 1 line
     ]{caption} % Needed for formatting captions
 \RequirePackage{setspace} % Needed for setting line spacing
@@ -148,7 +142,6 @@
 \ifdef{\@reqmintedflag}{
     \setminted{% Set default options for minted and code environments/commands
         fontsize=\small,%
-        linenos,% Enable line numbering
         breaklines,% Break lines rather than run off the page
         breakanywhere,% Break even if no spaces or other ideal breaking points
         autogobble}% Remove common leading whitespace
@@ -179,7 +172,7 @@
     \NewTCBInputListing{\cmdinput}{ m O{} }{listing file={#1}, listingsstyle, #2}
 }{}
 
-% filecontents can't be put under anything (/a/44467)
+% filecontents can't be put under ifdef (/a/44467)
 \begingroup\newif\ifbibincluded
 \ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
 \ifbibincluded
@@ -319,6 +312,7 @@
     \DeclarePrintbibliographyDefaults{heading=bibintoc} % Add bibliography to ToC
     \DeclareBibliographyCategory{cited} % All cited references added to this
     \AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}} % (/a/6977)
+    \AfterEndPreamble{\nocite{*}} % Needed so \printbibliography[notcategory=cited] works
     \DeclareBibliographyCategory{fullcitedfig} % References cited in figures added to this
     \DeclareBibliographyCategory{fullcitedtab} % References cited in tables added to this
     \defbibfilter{notfigtab}{
@@ -331,71 +325,61 @@
     \defbibfilter{nottab}{
         category=cited and
         not category=fullcitedtab}
-
-    % Set options for \makebibliography command to show list of figures/tables
-    \pgfkeys{
-        /makebibliography/.is family, /makebibliography,
-        extra/.default = true,
-        extra/.initial = false,
-        lof/.default = true,% lof's value if "lof" option given to command (without value)
-        lof/.initial = false,% lof's value if "lof" option not given to command
-        lot/.default = true,
-        lot/.initial = false,
-    }
-    % Command to render bibliography (and optionally LoF/LoT) to own page(s)
-    \newcommand\makebibliography[1][]{
-        \pgfkeys{/makebibliography, #1}
-        \newbool{showextra}\setbool{showextra}{\pgfkeysvalueof{/makebibliography/extra}}
-        \newbool{showlof}\setbool{showlof}{\pgfkeysvalueof{/makebibliography/lof}}
-        \newbool{showlot}\setbool{showlot}{\pgfkeysvalueof{/makebibliography/lot}}
+}{}
+\ExplSyntaxOn % Can't be put under ifdef (would put at top, but it breaks xpatch (/a/558525))
+\ifdef{\@reqbiblatexflag}{ % Continues from previous \@reqbiblatexflag ifdef
+    \keys_define:nn { xamk/makebib }{ % l3keys package used for named args (/a/518230)
+        extra .bool_set:N = \l__makebib_extra_bool,
+        lof .bool_set:N = \l__makebib_lof_bool,
+        lot .bool_set:N = \l__makebib_lot_bool}
+    % Command to render bibliography (and optionally LoF/LoT)
+    \NewDocumentCommand{\makebibliography}{ O{} }{
+        \keys_set:nn { xamk/makebib }{ extra=false,#1 }
+        \keys_set:nn { xamk/makebib }{ lof=false,#1 }
+        \keys_set:nn { xamk/makebib }{ lot=false,#1 }
 
         \clearpage
         \begin{singlespace}
-        % If \printbibliography is empty, suppress warning
         % TODO: Apparently section not output if empty, but might not always be the case
-        \WarningFilter[temp-empty-bib]{latex}{Empty bibliography}
-        \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{%
-            \ifbool{showlof}% References left out of bibliography if in LoF or LoT
-                {\ifbool{showlot}%
-                    {\printbibliography[filter=notfigtab]}%
-                    {\printbibliography[filter=notfig]}}%
-                {\ifbool{showlot}%
-                    {\printbibliography[filter=nottab]}%
+        \WarningFilter[temp-bib]{latex}{Empty bibliography} % If bib empty, suppress warning
+        \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{
+            \bool_if:NTF\l__makebib_lof_bool % References left out of bib if in LoF or LoT
+                {\bool_if:NTF\l__makebib_lot_bool
+                    {\printbibliography[filter=notfigtab]}
+                    {\printbibliography[filter=notfig]}}
+                {\bool_if:NTF\l__makebib_lot_bool
+                    {\printbibliography[filter=nottab]}
                     {\printbibliography[category=cited]}}}
-        \ifbool{showextra}{% Print section for uncited references
-            \ifdef{\@lessxamkflag}% If bibstyle numeric, make authoryear-like
-                {\printbibliography[title={Further Reading},notcategory=cited,%
-                    env=notnumbers,omitnumbers]}%
-                {\printbibliography[title={Further Reading},notcategory=cited]}}{}
-        \DeactivateWarningFilters[temp-empty-bib]
+        \bool_if:NT\l__makebib_extra_bool{ % Print section for uncited references
+            \ifundef{\@lessxamkflag} % If bibstyle numeric, make authoryear-like
+                {\printbibliography[title={Further~Reading},notcategory=cited]}
+                {\printbibliography[title={Further~Reading},notcategory=cited,
+                    env=notnumbers,omitnumbers]}}
+        \DeactivateWarningFilters[temp-bib]
 
         \clearpage
-        \ifbool{showlof}{\listoffigures}{}
-        \ifbool{showlot}{\listoftables}{}
+        \bool_if:NT\l__makebib_lof_bool{\listoffigures}
+        \bool_if:NT\l__makebib_lot_bool{\listoftables}
         \end{singlespace}
 
         \clearpage
     }
-
-    % Needed for showextra's \printbibliography
-    \AfterEndPreamble{\nocite{*}}
 }{}
 
 % This section is for setting up the \labelcaption and \citecaption commands
-\AfterEndPreamble{% Needed because something's modifying these commands later on...
-    \let\@oldcaption\caption% TODO: Do something about other forms (e.g. starred)?
+\AfterEndPreamble{ % Needed because something's modifying these commands later on...
+    \let\@oldcaption\caption % TODO: Do something about other forms (e.g. starred)?
     \let\@oldlabel\label}
-\newcommand*\@disablecaptioncmds[1]{%
-    \pretocmd{\caption}{\ClassError{xamk}%
-        {caption command not supported in #1 environment, %
-        use citecaption or labelcaption instead}{}}{}{}%
-    \pretocmd{\label}{\ClassError{xamk}%
-        {label command not supported in #1 environment, %
-        use citecaption or labelcaption instead}{}}{}{}}
-\newrobustcmd*\@fullcitehyper[1]{% Used to move citation hyperrefs to the LoF/LoT
+\newcommand*\@disablecaptioncmds[1]{
+    \pretocmd{\caption}{\ClassError{xamk}
+        {caption~command~not~supported~in~#1~environment,~
+        use~citecaption~or~labelcaption~instead}{}}{}{}
+    \pretocmd{\label}{\ClassError{xamk}
+        {label~command~not~supported~in~#1~environment,~
+        use~citecaption~or~labelcaption~instead}{}}{}{}}
+\newrobustcmd*\@fullcitehyper[1]{ % Used to move citation hyperrefs to the LoF/LoT
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
-\ExplSyntaxOn % TODO: Doesn't detect punctuation from commands? (e.g. \lipsum)
-\NewDocumentCommand\@adddotifnotpunct{ m }{
+\NewDocumentCommand\@adddotifnotpunct{ m }{ % TODO: Punctuation from commands? (e.g. \lipsum)
     #1\str_case_e:nnF { \tl_item:Nn { #1 } { -1 } } % Check last character
         {{.}{}{,}{}{?}{}{!}{}} % If punctuation (.,?!), do nothing
         {.}} % Otherwise, add period
@@ -463,17 +447,18 @@
     \patchcmd{\section}{\Large}{\normalsize}{}{}
     \patchcmd{\subsection}{\large}{\normalsize}{}{}
     % Capitalize sections (/a/555656)
-    \let\@oldsection\section
+    \let\old_section\section
     \RenewDocumentCommand{\section}{ s o m }{
         % TODO: Remove \tl_upper_case fallback (OL2020 and TL2021?)
-        \tl_set:Nx\@section_upper{\cs_if_exist:NTF{\text_uppercase:n}
+        \tl_set:Nx\l_section_upper{\cs_if_exist:NTF{\text_uppercase:n}
             {\text_uppercase:n{##3}}{\tl_upper_case:n{##3}}}
         \IfBooleanTF{##1}
-            {\@oldsection*{\@section_upper}}
+            {\old_section*{\l_section_upper}}
             {\IfNoValueTF{##2}
-                {\@oldsection{\@section_upper}}
-                {\@oldsection[##2]{\@section_upper}}}}
+                {\old_section{\l_section_upper}}
+                {\old_section[##2]{\l_section_upper}}}}
 
+    \renewcommand{\cftdot}{\textcolor{gray}{.}} % Clarify: Keep color? Use dashes?
     \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
     \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Add dotted line to sections in ToC
     % Remove bold font weight from sections in ToC
@@ -482,36 +467,28 @@
 
     % Make sections in ToC uppercase (/a/156917)
     \let\@oldcontentsline\contentsline
-    \def\contentsline##1##2{%
+    \def\contentsline##1##2{
         \expandafter\ifx\csname l@##1\endcsname\l@section
             \expandafter\@firstoftwo
         \else
             \expandafter\@secondoftwo
         \fi
-        {\@oldcontentsline{##1}{\MakeUppercase{##2}}}%
-        {\@oldcontentsline{##1}{##2}}%
-    }
-
-    % Redefine \tableofcontents to add custom geometry and line spacing
-    \let\@@oldtableofcontents\tableofcontents
-    \renewcommand\tableofcontents{
-        \@tableofcontentsgeometry
-
-        \begin{onehalfspace}
-        \@@oldtableofcontents
-        \end{onehalfspace}
-
-        \restoregeometry
+        {\@oldcontentsline{##1}{\MakeUppercase{##2}}}
+        {\@oldcontentsline{##1}{##2}}
     }
 }
 \ExplSyntaxOff
 
-% Removes page number(s) from ToC (works with multiple pages)
+% Removes page number(s) from ToC page(s) (/a/180877)
 \let\@oldtableofcontents\tableofcontents
-\renewcommand\tableofcontents{
+\renewcommand\tableofcontents{ % If not lessxamk, set custom geometry
+    \ifundef{\@lessxamkflag}{\@tableofcontentsgeometry}{}
     \pagestyle{empty}
-    \@oldtableofcontents
-    \cleardoublepage
+    {
+        \renewcommand{\thispagestyle}[1]{}
+        \@oldtableofcontents
+    }
+    \clearpage\ifundef{\@lessxamkflag}{\restoregeometry}{}
     \pagestyle{fancy}
 }
 
@@ -524,6 +501,9 @@
     % Remove LoF/LoT indents (fig/tab numbers have been moved into captions themselves)
     \cftsetindents{figure}{0pc}{0pc}
     \cftsetindents{table}{0pc}{0pc}
+
+    \floatstyle{plaintop}\restylefloat{table} % Force table captions above tables (/a/22754)
+    \floatstyle{plain}\restylefloat{figure} % Force figure captions below figures
 }
 
 \AtBeginEnvironment{appendices}{%
@@ -541,14 +521,13 @@
         \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
         \singlespacing % Set line spacing to 1
         \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
-        
+
         % Clarify: In Word template, appendix header pushes content down, imitate?
-        \fancyhead[C]{\textcolor{gray}{\thepage\ / \zpageref{LastPage}}}
         % Add "Appendix # (page # of #)" to the right header
         \fancyhead[R]{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}
-        
+
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
-        
+
         % Maintain total page count for each appendix section (/a/82560)
         \newcounter{pageaux}
         \def\currentauxref{PAGEAUX1}
@@ -563,8 +542,7 @@
         \AtEndDvi{\edef\@currentlabel{\thepageaux}\label{\currentauxref}}
     }
     \AtEndEnvironment{appendices}{ % Nothing should come after appendices
-        \restoregeometry
-        \fancyhead[C]{\textcolor{gray}{\thepage\ / \zpageref{LastPage}}}
+        \clearpage\restoregeometry
         \fancyhead[R]{}
     }
 }
@@ -749,18 +727,15 @@
     \renewcommand*\xamkdegreeprogramme[1]{#1}
 }
 
+\ExplSyntaxOn
 % Set option for \maketitle command to be a thesis title page
-\pgfkeys{
-    /maketitle/.is family, /maketitle,
-    thesis/.default = true,
-    thesis/.initial = false,
-}
+\keys_define:nn { xamk/maketitle } % Clarify: Is thesis abstract optional?
+    {thesis .bool_set:N = \l__maketitle_thesis_bool}
 % Command for rendering the title page
 \renewcommand*\maketitle[1][]{
-    \pgfkeys{/maketitle, #1} % Clarify: Is thesis abstract optional?
-    \newbool{thesisformat}\setbool{thesisformat}{\pgfkeysvalueof{/maketitle/thesis}}
-    \@invalidate@title@cmds{\ClassError{xamk}%
-        {This command must be used before the maketitle command}{}}
+    \keys_set:nn { xamk/maketitle }{ thesis=false,#1 }
+    \@invalidate@title@cmds{\ClassError{xamk}
+        {This~command~must~be~used~before~the~maketitle~command}{}}
 
     \@titlepagegeometry
     \begin{singlespace}
@@ -768,31 +743,27 @@
         \begin{center}
         \@titlepageimages
         {\Large\bf\setlength{\parskip}{1pc}
-            \ifdef{\@xamkstudentlist}%
-                {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}%
-                {\notbool{thesisformat}%
-                    {\@xamkdefaultstudent}{\@xamkdefaultstudentname}\par}
+            \ifdef{\@xamkstudentlist}
+                {{\setlength{\parskip}{0.25pc}\@printxamkstudentlist\par}}
+                {\bool_if:NTF\l__maketitle_thesis_bool
+                    {\@xamkdefaultstudentname}{\@xamkdefaultstudent}\par}
             \vspace*{2pc}
             {\huge\@xamkpapertitle\par}
             \ifdef{\@xamkpapersubtitle}{{\LARGE\@xamkpapersubtitle\par}}{}
             \vspace*{2pc}
-            \notbool{thesisformat}{%
-                \@xamkpapertype\par
-                \@xamkcoursename\par
-            }{%
-                \@xamkdegreetype\par
-                \@xamkdegreeprogramme\par
-            }
+            \bool_if:NTF\l__maketitle_thesis_bool
+                {\@xamkdegreetype\par\@xamkdegreeprogramme\par}
+                {\@xamkpapertype\par\@xamkcoursename\par}
             \vspace*{2pc}
             \@xamkpaperdate\par
         }
         \end{center}
     \end{titlepage}
     \end{singlespace}
-    \restoregeometry
-    \ifbool{thesisformat}{\clearpage\@makethesisabstract}{}
-    \clearpage
+    \bool_if:NT\l__maketitle_thesis_bool{\clearpage\restoregeometry\@makethesisabstract}
+    \clearpage\restoregeometry
 }
+\ExplSyntaxOff
 
 % Who commissioned the thesis. Defaults to "N/A".
 \newcommand*\xamkthesiscommissioner[1]{\def\@xamkthesiscommissioner{#1}}
@@ -826,9 +797,9 @@
             {0}{\the\numexpr\zref@extractdefault{LastPage}{page}{1}%
                 -\zref@extractdefault{firstappstart}{page}{1}+1\relax}}
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
-    \newlength{\abstractparskip}\ifdef{\@lessxamkflag}%
-        {\setlength{\abstractparskip}{\parskip}}%
-        {\setlength{\abstractparskip}{1pc}}
+    \newlength{\abstractparskip}\ifundef{\@lessxamkflag}%
+        {\setlength{\abstractparskip}{1pc}}%
+        {\setlength{\abstractparskip}{\parskip}}
     % tcolorbox's [parbox=false] could also be used (/a/154994), but that affects all rows
     \newenvironment{tcbrow}{\setlength{\parskip}{\abstractparskip}}{}
 

@@ -1,6 +1,6 @@
 \section{New and Modified Commands/Options/Etc.}
 
-\begin{code}{latex}[title={xamk document class options},label=code:class-options]
+\begin{code}{latex}[title={xamk document class options},label=code:class-options,minted options={linenos}]
 lessxamk
 % By default, lots of formatting is done with spacings, margins, the bibliography and citations, fonts, justification, etc. Using this option brings the formatting closer to LaTeX's defaults.
 minted
@@ -13,7 +13,7 @@ bib
 % Enables the biblatex package, used for the bibliography. Sets the format according to XAMK's guidelines. \addbibresource{<file>} must then be used to import the needed bibliography .bib file(s).
 \end{code}
 %
-\begin{code}{latex}[title={Standard title page commands},label=code:std-cmds,minted options={firstnumber=last}]
+\begin{code}{latex}[title={Standard title page commands},label=code:std-cmds,minted options={linenos,firstnumber=last}]
 \xamkstudent{<student name>}
 \xamkstudent{<student name>}{<student number>}{<group ID>}
 % Specify your full name, and optionally your student number and group ID. Can be used multiple times to share credit between students.
@@ -31,7 +31,7 @@ bib
 % Prints title page (must be called after preceding commands).
 \end{code}
 %
-\begin{code}{latex}[title={Thesis title and abstract page commands},label=code:thesis-cmds,minted options={firstnumber=last}]
+\begin{code}{latex}[title={Thesis title and abstract page commands},label=code:thesis-cmds,minted options={linenos,firstnumber=last}]
 % The previously shown \xamkstudent, \xamkpapertitle, \xamkpapersubtitle, and \xamkpaperdate commands are needed as well.
 \xamkdegreetype{<degree type>}
 % Used instead of \xamkpapertype. Specify your degree type (bachelor's, master's, etc.). Optional, defaults to "Bachelor's Degree".
@@ -49,26 +49,26 @@ bib
 % Prints thesis title and abstract pages (must be called after preceding commands).
 \end{code}
 %
-\begin{code}{latex}[title={Bibliography commands},label=code:bib-cmds,minted options={firstnumber=last}]
+\begin{code}{latex}[title={Bibliography commands},label=code:bib-cmds,minted options={linenos,firstnumber=last}]
 \makebibliography[<options>]
 % Provided with bib class option. Prints the bibliography. Use the extra option to add a section for uncited references. Use the lof (and/or lot) option(s) to add the list-of-figures/tables section(s) and move figure/table references to the LoF/LoT.
 \end{code}
 %
-\begin{code}{latex}[title={Caption commands},label=code:caption-cmds,minted options={firstnumber=last}]
+\begin{code}{latex}[title={Caption commands},label=code:caption-cmds,minted options={linenos,firstnumber=last}]
 \labelcaption{<label>}[<short caption>]{<caption>}
 % Defined for the figure and table environments. Creates a label (automatically prefixed with "fig:"/"tab:" for figures/tables). Must be used instead of \caption and \label in these environments. A shorter caption can be set to be displayed in the LoF/LoT.
 \citecaption{<cite key/label>}[<short caption>]{<caption>}
 % Provided with bib class option. Same as the \labelcaption command, but also inserts citation at end of caption, and configures the reference to appear under the list of figures/tables rather than the bibliography, if appropriate option set for \makebibliography.
 \end{code}
 %
-\begin{code}{latex}[title={Bibliography database fields},label=code:bib-fields,minted options={firstnumber=last}]
+\begin{code}{latex}[title={Bibliography database fields},label=code:bib-fields,minted options={linenos,firstnumber=last}]
 doctype
 % Goes with the url field. Specifies the document type (e.g. "PDF document"). If not specified, defaults to "WWW document".
 lastmoddate
 % Goes with the url field. Specifies the date when the document was last modified.
 \end{code}
 %
-\begin{code}{latex}[title={tcolorbox environments and commands},label=code:tcolorbox,minted options={firstnumber=last}]
+\begin{code}{latex}[title={tcolorbox environments and commands},label=code:tcolorbox,minted options={linenos,firstnumber=last}]
 {code}{<language>}[<tcblisting options>]
 % Environment. Provided with minted class option. TCBListing options (title, color, etc.) can be specified after the language (minted options (e.g. starting line number) can be set under the "minted options" option). Supported languages can be seen with the command "pygmentize -L lexers", or from https://pygments.org/docs/lexers/.
 \codeinput{<file>}{<language>}[<tcblisting options>]
