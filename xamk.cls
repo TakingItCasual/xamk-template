@@ -5,11 +5,10 @@
 % Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live 2020 installation
 
 % TODO: Create proper formatting for bibliography
-% Clarify: Formatting and example for (list of) equations
-% Clarify: If thesis changes format, thesis will need to become class option
+% TODO: Formatting and example for (list of) equations/symbols
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/13 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/18 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -126,8 +125,8 @@
 \RequirePackage[nottoc, notbib]{tocbibind} % Needed to add LoF/LoT to ToC
 \RequirePackage{enumitem} % Needed to remove vertical spacing from lists
     \setlist{nosep} % (/a/10689)
-\RequirePackage{atenddvi} % Needed for cmd at very end of doc? (Used for appendix page #s)
-\RequirePackage[lastpage, user]{zref} % Needed for better labels (Used for appendix page #s)
+\RequirePackage{atenddvi} % Needed for cmd at very end of doc?
+\RequirePackage[lastpage, user, abspage]{zref} % Needed for better labels
 \RequirePackage{embedfile} % Needed for attaching arbitrary files to the PDF
 %\RequirePackage{lipsum} % Needed for filler text
 
@@ -248,16 +247,6 @@
         \DeclareFieldAlias{translatortype}{editortype}
     \DeclareDelimFormat{editortypedelim}{\addspace} % Remove comma before (/a/419595)
         \DeclareDelimAlias{translatortypedelim}{editortypedelim}
-    \xpatchbibmacro{byeditor+others}% Clarify: Keep parantheses? (/a/241591)
-        {\usebibmacro{byeditor+othersstrg}%
-            \setunit{\addspace}\printnames[byeditor]{editor}}%
-        {\printtext[parens]{\usebibmacro{byeditor+othersstrg}%
-            \setunit{\addspace}\printnames[byeditor]{editor}}}{}{}
-    \xpatchbibmacro{bytranslator+others}% Add parantheses
-        {\usebibmacro{bytranslator+othersstrg}%
-            \setunit{\addspace}\printnames[bytranslator]{translator}}%
-        {\printtext[parens]{\usebibmacro{bytranslator+othersstrg}%
-            \setunit{\addspace}\printnames[bytranslator]{translator}}}{}{}
     \DeclareLabeldate{% Remove urldate as fallback date in bibliography (/a/525164)
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (/a/428193)
@@ -266,34 +255,11 @@
     \DeclareFieldFormat{url}{\bibstring{urlpre}\addcolon\addspace\url{#1}}
     \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
     \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
-    % Default \parencite's and \textcite's postnote to pages, if present
-    % Clarify: When should page numbers be included after citations?
-    \ifundef{\@lessxamkflag}{% Automatic page numbers for numeric citations is confusing
-        \letbibmacro*{parencite:postnote}{postnote} % Copy original postnote macro
-        \xpatchbibmacro{parencite:postnote}% Only replace if postnote not set by user
-            {{}}{{\iffieldundef{pages}{}%
-                {\setunit{\printdelim{postnotedelim}}\printfield{pages}}}}{}{}
-        \DeclareCiteCommand{\parencite}[\mkbibparens]% Make \parencite use the new postnote
-            {\usebibmacro{prenote}}% Based on authoryear's definition
-            {\usebibmacro{citeindex}\usebibmacro{cite}}%
-            {\multicitedelim}%
-            {\usebibmacro{parencite:postnote}}% This line changed
-        \xpatchbibmacro{textcite:postnote}% \textcite already has its own postnote
-            {\ifbool{cbx:parens}
-                {\bibcloseparen}
-                {}}% This search-and-replace only works without the % symbols
-            {\iffieldundef{pages}%
-                {\ifbool{cbx:parens}{\bibcloseparen}{}}%
-                {\ifbool{cbx:parens}%
-                    {\setunit{\printdelim{postnotedelim}}}%
-                    {\setunit{\printdelim{extpostnotedelim}\bibopenparen}}%
-                    \printfield{pages}\bibcloseparen}}{}{}}{}
     \DeclareFieldFormat{urldate}{\mkbibbrackets{\bibstring{urlseen}\addspace#1}}
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
         ]{title}{#1} % Remove title quotes from bibliography (/a/94090)
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
         ]{citetitle}{#1} % Remove title quotes from citations (/a/94090)
-    % Clarify: Also apply to doi/eprint?
     \xpretobibmacro{url+urldate}{% Print doctype and lastmoddate before url+urldate
         {\iffieldundef{url}{}% If doctype not specified, default to wwwdoc string
             {\iffieldundef{doctype}{\bibstring{wwwdoc}}{\printfield{doctype}}%
@@ -329,9 +295,9 @@
 \ExplSyntaxOn % Can't be put under ifdef (would put at top, but it breaks xpatch (/a/558525))
 \ifdef{\@reqbiblatexflag}{ % Continues from previous \@reqbiblatexflag ifdef
     \keys_define:nn { xamk/makebib }{ % l3keys package used for named args (/a/518230)
-        extra .bool_set:N = \l__makebib_extra_bool,
-        lof .bool_set:N = \l__makebib_lof_bool,
-        lot .bool_set:N = \l__makebib_lot_bool}
+        extra .bool_set:N = \l__makebib_extra_bool, % Print bibliography for uncited references
+        lof .bool_set:N = \l__makebib_lof_bool, % Print list of figures
+        lot .bool_set:N = \l__makebib_lot_bool} % Print list of tables
     % Command to render bibliography (and optionally LoF/LoT)
     \NewDocumentCommand{\makebibliography}{ O{} }{
         \keys_set:nn { xamk/makebib }{ extra=false,#1 }
@@ -342,8 +308,9 @@
         \begin{singlespace}
         % TODO: Apparently section not output if empty, but might not always be the case
         \WarningFilter[temp-bib]{latex}{Empty bibliography} % If bib empty, suppress warning
-        \ifdef{\@lessxamkflag}{\printbibliography[category=cited]}{
-            \bool_if:NTF\l__makebib_lof_bool % References left out of bib if in LoF or LoT
+        \ifdef{\@lessxamkflag}
+            {\printbibliography[category=cited]}
+            {\bool_if:NTF\l__makebib_lof_bool % References left out of bib if in LoF or LoT
                 {\bool_if:NTF\l__makebib_lot_bool
                     {\printbibliography[filter=notfigtab]}
                     {\printbibliography[filter=notfig]}}
@@ -396,7 +363,7 @@
             \@oldlabel{#2:##1}
             \addtocategory{fullcited#2}{##1}}}{}
     \NewDocumentCommand\labelcaption{ m O{##3} m }{
-        \ifundef{\@lessxamkflag} % Clarify: Add "(Made by author)"?
+        \ifundef{\@lessxamkflag}
             {\@oldcaption[#3~\@adddotifnotpunct{##2}]{##3}}
             {\@oldcaption[##2]{##3}}
         \@oldlabel{#2:##1}}}
@@ -434,11 +401,11 @@
     \pagestyle{fancy}
     \fancyhf{} % Clear header and footer defaults (/a/13897)
     \renewcommand\headrulewidth{0pc} % Remove header bar (/a/13897)
-    % Clarify: Keep color? Page numbering as "# / #"? Should appendices be included?
+    % Clarify: Page numbering as "# / #"? Should appendices be included?
     \ifundef{\@lessxamkflag}% Also print total page count after current page number
         {\fancyhead[C]{\makebox[\textwidth][c]{% Centering not needed now, but maybe later?
-            \textcolor{gray}{\thepage\ / \zpageref{LastPage}}}}}% (/a/201063)
-        {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / \zpageref{LastPage}}}}%
+            \textcolor{gray}{\thepage\ / \@xamk@pc}}}}% (/a/201063)
+        {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / \@xamk@pc}}}%
 
 % Official section/ToC formatting
 \ExplSyntaxOn
@@ -458,7 +425,7 @@
                 {\old_section{\l_section_upper}}
                 {\old_section[##2]{\l_section_upper}}}}
 
-    \renewcommand{\cftdot}{\textcolor{gray}{.}} % Clarify: Keep color? Use dashes?
+    \renewcommand{\cftdot}{\textcolor{gray}{.}}
     \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
     \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Add dotted line to sections in ToC
     % Remove bold font weight from sections in ToC
@@ -495,6 +462,9 @@
 % Add space between LoF/LoT entries
 \setlength{\cftbeforefigskip}{0.5pc}
 \setlength{\cftbeforetabskip}{0.5pc}
+% Section titles dynamically spaced from section numbers (/a/64124)
+%\renewcommand{\numberline}[1]{\@cftbsnum #1\@cftasnum\quad\@cftasnumb} % Messes up LoF/LoT
+% TODO: Set proper spacing around floats
 % Official list of figures/tables formatting
 \newcommand*\@xamkloftlayout{
     \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries ragged-right (/a/62006)
@@ -506,27 +476,30 @@
     \floatstyle{plain}\restylefloat{figure} % Force figure captions below figures
 }
 
-\AtBeginEnvironment{appendices}{%
+% Permanent, but "Before" needed for last footer to work, and appendices should be last anyways
+\BeforeBeginEnvironment{appendices}{
     \clearpage\pretocmd{\section}{%
         \ifundef{\@firstapppass}{% Label used to get first appendix page number
             \def\@firstapppass{}% Only run once (on first appendix)
-            \zref@label{firstappstart}}{}}{}{}}
+            \zref@label{firstappstart}}{}}{}{}
+    \pagenumbering{arabic} % Reset numbering
+    \renewcommand*{\thepage}{A\arabic{page}} % (/a/59574)
+    \ifundef{\@lessxamkflag}% Clarify: Keep current page numbering, or (/a/239162)?
+        {\fancyhead[C]{\makebox[\textwidth][c]{\textcolor{gray}{\thepage\ / A\@xamk@apc}}}}%
+        {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / A\@xamk@apc}}}{}
+}
 % Official appendix formatting
 \newcommand*\@xamkapplayout{
     % Make appendix section titles use numbers instead of letters
     \apptocmd{\appendices}{\renewcommand{\thesection}{\arabic{section}}}{}{}
     \AtBeginEnvironment{appendices}{
-        % TODO: Find better fix
-        \@xamkpagegeometry % Redundant, but needed for appendix page counting to work properly
         \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
+        \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
         \singlespacing % Set line spacing to 1
         \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
 
-        % Clarify: In Word template, appendix header pushes content down, imitate?
         % Add "Appendix # (page # of #)" to the right header
         \fancyhead[R]{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}
-
-        \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
 
         % Maintain total page count for each appendix section (/a/82560)
         \newcounter{pageaux}
@@ -541,10 +514,15 @@
             \setcounter{pageaux}{0}}
         \AtEndDvi{\edef\@currentlabel{\thepageaux}\label{\currentauxref}}
     }
-    \AtEndEnvironment{appendices}{ % Nothing should come after appendices
-        \clearpage\restoregeometry
-        \fancyhead[R]{}
-    }
+    \AtEndEnvironment{appendices}{\clearpage} % Needed so appendix page counting works properly
+}
+\AfterEndEnvironment{appendices}{ % TODO: Find way to detect/block all content
+    \RenewDocumentCommand{\section}{ s o m }{\ClassError{xamk}%
+        {Nothing should come after the appendices environment}{}}
+    \RenewDocumentCommand{\subsection}{ s o m }{\ClassError{xamk}%
+        {Nothing should come after the appendices environment}{}}
+    \RenewDocumentCommand{\subsubsection}{ s o m }{\ClassError{xamk}%
+        {Nothing should come after the appendices environment}{}}
 }
 
 % Apply the official XAMK layout (can be disabled with the lessxamk class option)
@@ -729,8 +707,8 @@
 
 \ExplSyntaxOn
 % Set option for \maketitle command to be a thesis title page
-\keys_define:nn { xamk/maketitle } % Clarify: Is thesis abstract optional?
-    {thesis .bool_set:N = \l__maketitle_thesis_bool}
+\keys_define:nn { xamk/maketitle }
+    {thesis .bool_set:N = \l__maketitle_thesis_bool} % Print thesis title page and abstract
 % Command for rendering the title page
 \renewcommand*\maketitle[1][]{
     \keys_set:nn { xamk/maketitle }{ thesis=false,#1 }
@@ -765,9 +743,9 @@
 }
 \ExplSyntaxOff
 
-% Who commissioned the thesis. Defaults to "N/A".
+% Who commissioned the thesis. Defaults to "<Commissioner>".
 \newcommand*\xamkthesiscommissioner[1]{\def\@xamkthesiscommissioner{#1}}
-\xamkthesiscommissioner{N/A}
+\xamkthesiscommissioner{\@placehold{Commissioner}}
 % Who supervised the writing of the thesis. Defaults to "<Supervisor>".
 \newcommand*\xamkthesissupervisor[1]{\def\@xamkthesissupervisor{#1}}
 \xamkthesissupervisor{\@placehold{Supervisor}}
@@ -783,19 +761,21 @@
     \renewcommand*\xamkthesisabstractfile[1]{#1}
 }
 
+\AtBeginDocument{% Label math doesn't work if done within preamble
+    % Early expansion needed so ifdefstring test works
+    \edef\@xamk@pc{% Number of pages until appendices (or all pages, if no appendices)
+        \zref@ifrefundefined{firstappstart}%
+            {\zpageref{LastPage}}%
+            {\the\numexpr\zref@extractdefault{firstappstart}{abspage}{1}-1\relax}}
+    \edef\@xamk@apc{% Number of appendix pages (or 0, if no appendices)
+        \zref@ifrefundefined{firstappstart}%
+            {0}{\the\numexpr\zref@extractdefault{LastPage}{abspage}{1}%
+                -\zref@extractdefault{firstappstart}{abspage}{1}+1\relax}}
+}
 % Command for rendering the thesis abstract
 \newcommand*\@makethesisabstract{
     \@invalidate@abstract@cmds{\ClassError{xamk}%
         {This command must be used before the maketitle command}{}}
-    % Early expansion needed so ifdefstring test works
-    \edef\@xamk@pc{% Number of pages until appendices
-        \zref@ifrefundefined{firstappstart}%
-            {\zpageref{LastPage}}%
-            {\the\numexpr\zref@extractdefault{firstappstart}{page}{1}-1\relax}}
-    \edef\@xamk@apc{% Number of appendix pages
-        \zref@ifrefundefined{firstappstart}%
-            {0}{\the\numexpr\zref@extractdefault{LastPage}{page}{1}%
-                -\zref@extractdefault{firstappstart}{page}{1}+1\relax}}
     % If lessxamk, use default parskip, otherwise use 1pc (even default needs explicit setting)
     \newlength{\abstractparskip}\ifundef{\@lessxamkflag}%
         {\setlength{\abstractparskip}{1pc}}%
@@ -840,7 +820,7 @@
         \noindent\begin{tabularx}{\textwidth}%
         % 2 columns -> sum must be exactly 2 (enough space for up to 999 appendix pages)
         {@{} >{\hsize=1.44\hsize}X >{\hsize=0.56\hsize}X @{}}
-        \textbf{Thesis title} % Clarify: Detect subtitle presence?
+        \textbf{Thesis title}
         \vspace*{0.5pc}
 
         \@xamkpapertitle
@@ -849,9 +829,10 @@
         \vspace*{-0.5pc} % Center page counts (gets pushed down even with negative vspace?)
         \@xamk@pc\ page\ifdefstring{\@xamk@pc}{1}{}{s}
 
-        \@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices % Clarify: Hide if 0?
+        \ifdefstring{\@xamk@apc}{0}% Hide if 0
+            {}{\@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices}
         \end{tabularx} % Clarify: Rephrase as "# appendix page(s)"? More space.
-    \tcbline% Clarify: Hide if commissioner not specified?
+    \tcbline
         \textbf{Commissioned by}
         \vspace*{0.5pc}
 
@@ -880,8 +861,9 @@
 }
 
 % Uncomment and place more '\listeadd's to find compilation bottlenecks
-%\listeadd\@timerlist{end: \the\pdfelapsedtime}
-%\renewcommand*{\do}[1]{\typeout{#1}}
-%\dolistloop{\@timerlist}
+%\AfterEndPreamble{
+%    \listeadd\@timerlist{end: \the\pdfelapsedtime}
+%    \renewcommand*{\do}[1]{\typeout{#1}}
+%    \dolistloop{\@timerlist}}
 
 \endinput

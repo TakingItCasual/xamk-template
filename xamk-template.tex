@@ -7,9 +7,9 @@
 % Anything meant to be written to the PDF must be within the document environment.
 \begin{document}
     %\embedfile{./attach.zip} % Attach attach.zip file to output PDF
-    
+
     % Choose one of the following two title page formats. See appendix 1 for more information.
-    
+
     % Format for title page of assignment/report/etc.
     %\xamkstudent{John Smith}{1234567}{ITMI17SP}
     %\xamkstudent{Jane Smith}{1234568}{ITMI17SP} % More than 1 student can be listed
@@ -20,7 +20,7 @@
     %\xamkcoursename{Computer Hardware}
     %\xamkpaperdate{2020}
     \maketitle % Creates title page with the preceding options
-    
+
     % Format for title page of thesis.
     %\xamkstudent{John Smith}
     %\xamkstudent{Jane Smith}
@@ -36,14 +36,14 @@
     %\maketitle[thesis] % Creates thesis title and abstract pages with preceding options
 
     \tableofcontents % Automatically generates table of contents, based on sections/subsections/etc.
-    
+
     % tex files can be imported with \input{} (the \include{} command is not supported)
     \input{section1} % Imports section1.tex from the same directory as xamk-template.tex
     \input{section2}
-    
+
     % See appendix 1 for a description of this command's options
     \makebibliography[extra, lof, lot] % Automatically generates the bibliography using biblatex
-    
+
     % Appendix sections are expected to be within the appendices environment
     \begin{appendices}
         \input{appendix1}
