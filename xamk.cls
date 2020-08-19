@@ -5,10 +5,10 @@
 % Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live 2020 installation
 
 % TODO: Create proper formatting for bibliography
-% TODO: Formatting and example for (list of) equations/symbols
+% TODO: Formatting/commands/example for (list of) equations/symbols
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/18 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/19 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -230,6 +230,7 @@
         urlpre = {Available at}
     }
 
+    % TODO: Ensure \fullcite has identical output as in bibliography
     % general:    github.com/plk/biblatex/blob/master/tex/latex/biblatex/biblatex.def
     % authoryear: github.com/plk/biblatex/blob/master/tex/latex/biblatex/cbx/authoryear.cbx
     % Biblatex bibliography/citation format modifications
@@ -425,7 +426,7 @@
                 {\old_section{\l_section_upper}}
                 {\old_section[##2]{\l_section_upper}}}}
 
-    \renewcommand{\cftdot}{\textcolor{gray}{.}}
+    \renewcommand{\cftdot}{\textcolor{gray}{.}} % Change color
     \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
     \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Add dotted line to sections in ToC
     % Remove bold font weight from sections in ToC
@@ -818,8 +819,8 @@
         \end{tabularx}
     \tcbline
         \noindent\begin{tabularx}{\textwidth}%
-        % 2 columns -> sum must be exactly 2 (enough space for up to 999 appendix pages)
-        {@{} >{\hsize=1.44\hsize}X >{\hsize=0.56\hsize}X @{}}
+        % 2 columns -> sum must be exactly 2 (pages almost aligned with time)
+        {@{} >{\hsize=1.55\hsize}X >{\hsize=0.45\hsize}X @{}}
         \textbf{Thesis title}
         \vspace*{0.5pc}
 
@@ -830,8 +831,8 @@
         \@xamk@pc\ page\ifdefstring{\@xamk@pc}{1}{}{s}
 
         \ifdefstring{\@xamk@apc}{0}% Hide if 0
-            {}{\@xamk@apc\ page\ifdefstring{\@xamk@apc}{1}{}{s} of appendices}
-        \end{tabularx} % Clarify: Rephrase as "# appendix page(s)"? More space.
+            {}{\@xamk@apc\ appendix page\ifdefstring{\@xamk@apc}{1}{}{s}}
+        \end{tabularx}
     \tcbline
         \textbf{Commissioned by}
         \vspace*{0.5pc}
@@ -860,9 +861,11 @@
     \restoregeometry
 }
 
-% Uncomment and place more '\listeadd's to find compilation bottlenecks
-%\AfterEndPreamble{
-%    \listeadd\@timerlist{end: \the\pdfelapsedtime}
+% Uncomment and use \checktime to find compilation bottlenecks
+%\newcommand*{\checktime}[1]{\listeadd\@timerlist{#1: \the\pdfelapsedtime}}
+%\AfterEndPreamble{\checktime{preamble end}}
+%\AfterEndDocument{
+%    \checktime{document end}
 %    \renewcommand*{\do}[1]{\typeout{#1}}
 %    \dolistloop{\@timerlist}}
 
