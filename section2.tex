@@ -9,6 +9,7 @@ Notice the missing \verb'|' and \verb|\hline| in the \verb|chapter2.tex| file an
 \begin{table}[H]
     %\centering % Uncomment to center the table
     %\captionsetup{justification=centering} % Uncomment to center the caption
+    \labelcaption{table-eg}{An example table} % See appendix 1
     \begin{tabular}[b]{ || l | l  } % extra | before first l and missing | after the last l
         \hline % "\\" adds a linebreak, "\hline" adds a horizontal line
         \textbf{Time} & \textbf{Measurement} \\\hline
@@ -16,7 +17,6 @@ Notice the missing \verb'|' and \verb|\hline| in the \verb|chapter2.tex| file an
         13:04 & $(20.47 \pm 0.01)\si{mm}$ \\%\hline
         14:32 & $(18.63 \pm 0.01)\si{mm}$ \\\hline
     \end{tabular}
-    \labelcaption{table-eg}{An example table} % See appendix 1
 \end{table}
 
 \subsection{Mathematics}

@@ -8,7 +8,7 @@
 % TODO: Formatting/commands/example for (list of) equations/symbols
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/19 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/21 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -22,10 +22,15 @@
 
 \RequirePackage{etoolbox} % Needed for logic in this class file
 \RequirePackage{xcolor} % Needed for background color behind code blocks
-\RequirePackage[scaled=0.85]{beramono} % Better tt font (must be loaded before text encoding)
 \RequirePackage{xpatch} % Needed for more advanced modifications of existing commands
 \RequirePackage{xparse} % Needed for creating advanced commands, and for LaTeX3
 \RequirePackage[immediate]{silence} % Needed to silence some unavoidable but harmless warnings
+\RequirePackage[scaled=0.85]{beramono} % Better tt font (must be loaded before text encoding)
+\ifundef{\@lessxamkflag}{
+    \RequirePackage{helvet} % Provides the helvet font
+        \renewcommand*{\familydefault}{\sfdefault} % Set Helvet as default font
+        \RequirePackage[helvet]{sfmath} % Set Helvet as default font for math
+}{}
 
 \ifundef{\@lessxamkflag}{% Package options to use if the official layout is used
     \PassOptionsToPackage{%
@@ -216,6 +221,7 @@
     \setlength\bibhang{0pc} % Remove indent from bibliography
 
     % Prevents long urls from going into page margin, by adding arbitrary newline (/a/134281)
+    \setcounter{biburlnumpenalty}{6000}
     \setcounter{biburllcpenalty}{7000}
     \setcounter{biburlucpenalty}{8000}
 
@@ -322,7 +328,7 @@
             \ifundef{\@lessxamkflag} % If bibstyle numeric, make authoryear-like
                 {\printbibliography[title={Further~Reading},notcategory=cited]}
                 {\printbibliography[title={Further~Reading},notcategory=cited,
-                    env=notnumbers,omitnumbers]}}
+                    env=notnumbers,omitnumbers]}} % Clarify: Change to "Uncited References"?
         \DeactivateWarningFilters[temp-bib]
 
         \clearpage
@@ -345,7 +351,7 @@
     \pretocmd{\label}{\ClassError{xamk}
         {label~command~not~supported~in~#1~environment,~
         use~citecaption~or~labelcaption~instead}{}}{}{}}
-\newrobustcmd*\@fullcitehyper[1]{ % Used to move citation hyperrefs to the LoF/LoT
+\newrobustcmd*\@fullcitehyper[1]{ % \fullcite that also moves bib hyperref to \fullcite
     \Hy@raisedlink{\hypertarget{cite.\the\c@refsection @#1}{}}\protect\fullcite{#1}}
 \NewDocumentCommand\@adddotifnotpunct{ m }{ % TODO: Punctuation from commands? (e.g. \lipsum)
     #1\str_case_e:nnF { \tl_item:Nn { #1 } { -1 } } % Check last character
@@ -409,22 +415,24 @@
         {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / \@xamk@pc}}}%
 
 % Official section/ToC formatting
-\ExplSyntaxOn
-\newcommand*\@xamktoclayout{
+\ifundef{\@lessxamkflag}{ % Patching doesn't work under expl3 syntax
     % Make section/subsection text size same as normal text
     \patchcmd{\section}{\Large}{\normalsize}{}{}
     \patchcmd{\subsection}{\large}{\normalsize}{}{}
+}{}
+\ExplSyntaxOn
+\ifundef{\@lessxamkflag}{
     % Capitalize sections (/a/555656)
     \let\old_section\section
     \RenewDocumentCommand{\section}{ s o m }{
         % TODO: Remove \tl_upper_case fallback (OL2020 and TL2021?)
         \tl_set:Nx\l_section_upper{\cs_if_exist:NTF{\text_uppercase:n}
-            {\text_uppercase:n{##3}}{\tl_upper_case:n{##3}}}
-        \IfBooleanTF{##1}
+            {\text_uppercase:n{#3}}{\tl_upper_case:n{#3}}}
+        \IfBooleanTF{#1}
             {\old_section*{\l_section_upper}}
-            {\IfNoValueTF{##2}
+            {\IfNoValueTF{#2}
                 {\old_section{\l_section_upper}}
-                {\old_section[##2]{\l_section_upper}}}}
+                {\old_section[#2]{\l_section_upper}}}}
 
     \renewcommand{\cftdot}{\textcolor{gray}{.}} % Change color
     \renewcommand{\cftdotsep}{2} % Make dots in ToC/LoF/LoT closer together
@@ -435,16 +443,16 @@
 
     % Make sections in ToC uppercase (/a/156917)
     \let\@oldcontentsline\contentsline
-    \def\contentsline##1##2{
-        \expandafter\ifx\csname l@##1\endcsname\l@section
+    \def\contentsline#1#2{
+        \expandafter\ifx\csname l@#1\endcsname\l@section
             \expandafter\@firstoftwo
         \else
             \expandafter\@secondoftwo
         \fi
-        {\@oldcontentsline{##1}{\MakeUppercase{##2}}}
-        {\@oldcontentsline{##1}{##2}}
+        {\@oldcontentsline{#1}{\MakeUppercase{#2}}}
+        {\@oldcontentsline{#1}{#2}}
     }
-}
+}{}
 \ExplSyntaxOff
 
 % Removes page number(s) from ToC page(s) (/a/180877)
@@ -467,7 +475,7 @@
 %\renewcommand{\numberline}[1]{\@cftbsnum #1\@cftasnum\quad\@cftasnumb} % Messes up LoF/LoT
 % TODO: Set proper spacing around floats
 % Official list of figures/tables formatting
-\newcommand*\@xamkloftlayout{
+\ifundef{\@lessxamkflag}{
     \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries ragged-right (/a/62006)
     % Remove LoF/LoT indents (fig/tab numbers have been moved into captions themselves)
     \cftsetindents{figure}{0pc}{0pc}
@@ -475,25 +483,27 @@
 
     \floatstyle{plaintop}\restylefloat{table} % Force table captions above tables (/a/22754)
     \floatstyle{plain}\restylefloat{figure} % Force figure captions below figures
-}
+}{}
 
 % Permanent, but "Before" needed for last footer to work, and appendices should be last anyways
 \BeforeBeginEnvironment{appendices}{
     \clearpage\pretocmd{\section}{%
-        \ifundef{\@firstapppass}{% Label used to get first appendix page number
-            \def\@firstapppass{}% Only run once (on first appendix)
-            \zref@label{firstappstart}}{}}{}{}
+        \ifundef{\@firstapppass}{% Only run once (on first appendix section)
+            \gdef\@firstapppass{}% \gdef needed for sections after appendices environment
+            \zref@label{firstappstart}}{}}{}{} % Label used to get first appendix page number
     \pagenumbering{arabic} % Reset numbering
     \renewcommand*{\thepage}{A\arabic{page}} % (/a/59574)
     \ifundef{\@lessxamkflag}% Clarify: Keep current page numbering, or (/a/239162)?
         {\fancyhead[C]{\makebox[\textwidth][c]{\textcolor{gray}{\thepage\ / A\@xamk@apc}}}}%
         {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / A\@xamk@apc}}}{}
 }
+% TODO: Utilize \appendix command instead of appendices environment?
+% The command makes more sense, since the formatting shouldn't be able to change back
 % Official appendix formatting
-\newcommand*\@xamkapplayout{
+\ifundef{\@lessxamkflag}{
     % Make appendix section titles use numbers instead of letters
     \apptocmd{\appendices}{\renewcommand{\thesection}{\arabic{section}}}{}{}
-    \AtBeginEnvironment{appendices}{
+    \BeforeBeginEnvironment{appendices}{ % "\At..." not used because header shouldn't revert
         \pretocmd{\section}{\resetpageaux}{}{} % Force appendix sections to start from new pages
         \renewcommand*{\@seccntformat}[1]{} % Remove appendix section title numbers
         \singlespacing % Set line spacing to 1
@@ -516,24 +526,16 @@
         \AtEndDvi{\edef\@currentlabel{\thepageaux}\label{\currentauxref}}
     }
     \AtEndEnvironment{appendices}{\clearpage} % Needed so appendix page counting works properly
-}
-\AfterEndEnvironment{appendices}{ % TODO: Find way to detect/block all content
-    \RenewDocumentCommand{\section}{ s o m }{\ClassError{xamk}%
-        {Nothing should come after the appendices environment}{}}
-    \RenewDocumentCommand{\subsection}{ s o m }{\ClassError{xamk}%
-        {Nothing should come after the appendices environment}{}}
-    \RenewDocumentCommand{\subsubsection}{ s o m }{\ClassError{xamk}%
-        {Nothing should come after the appendices environment}{}}
+}{}
+\AfterEndEnvironment{appendices}{ % Give error for contents after appendices (/a/559381)
+    \gdef\@afterapp{\ClassError{xamk}{Content found after the appendices environment}{}}
+    \par
+    \global\let\@nodocument\@afterapp
+    \global\everypar{\@afterapp}
 }
 
-% Apply the official XAMK layout (can be disabled with the lessxamk class option)
+% Miscellaneous official formatting
 \ifundef{\@lessxamkflag}{
-    \RequirePackage{helvet} % Provides the helvet font
-        \renewcommand*{\familydefault}{\sfdefault} % Set Helvet as default font
-        \RequirePackage[helvet]{sfmath} % Set Helvet as default font for math
-    \@xamktoclayout % Apply official section/ToC formatting
-    \@xamkloftlayout % Apply official list of figures/tables formatting
-    \@xamkapplayout % Apply official appendix formatting
     \onehalfspacing % Set line spacing to 1.5
     \AtBeginDocument{\raggedright} % Disable text justification (TODO: Is ragged2e needed?)
     \pretocmd{\include}{\ClassError{xamk}% There shouldn't be incomplete pages between sections
