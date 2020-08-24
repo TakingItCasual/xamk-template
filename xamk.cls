@@ -1,14 +1,15 @@
 % Unofficial LaTeX class file for XAMK assignments/theses/reports/etc.
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
-% For comments with a number in parentheses, append to "tex.stackexchange.com"
+% TeX.SX sources shown with number in parentheses, append to "tex.stackexchange.com"
 % Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live 2020 installation
 
 % TODO: Create proper formatting for bibliography
+% student.xamk.fi/studies-and-supporting-services/Documents/Referencing_guidelines.pdf
 % TODO: Formatting/commands/example for (list of) equations/symbols
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/21 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/24 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -122,8 +123,6 @@
         breakable,enhanced jigsaw}% Properly break across pages
 \RequirePackage{csquotes} % Recommended for use with biblatex
 \RequirePackage[titletoc]{appendix} % Prepends "Appendix #" to appendix sections in ToC
-    \pretocmd{\appendix}{\ClassError{xamk}%
-        {appendix command not supported, use appendices environment instead}{}}{}{}
 \RequirePackage[titles% Custom ToC formatting doesn't work without this...
     ]{tocloft} % Needed for ToC, LoF, and LoT formatting
 \RequirePackage{parskip} % Needed for vertical spacing (must be loaded after tocloft)
@@ -181,21 +180,21 @@
 \ifdef{\@reqbiblatexflag}{\bibincludedtrue}{}
 \ifbibincluded
 \WarningFilter[temp-file]{latex}{Writing or overwriting file}
-% Add doctype and lastmoddate bibliography database fields (/a/244144)
+% Add doctype and moddate bibliography database fields (/a/244144)
 \begin{filecontents*}[overwrite]{xamkbibdm.dbx}
 \DeclareDatamodelFields[type=field, datatype=literal]{doctype}
 \DeclareDatamodelFields[type=field, datatype=datepart]{
-    lastmodyear,
-    lastmodmonth,
-    lastmodday,
-    lastmodhour,
-    lastmodminute,
-    lastmodsecond,
-    lastmodtimezone,
-    lastmodseason,
+    modyear,
+    modmonth,
+    modday,
+    modhour,
+    modminute,
+    modsecond,
+    modtimezone,
+    modseason,
 }
-\DeclareDatamodelFields[type=field, datatype=date, skipout]{lastmoddate}
-\DeclareDatamodelEntryfields{doctype, lastmoddate}
+\DeclareDatamodelFields[type=field, datatype=date, skipout]{moddate}
+\DeclareDatamodelEntryfields{doctype, moddate}
 \end{filecontents*}
 \DeactivateWarningFilters[temp-file]
 \fi\endgroup
@@ -227,12 +226,12 @@
 
     % Create/modify bibliography string constants
     % Following/preceding periods/colons/spaces/etc. should be specified in the next section
-    \NewBibliographyString{wwwdoc, lastmodstr, urlpre}
+    \NewBibliographyString{wwwdoc, modstr, urlpre}
     \DefineBibliographyStrings{UKenglish}{%
-        nodate = {No date},
+        nodate = {No date},% Clarify: Uppercase in bibliography but lowercase in citations?
         urlseen = {Accessed},
         wwwdoc = {WWW document},
-        lastmodstr = {Updated},
+        modstr = {Updated},
         urlpre = {Available at}
     }
 
@@ -258,7 +257,7 @@
         \field{date}\field{year}\field{eventdate}\field{origdate}\literal{nodate}}
     \xpatchbibmacro{date+extradate}% Remove date's parentheses, add period before (/a/428193)
         {\printtext[parens]}{\setunit*{\addperiod\addspace}\printtext}{}{}
-    \DeclareFieldFormat{lastmoddate}{\bibstring{lastmodstr}\addspace#1}
+    \DeclareFieldFormat{moddate}{\bibstring{modstr}\addspace#1}
     \DeclareFieldFormat{url}{\bibstring{urlpre}\addcolon\addspace\url{#1}}
     \DeclareFieldFormat{pages}{#1} % Remove "pp. " prefix from pages in bibliography
     \DeclareFieldFormat{postnote}{#1} % Remove "pp. " prefix from pages in citation postnotes
@@ -267,12 +266,25 @@
         ]{title}{#1} % Remove title quotes from bibliography (/a/94090)
     \DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished%
         ]{citetitle}{#1} % Remove title quotes from citations (/a/94090)
-    \xpretobibmacro{url+urldate}{% Print doctype and lastmoddate before url+urldate
+    \xpretobibmacro{url+urldate}{% Print doctype and moddate before url+urldate
         {\iffieldundef{url}{}% If doctype not specified, default to wwwdoc string
             {\iffieldundef{doctype}{\bibstring{wwwdoc}}{\printfield{doctype}}%
             \setunit*{\addperiod\addspace}}}%
-        \iffieldundef{lastmodyear}{}% (/a/244144)
-            {\printlastmoddate\setunit*{\addperiod\addspace}}}{}{}
+        \iffieldundef{modyear}{}% (/a/244144)
+            {\printmoddate\setunit*{\addperiod\addspace}}}{}{}
+    \DefineBibliographyExtras{UKenglish}{% Remove ordinal st/nd/rd/th from dates (/a/366416)
+        \protected\def\mkbibdatelong#1#2#3{%
+            \iffieldundef{#3}{}{\stripzeros{\thefield{#3}}\iffieldundef{#2}{}{\nobreakspace}}%
+            \iffieldundef{#2}{}{\mkbibmonth{\thefield{#2}}\iffieldundef{#1}{}{\space}}%
+            \iffieldbibstring{#1}{\bibstring{\thefield{#1}}}{\stripzeros{\thefield{#1}}}}%
+        \protected\def\mkbibseasondateshort#1#2{%
+            \mkbibseason{\thefield{#2}}%
+            \iffieldundef{#1}{}{\space}%
+            \mkyearzeros{\thefield{#1}}}%
+        \protected\def\mkbibseasondatelong#1#2{%
+            \mkbibseason{\thefield{#2}}%
+            \iffieldundef{#1}{}{\space}%
+            \mkyearzeros{\thefield{#1}}}}
 
     \defbibenvironment{notnumbers}% Needed for authoryear-like bibstyle (/a/314071)
         {\list{}{%
@@ -313,7 +325,7 @@
 
         \clearpage
         \begin{singlespace}
-        % TODO: Apparently section not output if empty, but might not always be the case
+        % TODO: Apparently section not output if empty, check if always the case
         \WarningFilter[temp-bib]{latex}{Empty bibliography} % If bib empty, suppress warning
         \ifdef{\@lessxamkflag}
             {\printbibliography[category=cited]}
@@ -499,6 +511,8 @@
 }
 % TODO: Utilize \appendix command instead of appendices environment?
 % The command makes more sense, since the formatting shouldn't be able to change back
+\pretocmd{\appendix}{\ClassError{xamk}%
+    {appendix command not supported, use appendices environment instead}{}}{}{}
 % Official appendix formatting
 \ifundef{\@lessxamkflag}{
     % Make appendix section titles use numbers instead of letters
@@ -545,7 +559,6 @@
 % Colors used in title page
 \definecolor{xamklightblue}{RGB}{200, 200, 255}
 \definecolor{xamkdarkblue}{RGB}{11, 124, 164}
-
 % TikZ code for the page border used in the title page
 \newcommand*\xamkdrawpageborder{
     \coordinate[xshift=0.75cm , yshift=-0.75cm] (b1)  at (current page.north west);
@@ -653,9 +666,6 @@
     \end{tikzpicture}
 }
 
-% Include the title page in page numbering (/a/172005)
-\renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
-
 \newcommand*\@placehold[1]{$\langle$#1$\rangle$} % Places < > around text
 
 % The list of students. Supported formats are "<name> | <number> | <group>", and "<name>".
@@ -708,6 +718,8 @@
     \renewcommand*\xamkdegreeprogramme[1]{#1}
 }
 
+% Include the title page in page numbering (/a/172005)
+\renewenvironment{titlepage}{\thispagestyle{empty}}{} % Page number not printed though
 \ExplSyntaxOn
 % Set option for \maketitle command to be a thesis title page
 \keys_define:nn { xamk/maketitle }
