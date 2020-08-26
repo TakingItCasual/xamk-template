@@ -1,15 +1,11 @@
 % Unofficial LaTeX class file for XAMK assignments/theses/reports/etc.
 % This file is not meant to be modified, see xamk-template.tex instead
 % If you have issues/suggestions, see github.com/TakingItCasual/xamk-template
-% TeX.SX sources shown with number in parentheses, append to "tex.stackexchange.com"
+% TeX.SX sources shown in comments with "(/a/<number>)", append to "tex.stackexchange.com"
 % Tested with Overleaf (TeX Live version 2019) and a local Win10 TeX Live 2020 installation
 
-% TODO: Create proper formatting for bibliography
-% student.xamk.fi/studies-and-supporting-services/Documents/Referencing_guidelines.pdf
-% TODO: Formatting/commands/example for (list of) equations/symbols
-
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{xamk}[2020/08/24 TakingItCasual's XAMK assignment/thesis template]
+\ProvidesClass{xamk}[2020/08/26 TakingItCasual's XAMK assignment/thesis template]
 
 \DeclareOption{lessxamk}{\def\@lessxamkflag{}} % Do not use the official XAMK layout
 \DeclareOption{minted}{\def\@reqmintedflag{}} % Require the minted package
@@ -228,16 +224,18 @@
     % Following/preceding periods/colons/spaces/etc. should be specified in the next section
     \NewBibliographyString{wwwdoc, modstr, urlpre}
     \DefineBibliographyStrings{UKenglish}{%
-        nodate = {No date},% Clarify: Uppercase in bibliography but lowercase in citations?
+        nodate = {No date},% TODO: Uppercase in bibliography but lowercase in citations?
         urlseen = {Accessed},
         wwwdoc = {WWW document},
         modstr = {Updated},
         urlpre = {Available at}
     }
 
+    % TODO: Compliance with proper formatting can never be perfect, but it can be improved
+    % See student.xamk.fi/studies-and-supporting-services/Documents/Referencing_guidelines.pdf
     % TODO: Ensure \fullcite has identical output as in bibliography
-    % general:    github.com/plk/biblatex/blob/master/tex/latex/biblatex/biblatex.def
-    % authoryear: github.com/plk/biblatex/blob/master/tex/latex/biblatex/cbx/authoryear.cbx
+    % TODO: Formatting for laws/decrees/etc.
+    % TODO: Re-add cite changes to automatically add page counts (removed in commit 13e0780)?
     % Biblatex bibliography/citation format modifications
     \renewrobustcmd*{\mkbibemph}{} % Disable all bib italics (e.g. for titles) (/a/551547)
         \protected\long\def\blx@imc@mkbibemph#1{#1} % Also disable internal macro
@@ -340,7 +338,7 @@
             \ifundef{\@lessxamkflag} % If bibstyle numeric, make authoryear-like
                 {\printbibliography[title={Further~Reading},notcategory=cited]}
                 {\printbibliography[title={Further~Reading},notcategory=cited,
-                    env=notnumbers,omitnumbers]}} % Clarify: Change to "Uncited References"?
+                    env=notnumbers,omitnumbers]}}
         \DeactivateWarningFilters[temp-bib]
 
         \clearpage
@@ -387,10 +385,8 @@
             {\@oldcaption[##2]{##3}}
         \@oldlabel{#2:##1}}}
 \ExplSyntaxOff
-\AtBeginEnvironment{figure}{%
-    \@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
-\AtBeginEnvironment{table}{%
-    \@makecaptioncmds{table}{tab}{\tablename\ \thetable.}}
+\AtBeginEnvironment{figure}{\@makecaptioncmds{figure}{fig}{\figurename\ \thefigure.}}
+\AtBeginEnvironment{table}{\@makecaptioncmds{table}{tab}{\tablename\ \thetable.}}
 
 % TODO: Check (/a/54607) for fix for page broken urls affecting footer/header
 \RequirePackage[%
@@ -411,20 +407,20 @@
     \newgeometry{left=1.5cm, right=1.5cm, top=1.5cm, bottom=1.5cm}}
 \newcommand*\@tableofcontentsgeometry{% Custom page margins for the table of contents
     \newgeometry{left=1.75cm, right=1.75cm, top=1.75cm, bottom=1.75cm}}
-\RequirePackage[left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm%
-    ]{geometry} % Set page margins (must be loaded after hyperref? (/a/26592))
+\RequirePackage[left=1.5cm, right=1.5cm, top=2.0cm, bottom=2.0cm, headheight=15pt%
+    ]{geometry} % Needed to set page margins (must be loaded after hyperref? (/a/26592))
     \ifundef{\@lessxamkflag}{\@xamkpagegeometry}{}
 
+\ifundef{\@lessxamkflag}%
+    {\colorlet{pagenumcolor}{gray}}%
+    {\colorlet{pagenumcolor}{black}}
 % Allows customization of the header and footer
 \RequirePackage{fancyhdr} % Must be loaded after setting default geometry in preamble
     \pagestyle{fancy}
     \fancyhf{} % Clear header and footer defaults (/a/13897)
     \renewcommand\headrulewidth{0pc} % Remove header bar (/a/13897)
-    % Clarify: Page numbering as "# / #"? Should appendices be included?
-    \ifundef{\@lessxamkflag}% Also print total page count after current page number
-        {\fancyhead[C]{\makebox[\textwidth][c]{% Centering not needed now, but maybe later?
-            \textcolor{gray}{\thepage\ / \@xamk@pc}}}}% (/a/201063)
-        {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / \@xamk@pc}}}%
+    \fancyhead[C]{\makebox[\textwidth][c]{% Centering not needed now, but maybe later?
+        \textcolor{pagenumcolor}{\thepage}}}% (/a/201063)
 
 % Official section/ToC formatting
 \ifundef{\@lessxamkflag}{ % Patching doesn't work under expl3 syntax
@@ -485,7 +481,6 @@
 \setlength{\cftbeforetabskip}{0.5pc}
 % Section titles dynamically spaced from section numbers (/a/64124)
 %\renewcommand{\numberline}[1]{\@cftbsnum #1\@cftasnum\quad\@cftasnumb} % Messes up LoF/LoT
-% TODO: Set proper spacing around floats
 % Official list of figures/tables formatting
 \ifundef{\@lessxamkflag}{
     \renewcommand{\@tocrmarg}{2.55em plus1fil} % Set ToC/LoF/LoT entries ragged-right (/a/62006)
@@ -495,6 +490,11 @@
 
     \floatstyle{plaintop}\restylefloat{table} % Force table captions above tables (/a/22754)
     \floatstyle{plain}\restylefloat{figure} % Force figure captions below figures
+
+    % TODO: Same needed for other environments? Find better/global fix.
+    % Remove extra space below figures/tables (compensate for parskip's skip) (/a/238378)
+    \AfterEndEnvironment{figure}{\vskip-1.5pc}
+    \AfterEndEnvironment{table}{\vskip-1.5pc}
 }{}
 
 % Permanent, but "Before" needed for last footer to work, and appendices should be last anyways
@@ -505,9 +505,6 @@
             \zref@label{firstappstart}}{}}{}{} % Label used to get first appendix page number
     \pagenumbering{arabic} % Reset numbering
     \renewcommand*{\thepage}{A\arabic{page}} % (/a/59574)
-    \ifundef{\@lessxamkflag}% Clarify: Keep current page numbering, or (/a/239162)?
-        {\fancyhead[C]{\makebox[\textwidth][c]{\textcolor{gray}{\thepage\ / A\@xamk@apc}}}}%
-        {\fancyfoot[C]{\makebox[\textwidth][c]{\thepage\ / A\@xamk@apc}}}{}
 }
 % TODO: Utilize \appendix command instead of appendices environment?
 % The command makes more sense, since the formatting shouldn't be able to change back
@@ -524,7 +521,7 @@
         \setlength{\parskip}{1pc} % Match paragraph spacing with line spacing
 
         % Add "Appendix # (page # of #)" to the right header
-        \fancyhead[R]{\textcolor{gray}{Appendix \thesection\ (\apppagenumbers)}}
+        \fancyhead[R]{\textcolor{pagenumcolor}{Appendix \thesection\ (\apppagenumbers)}}
 
         % Maintain total page count for each appendix section (/a/82560)
         \newcounter{pageaux}
@@ -559,7 +556,7 @@
 % Colors used in title page
 \definecolor{xamklightblue}{RGB}{200, 200, 255}
 \definecolor{xamkdarkblue}{RGB}{11, 124, 164}
-% TikZ code for the page border used in the title page
+% TikZ code for the page border used in the title page (works regardless of page dimensions)
 \newcommand*\xamkdrawpageborder{
     \coordinate[xshift=0.75cm , yshift=-0.75cm] (b1)  at (current page.north west);
     \coordinate[xshift=-0.65cm, yshift=-0.75cm] (b2)  at (current page.north);
